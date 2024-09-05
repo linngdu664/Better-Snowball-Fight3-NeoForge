@@ -23,7 +23,7 @@ public class BSFTeamSavedData extends SavedData {
         }
     }
 
-    public BSFTeamSavedData(CompoundTag root) {
+    public BSFTeamSavedData(CompoundTag root, HolderLookup.Provider lookupProvider) {
         this();
         if (root.contains("BSFTeam")) {
             ListTag listTag = (ListTag) root.get("BSFTeam");

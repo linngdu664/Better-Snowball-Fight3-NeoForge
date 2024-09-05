@@ -4,10 +4,9 @@ import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.entity.executor.BlackHoleExecutor;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.network.ScreenshakeToClient;
+import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -103,7 +102,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
     private void startBlackHole() {
         List<Player> nearbyPlayers = level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
                 new AABB(this.position().add(100, 100, 100), this.position().subtract(100, 100, 100)));
-        nearbyPlayers.forEach(p -> NetworkRegister.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p), new ScreenshakeToClient(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.6F)));
+        nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenShakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.6F)));
         discard();
         Level level = level();
         Vec3 vec3 = getDeltaMovement();

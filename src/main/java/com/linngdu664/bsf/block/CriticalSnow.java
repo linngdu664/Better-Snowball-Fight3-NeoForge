@@ -30,7 +30,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @SuppressWarnings("deprecation")
 public class CriticalSnow extends Block implements EntityBlock {
     public CriticalSnow() {
-        super(Properties.copy(Blocks.SNOW).speedFactor(0.2F).jumpFactor(0.2F).noLootTable());
+        super(Properties.ofLegacyCopy(Blocks.SNOW).speedFactor(0.2F).jumpFactor(0.2F).noLootTable());
     }
 
     @Nullable
@@ -46,8 +46,8 @@ public class CriticalSnow extends Block implements EntityBlock {
     }
 
     @Override
-    public boolean isPathfindable(BlockState pState, BlockGetter pLevel, BlockPos pPos, PathComputationType pType) {
-        return pType.equals(PathComputationType.LAND);
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
+        return pathComputationType.equals(PathComputationType.LAND);
     }
 
     @Override

@@ -33,12 +33,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @SuppressWarnings("deprecation")
 public class SnowTrap extends Block {
     public SnowTrap() {
-        super(Properties.copy(Blocks.SNOW).noLootTable().randomTicks());
+        super(Properties.ofLegacyCopy(Blocks.SNOW).noLootTable().randomTicks());
     }
 
     @Override
-    public boolean isPathfindable(BlockState pState, BlockGetter pLevel, BlockPos pPos, PathComputationType pType) {
-        return pType.equals(PathComputationType.LAND);
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
+        return pathComputationType.equals(PathComputationType.LAND);
     }
 
     @Override

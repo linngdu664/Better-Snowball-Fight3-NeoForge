@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
@@ -51,7 +52,7 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
             targetConditions.selector(p -> p instanceof Enemy);
             target = snowGolem.level().getNearestEntity(snowGolem.level().getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else if (snowGolem.getLocator() == 2) {
-            BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team");
+            BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             targetConditions.selector(p -> !savedData.isSameTeam(snowGolem.getOwner(), p));
             target = snowGolem.level().getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else {

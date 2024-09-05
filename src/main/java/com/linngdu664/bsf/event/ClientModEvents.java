@@ -2,24 +2,25 @@ package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.model.*;
+import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientModEvents {
     public static final KeyMapping CYCLE_MOVE_AMMO_NEXT = new KeyMapping("key.bsf.ammo_switch_next", GLFW.GLFW_KEY_H, "key.categories.misc");
     public static final KeyMapping CYCLE_MOVE_AMMO_PREV = new KeyMapping("key.bsf.ammo_switch_prev", GLFW.GLFW_KEY_G, "key.categories.misc");
@@ -34,18 +35,18 @@ public class ClientModEvents {
     public static void setupClient(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemProperties.register(ItemRegister.COLD_COMPRESSION_JET_ENGINE.get(),
-                    new ResourceLocation("sc_xxx"), (itemStack, world, livingEntity, num) -> ((float) itemStack.getMaxDamage() - itemStack.getDamageValue()) / itemStack.getMaxDamage());
+                    ResourceLocation.withDefaultNamespace("sc_xxx"), (itemStack, world, livingEntity, num) -> ((float) itemStack.getMaxDamage() - itemStack.getDamageValue()) / itemStack.getMaxDamage());
             ItemProperties.register(ItemRegister.COLD_COMPRESSION_JET_ENGINE.get(),
-                    new ResourceLocation("sc_starting"), (itemStack, world, livingEntity, num) -> {
+                    ResourceLocation.withDefaultNamespace("sc_starting"), (itemStack, world, livingEntity, num) -> {
                         if (livingEntity == null || livingEntity.getUseItem() != itemStack) {
                             return 0.0F;
                         } else {
-                            float pct = (float) (itemStack.getUseDuration() - livingEntity.getUseItemRemainingTicks()) / ColdCompressionJetEngineItem.STARTUP_DURATION;
+                            float pct = (float) (itemStack.getUseDuration(livingEntity) - livingEntity.getUseItemRemainingTicks()) / ColdCompressionJetEngineItem.STARTUP_DURATION;
                             return pct > 1.4f ? 2.0f : pct;
                         }
                     });
             ItemProperties.register(ItemRegister.IMPLOSION_SNOWBALL_CANNON.get(),
-                    new ResourceLocation("cooling"), (itemStack, world, livingEntity, num) -> {
+                    ResourceLocation.withDefaultNamespace("cooling"), (itemStack, world, livingEntity, num) -> {
                         if (livingEntity instanceof Player player) {
                             return player.getCooldowns().getCooldownPercent(itemStack.getItem(), 1);
                         }else{
@@ -53,55 +54,55 @@ public class ClientModEvents {
                         }
                     });
             ItemProperties.register(ItemRegister.SNOWBALL_CANNON.get(),
-                    new ResourceLocation("pull"), (itemStack, world, livingEntity, num) -> {
+                    ResourceLocation.withDefaultNamespace("pull"), (itemStack, world, livingEntity, num) -> {
                         if (livingEntity == null) {
                             return 0.0F;
                         } else {
-                            return livingEntity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration() - livingEntity.getUseItemRemainingTicks()) / 20.0F;
+                            return livingEntity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration(livingEntity) - livingEntity.getUseItemRemainingTicks()) / 20.0F;
                         }
                     });
-            ItemProperties.register(ItemRegister.SNOWBALL_CANNON.get(), new ResourceLocation("pulling"), (itemStack, world, livingEntity, num)
+            ItemProperties.register(ItemRegister.SNOWBALL_CANNON.get(), ResourceLocation.withDefaultNamespace("pulling"), (itemStack, world, livingEntity, num)
                     -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
             ItemProperties.register(ItemRegister.FREEZING_SNOWBALL_CANNON.get(),
-                    new ResourceLocation("pull"), (itemStack, world, livingEntity, num) -> {
+                    ResourceLocation.withDefaultNamespace("pull"), (itemStack, world, livingEntity, num) -> {
                         if (livingEntity == null) {
                             return 0.0F;
                         } else {
-                            return livingEntity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration() - livingEntity.getUseItemRemainingTicks()) / 20.0F;
+                            return livingEntity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration(livingEntity) - livingEntity.getUseItemRemainingTicks()) / 20.0F;
                         }
                     });
-            ItemProperties.register(ItemRegister.FREEZING_SNOWBALL_CANNON.get(), new ResourceLocation("pulling"), (itemStack, world, livingEntity, num)
+            ItemProperties.register(ItemRegister.FREEZING_SNOWBALL_CANNON.get(), ResourceLocation.withDefaultNamespace("pulling"), (itemStack, world, livingEntity, num)
                     -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
             ItemProperties.register(ItemRegister.POWERFUL_SNOWBALL_CANNON.get(),
-                    new ResourceLocation("pull"), (itemStack, world, livingEntity, num) -> {
+                    ResourceLocation.withDefaultNamespace("pull"), (itemStack, world, livingEntity, num) -> {
                         if (livingEntity == null) {
                             return 0.0F;
                         } else {
-                            return livingEntity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration() - livingEntity.getUseItemRemainingTicks()) / 20.0F;
+                            return livingEntity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration(livingEntity) - livingEntity.getUseItemRemainingTicks()) / 20.0F;
                         }
                     });
-            ItemProperties.register(ItemRegister.POWERFUL_SNOWBALL_CANNON.get(), new ResourceLocation("pulling"), (itemStack, world, livingEntity, num)
+            ItemProperties.register(ItemRegister.POWERFUL_SNOWBALL_CANNON.get(), ResourceLocation.withDefaultNamespace("pulling"), (itemStack, world, livingEntity, num)
                     -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
-            ItemProperties.register(ItemRegister.GLOVE.get(), new ResourceLocation("using"), (itemStack, world, livingEntity, num)
+            ItemProperties.register(ItemRegister.GLOVE.get(), ResourceLocation.withDefaultNamespace("using"), (itemStack, world, livingEntity, num)
                     -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
-            ItemProperties.register(ItemRegister.JEDI_GLOVE.get(), new ResourceLocation("using"), (itemStack, world, livingEntity, num)
+            ItemProperties.register(ItemRegister.JEDI_GLOVE.get(), ResourceLocation.withDefaultNamespace("using"), (itemStack, world, livingEntity, num)
                     -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
-            ItemProperties.register(ItemRegister.LARGE_SNOWBALL_TANK.get(), new ResourceLocation("snowball"), (itemStack, world, livingEntity, num) -> {
-                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, itemStack.getOrCreateTag().getString("Snowball")));
+            ItemProperties.register(ItemRegister.LARGE_SNOWBALL_TANK.get(), ResourceLocation.withDefaultNamespace("snowball"), (itemStack, world, livingEntity, num) -> {
+                Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
                 if (item instanceof AbstractBSFSnowballItem snowballItem) {
                     return snowballItem.getIdForTank();
                 }
                 return -1;
             });
-            ItemProperties.register(ItemRegister.SNOWBALL_TANK.get(), new ResourceLocation("snowball"), (itemStack, world, livingEntity, num) -> {
-                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, itemStack.getOrCreateTag().getString("Snowball")));
+            ItemProperties.register(ItemRegister.SNOWBALL_TANK.get(), ResourceLocation.withDefaultNamespace("snowball"), (itemStack, world, livingEntity, num) -> {
+                Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
                 if (item instanceof AbstractBSFSnowballItem snowballItem) {
                     return snowballItem.getIdForTank();
                 }
                 return -1;
             });
-            ItemProperties.register(ItemRegister.SNOW_GOLEM_CONTAINER.get(), new ResourceLocation("has_golem"), (itemStack, world, livingEntity, num) -> itemStack.getOrCreateTag().getBoolean("HasGolem") ? 1.0F : 0.0F);
-            ItemProperties.register(ItemRegister.BASIN.get(), new ResourceLocation("snow_type"), (itemStack, world, livingEntity, num) -> (itemStack.getOrCreateTag().getByte("SnowType")));
+            ItemProperties.register(ItemRegister.SNOW_GOLEM_CONTAINER.get(), ResourceLocation.withDefaultNamespace("has_golem"), (itemStack, world, livingEntity, num) -> itemStack.getOrCreateTag().getBoolean("HasGolem") ? 1.0F : 0.0F);
+            ItemProperties.register(ItemRegister.BASIN.get(), ResourceLocation.withDefaultNamespace("snow_type"), (itemStack, world, livingEntity, num) -> (itemStack.getOrDefault(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 0)));
         });
     }
     // current max id for tank is 31 (icicle snowball)

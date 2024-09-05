@@ -2,7 +2,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.block.LooseSnowBlock;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
-import com.linngdu664.bsf.registry.BlockRegister;
+import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -46,9 +46,9 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        entityData.define(INVISIBLE, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(INVISIBLE, false);
     }
 
     @Override

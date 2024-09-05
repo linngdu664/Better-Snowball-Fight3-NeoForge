@@ -1,9 +1,9 @@
 package com.linngdu664.bsf.block.entity;
 
 import com.linngdu664.bsf.registry.BlockEntityRegister;
-import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import com.linngdu664.bsf.registry.*;
 
 public class CriticalSnowEntity extends BlockEntity {
     private int targetAge = BSFCommonUtil.staticRandInt(100, 140);
@@ -53,16 +53,16 @@ public class CriticalSnowEntity extends BlockEntity {
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
-        super.load(pTag);
-        age = pTag.getInt("age");
-        targetAge = pTag.getInt("target_age");
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        age = tag.getInt("age");
+        targetAge = tag.getInt("target_age");
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
-        super.saveAdditional(pTag);
-        pTag.putInt("age", age);
-        pTag.putInt("target_age", targetAge);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putInt("age", age);
+        tag.putInt("target_age", targetAge);
     }
 }

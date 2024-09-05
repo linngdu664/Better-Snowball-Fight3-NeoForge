@@ -80,8 +80,6 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
     /**
      * pXSpeed, pZSpeed and pYSpeed are the x, y and z coordinates of the rotation point.
      */
-
-    @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprite;
 

@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.EnumSet;
 
@@ -42,7 +43,7 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
                     if (!(ownerLastHurtBy instanceof Player)) {
                         return false;
                     }
-                    if (snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team").isSameTeam(owner, ownerLastHurtBy)) {
+                    if (snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team").isSameTeam(owner, ownerLastHurtBy)) {
                         return false;
                     }
                 }

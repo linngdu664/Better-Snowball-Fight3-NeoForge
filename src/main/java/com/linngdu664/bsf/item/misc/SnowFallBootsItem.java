@@ -25,6 +25,7 @@ public class SnowFallBootsItem extends ArmorItem {
         super(ArmorMaterialRegister.SNOW_FALL_BOOTS_ARMOR_MATERIAL, Type.BOOTS, new Properties().rarity(Rarity.UNCOMMON).stacksTo(1).durability(810));
     }
 
+    @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             @Override

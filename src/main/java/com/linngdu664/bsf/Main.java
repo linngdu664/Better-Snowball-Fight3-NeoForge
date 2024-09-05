@@ -24,7 +24,6 @@ public class Main {
         SoundRegister.SOUNDS.register(modEventBus);
         ParticleRegister.PARTICLES.register(modEventBus);
         EffectRegister.EFFECTS.register(modEventBus);
-        EnchantmentRegister.ENCHANTMENTS.register(modEventBus);
         EntityRegister.ENTITY_TYPES.register(modEventBus);
         CreativeTabRegister.CREATIVE_TABS.register(modEventBus);
 

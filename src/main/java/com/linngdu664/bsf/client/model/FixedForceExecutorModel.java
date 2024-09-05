@@ -2,6 +2,7 @@ package com.linngdu664.bsf.client.model;// Made with Blockbench 4.9.3
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.entity.executor.AbstractFixedForceExecutor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -10,16 +11,15 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 
 public class FixedForceExecutorModel<T extends AbstractFixedForceExecutor> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION1 = new ModelLayerLocation(new ResourceLocation("bsf", "textures/models/monster_gravity_executor.png"), "main");
-	public static final ModelLayerLocation LAYER_LOCATION2 = new ModelLayerLocation(new ResourceLocation("bsf", "textures/models/monster_repulsion_executor.png"), "main");
-	public static final ModelLayerLocation LAYER_LOCATION3 = new ModelLayerLocation(new ResourceLocation("bsf", "textures/models/projectile_gravity_executor.png"), "main");
-	public static final ModelLayerLocation LAYER_LOCATION4 = new ModelLayerLocation(new ResourceLocation("bsf", "textures/models/projectile_repulsion_executor.png"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION1 = new ModelLayerLocation(Main.makeResLoc("textures/models/monster_gravity_executor.png"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION2 = new ModelLayerLocation(Main.makeResLoc("textures/models/monster_repulsion_executor.png"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION3 = new ModelLayerLocation(Main.makeResLoc("textures/models/projectile_gravity_executor.png"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION4 = new ModelLayerLocation(Main.makeResLoc("textures/models/projectile_repulsion_executor.png"), "main");
 	private final ModelPart circle1;
 	private final ModelPart circle2;
 	private final ModelPart bb_main;
@@ -114,10 +114,10 @@ public class FixedForceExecutorModel<T extends AbstractFixedForceExecutor> exten
 	}
 
 	@Override
-	public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		circle1.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		circle2.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		bb_main.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+		circle1.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		circle2.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+		bb_main.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
 	}
 
 	public ModelPart getCircle1() {

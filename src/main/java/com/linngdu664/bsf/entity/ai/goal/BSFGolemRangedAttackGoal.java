@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -45,7 +46,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity livingEntity = golem.getTarget();
-        BSFTeamSavedData savedData = golem.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team");
+        BSFTeamSavedData savedData = golem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
         return livingEntity != null && !savedData.isSameTeam(golem.getOwner(), livingEntity) && livingEntity.isAlive() && golem.getStatus() != 1;
     }
 
@@ -68,7 +69,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
 
     private boolean canShoot(LivingEntity pTarget) {
         ItemStack weapon = golem.getWeapon();
-        if (!weapon.isEmpty() && !golem.hasEffect(EffectRegister.WEAPON_JAM.get())) {
+        if (!weapon.isEmpty() && !golem.hasEffect(EffectRegister.WEAPON_JAM)) {
             AbstractBSFWeaponItem weaponItem = (AbstractBSFWeaponItem) weapon.getItem();
             float v = 3.0F;
             float acc = 1.0F;
@@ -114,7 +115,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
                         if (y >= aabb.minY - 0.8 && y <= aabb.maxY + 0.8) {
                             LivingEntity owner = golem.getOwner();
                             if (golem.getLocator() == 0 && entity.getType().equals(golem.getTarget().getType())
-                                    || golem.getLocator() == 2 && !golem.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team").isSameTeam(entity, owner)
+                                    || golem.getLocator() == 2 && !golem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team").isSameTeam(entity, owner)
                                     || golem.getLocator() == 3 && (owner != null && (!(entity instanceof Player) && golem.wantsToAttack(entity, owner)
                                     || entity instanceof Player player && !player.isCreative() && !player.isSpectator() && !player.equals(owner))
                                     || owner == null && entity instanceof Player player && !player.isCreative() && !player.isSpectator())) {

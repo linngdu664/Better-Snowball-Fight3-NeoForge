@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:bow",
+    "bsf:snowball_cannon",
+    "bsf:freezing_snowball_cannon",
+    "bsf:powerful_snowball_cannon",
+    "bsf:snowball_machine_gun",
+    "bsf:snowman_in_hand"
+  ]
+}

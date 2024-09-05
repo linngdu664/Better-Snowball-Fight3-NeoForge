@@ -11,14 +11,13 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class BSFSnowGolemModel<T extends BSFSnowGolemEntity> extends EntityModel<T>  {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(Main.MODID, "bsf_snow_golem"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("bsf_snow_golem"), "main");
     private final ModelPart middle;
     private final ModelPart up;
     private final ModelPart down;
@@ -101,9 +100,9 @@ public class BSFSnowGolemModel<T extends BSFSnowGolemEntity> extends EntityModel
     }
 
     @Override
-    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        middle.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        up.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        down.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        middle.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        up.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        down.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 }

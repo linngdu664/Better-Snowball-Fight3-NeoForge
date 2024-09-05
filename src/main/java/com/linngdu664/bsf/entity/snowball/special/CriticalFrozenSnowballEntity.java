@@ -5,12 +5,11 @@ import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
-import com.linngdu664.bsf.network.ForwardRaysParticlesToClient;
+import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.registry.BlockRegister;
+import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,7 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import com.linngdu664.bsf.registry.*;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -84,10 +84,10 @@ public class CriticalFrozenSnowballEntity extends AbstractBSFSnowballEntity {
                                 } else if (level.getBlockEntity(blockPos1) instanceof CriticalSnowEntity blockEntity) {
                                     blockEntity.setAge(0);
                                     blockEntity.setChanged();
-                                    NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new ForwardRaysParticlesToClient(blockPos1.getCenter().add(-0.5, -0.4, -0.5), blockPos1.getCenter().add(0.5, -0.4, 0.5), new Vec3(0, 1, 0), 0.2, 0.6, getLaunchFrom() == LaunchFrom.FREEZING_CANNON ? 10 : 5, BSFParticleType.SNOWFLAKE.ordinal()));
+                                    PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(blockPos1.getCenter().add(-0.5, -0.4, -0.5), blockPos1.getCenter().add(0.5, -0.4, 0.5), new Vec3(0, 1, 0), 0.2, 0.6, getLaunchFrom() == LaunchFrom.FREEZING_CANNON ? 10 : 5), BSFParticleType.SNOWFLAKE.ordinal()));
                                 } else if (blockState.canBeReplaced() && newBlock.canSurvive(level, blockPos1)) {
                                     level.setBlockAndUpdate(blockPos1, newBlock);
-                                    NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new ForwardRaysParticlesToClient(blockPos1.getCenter().add(-0.5, -0.4, -0.5), blockPos1.getCenter().add(0.5, -0.4, 0.5), new Vec3(0, 1, 0), 0.2, 0.6, getLaunchFrom() == LaunchFrom.FREEZING_CANNON ? 10 : 5, BSFParticleType.SNOWFLAKE.ordinal()));
+                                    PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(blockPos1.getCenter().add(-0.5, -0.4, -0.5), blockPos1.getCenter().add(0.5, -0.4, 0.5), new Vec3(0, 1, 0), 0.2, 0.6, getLaunchFrom() == LaunchFrom.FREEZING_CANNON ? 10 : 5), BSFParticleType.SNOWFLAKE.ordinal()));
                                 }
                             }
                         }

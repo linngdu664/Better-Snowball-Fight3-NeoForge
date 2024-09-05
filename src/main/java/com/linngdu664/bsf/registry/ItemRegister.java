@@ -63,7 +63,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> CHERRY_BLOSSOM_SNOWBALL = ITEMS.register("cherry_blossom_snowball", CherryBlossomSnowballItem::new);
     public static final DeferredItem<Item> GHOST_SNOWBALL = ITEMS.register("ghost_snowball", GhostSnowballItem::new);
 
-    public static final DeferredItem<Item> SNOWBALL_TANK = ITEMS.register("snowball_tank", SnowballTankItem::new);
+    public static final DeferredItem<Item> SNOWBALL_TANK = ITEMS.register("snowball_tank", () -> new SnowballTankItem());
     public static final DeferredItem<Item> LARGE_SNOWBALL_TANK = ITEMS.register("large_snowball_tank", LargeSnowballTankItem::new);
 
     public static final DeferredItem<Item> WOOD_SNOWBALL_CLAMP = ITEMS.register("wood_snowball_clamp", () -> new SnowballClampItem(Tiers.WOOD, 118));
@@ -73,7 +73,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> DIAMOND_SNOWBALL_CLAMP = ITEMS.register("diamond_snowball_clamp", () -> new SnowballClampItem(Tiers.DIAMOND, 3122));
     public static final DeferredItem<Item> NETHERITE_SNOWBALL_CLAMP = ITEMS.register("netherite_snowball_clamp", () -> new SnowballClampItem(Tiers.NETHERITE, 4062));
     public static final DeferredItem<Item> EMERALD_SNOWBALL_CLAMP = ITEMS.register("emerald_snowball_clamp", () -> new SnowballClampItem(BSFTiers.EMERALD, 2866));
-    public static final DeferredItem<Item> SNOWBALL_CANNON = ITEMS.register("snowball_cannon", SnowballCannonItem::new);
+    public static final DeferredItem<Item> SNOWBALL_CANNON = ITEMS.register("snowball_cannon", () -> new SnowballCannonItem());
     public static final DeferredItem<Item> POWERFUL_SNOWBALL_CANNON = ITEMS.register("powerful_snowball_cannon", PowerfulSnowballCannonItem::new);
     public static final DeferredItem<Item> FREEZING_SNOWBALL_CANNON = ITEMS.register("freezing_snowball_cannon", FreezingSnowballCannonItem::new);
     public static final DeferredItem<Item> IMPLOSION_SNOWBALL_CANNON = ITEMS.register("implosion_snowball_cannon", ImplosionSnowballCannonItem::new);

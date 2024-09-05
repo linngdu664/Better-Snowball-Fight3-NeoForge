@@ -1,0 +1,18 @@
+{
+  "description": {
+    "translate": "enchantment.bsf.kinetic_energy_storage"
+  },
+  "max_level": 3,
+  "weight": 10,
+  "min_cost": {
+    "base": 5,
+    "per_level_above_first": 10
+  },
+  "max_cost": {
+    "base": 15,
+    "per_level_above_first": 10
+  },
+  "anvil_cost": 4,
+  "supported_items": ["bsf:snow_fall_boots"],
+  "slots": ["feet"]
+}

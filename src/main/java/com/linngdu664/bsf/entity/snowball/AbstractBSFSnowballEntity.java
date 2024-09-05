@@ -187,10 +187,10 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
                     player.isUsingItem() && isHeadingToSnowball(player) && canBeCaught()) {
                 player.getInventory().placeItemBackInInventory(new ItemStack(getDefaultItem()));
                 if (mainHand.getItem() instanceof GloveItem glove) {
-                    mainHand.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+                    mainHand.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                     glove.releaseUsing(mainHand, level, player, 1);
                 } else if (offHand.getItem() instanceof GloveItem glove) {
-                    offHand.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.OFFHAND));
+                    offHand.hurtAndBreak(1, player, EquipmentSlot.OFFHAND);
                     glove.releaseUsing(offHand, level, player, 1);
                 }
                 if (!level.isClientSide) {

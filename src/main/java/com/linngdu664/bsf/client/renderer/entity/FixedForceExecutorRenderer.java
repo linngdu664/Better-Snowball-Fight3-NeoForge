@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.client.renderer.entity;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.model.FixedForceExecutorModel;
 import com.linngdu664.bsf.entity.executor.AbstractFixedForceExecutor;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -63,16 +64,16 @@ public class FixedForceExecutorRenderer extends EntityRenderer<AbstractFixedForc
     private ResourceLocation getTexture() {
         switch (layerType) {
             case MONSTER_GRAVITY -> {
-                return new ResourceLocation("bsf:textures/models/monster_gravity_executor.png");
+                return Main.makeResLoc("textures/models/monster_gravity_executor.png");
             }
             case MONSTER_REPULSION -> {
-                return new ResourceLocation("bsf:textures/models/monster_repulsion_executor.png");
+                return Main.makeResLoc("textures/models/monster_repulsion_executor.png");
             }
             case PROJECTILE_GRAVITY -> {
-                return new ResourceLocation("bsf:textures/models/projectile_gravity_executor.png");
+                return Main.makeResLoc("textures/models/projectile_gravity_executor.png");
             }
             default -> {
-                return new ResourceLocation("bsf:textures/models/projectile_repulsion_executor.png");
+                return Main.makeResLoc("textures/models/projectile_repulsion_executor.png");
             }
         }
     }

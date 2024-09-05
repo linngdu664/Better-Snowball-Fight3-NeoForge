@@ -1,8 +1,9 @@
 package com.linngdu664.bsf.block;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.registry.BlockRegister;
+import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.registry.EntityRegister;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,10 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
@@ -24,7 +23,6 @@ import net.minecraft.world.level.block.state.pattern.BlockPattern;
 import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
 import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -33,14 +31,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class SmartSnowBlock extends HorizontalDirectionalBlock {
+    public static final MapCodec<SmartSnowBlock> CODEC = simpleCodec(SmartSnowBlock::new);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
     private static final Predicate<BlockState> PUMPKINS_PREDICATE = (p_51396_) -> p_51396_ != null && p_51396_.is(BlockRegister.SMART_SNOW_BLOCK.get());
     private BlockPattern snowGolemFull;
 
-    public SmartSnowBlock() {
-        super(Properties.of().mapColor(MapColor.SNOW).strength(0.5F).sound(SoundType.SNOW));
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+    public SmartSnowBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+        this.registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -75,7 +74,7 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
                 level.levelEvent(2001, blockInWorld.getPos(), Block.getId(blockInWorld.getState()));
             }
             BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(level);
-            snowGolem.setTame(true);
+            snowGolem.setTame(true, false);
             snowGolem.setOwnerUUID(player.getUUID());
             snowGolem.setOrderedToSit(true);
             snowGolem.setDropEquipment(true);
@@ -97,5 +96,10 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
             snowGolemFull = BlockPatternBuilder.start().aisle("^", "#", "#").where('^', BlockInWorld.hasState(PUMPKINS_PREDICATE)).where('#', BlockInWorld.hasState(BlockStatePredicate.forBlock(Blocks.SNOW_BLOCK))).build();
         }
         return snowGolemFull;
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
     }
 }

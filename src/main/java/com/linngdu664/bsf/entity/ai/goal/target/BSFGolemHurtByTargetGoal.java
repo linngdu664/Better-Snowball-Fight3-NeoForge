@@ -7,6 +7,7 @@ import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.saveddata.SavedData;
 
 public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
     private final BSFSnowGolemEntity snowGolem;
@@ -27,7 +28,7 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
                 return super.canUse();
             }
         } else if (snowGolem.getLocator() == 2) {
-            BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team");
+            BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             LivingEntity target = snowGolem.getLastHurtByMob();
             LivingEntity owner = snowGolem.getOwner();
             if (target instanceof Player && !savedData.isSameTeam(target, owner) || target instanceof OwnableEntity ownableEntity && !savedData.isSameTeam(target, ownableEntity.getOwner())) {

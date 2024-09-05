@@ -3,6 +3,7 @@ package com.linngdu664.bsf.client.model;// Made with Blockbench 4.4.2
 // Paste this class into your mod and generate all required imports
 
 
+import com.linngdu664.bsf.Main;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -10,13 +11,12 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 public class SnowFallBootsModel<T extends Entity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "snow_fall_boots"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("snow_fall_boots"), "main");
     public final ModelPart bone;
 
     public SnowFallBootsModel(ModelPart root) {
@@ -55,7 +55,7 @@ public class SnowFallBootsModel<T extends Entity> extends EntityModel<T> {
     }
 
     @Override
-    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        bone.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
+        bone.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 }

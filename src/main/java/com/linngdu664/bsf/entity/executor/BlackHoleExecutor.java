@@ -103,14 +103,14 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        entityData.define(RANK, 30);
-        entityData.define(ANGLE1, 0f);
-        entityData.define(AXIS, new Vector3f(1, 0, 0));
-        entityData.define(PROJECTION, new Vector3f(1, 0, 0));
-        entityData.define(SHAFT, new Vector3f(0, 1, 0));
-        entityData.define(OBLIQUITY, 0f);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(RANK, 30);
+        builder.define(ANGLE1, 0f);
+        builder.define(AXIS, new Vector3f(1, 0, 0));
+        builder.define(PROJECTION, new Vector3f(1, 0, 0));
+        builder.define(SHAFT, new Vector3f(0, 1, 0));
+        builder.define(OBLIQUITY, 0f);
     }
 
     @Override

@@ -1,15 +1,15 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.network.ForwardConeParticlesToClient;
+import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
+import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -35,9 +35,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -50,17 +49,18 @@ public class BasinItem extends Item {
     @Override
     public @NotNull InteractionResult useOn(UseOnContext pContext) {
         ItemStack itemStack = pContext.getItemInHand();
-        if (!itemStack.getOrCreateTag().contains("SnowType")) {
+        int snowType = itemStack.getOrDefault(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 0);
+        if (snowType == 0) {
             Player player = pContext.getPlayer();
             Level level = pContext.getLevel();
             Block block = level.getBlockState(pContext.getClickedPos()).getBlock();
             if (player != null) {
                 if (block.equals(Blocks.SNOW_BLOCK) || block.equals(Blocks.SNOW)) {
-                    itemStack.getOrCreateTag().putByte("SnowType", (byte) 1);
+                    itemStack.set(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 1);
                     player.awardStat(Stats.ITEM_USED.get(this));
                     return InteractionResult.SUCCESS;
                 } else if (block.equals(Blocks.POWDER_SNOW)) {
-                    itemStack.getOrCreateTag().putByte("SnowType", (byte) 2);
+                    itemStack.set(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 2);
                     player.awardStat(Stats.ITEM_USED.get(this));
                     return InteractionResult.SUCCESS;
                 }
@@ -71,7 +71,8 @@ public class BasinItem extends Item {
 
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        if (!itemStack.getOrCreateTag().contains("SnowType")) {
+        int snowType = itemStack.getOrDefault(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 0);
+        if (snowType == 0) {
             return InteractionResultHolder.pass(itemStack);
         }
         Vec3 cameraVec = Vec3.directionFromRotation(pPlayer.getXRot(), pPlayer.getYRot());
@@ -84,14 +85,14 @@ public class BasinItem extends Item {
                 Vec3 vec32 = new Vec3(p.getX() - pPlayer.getX(), p.getY() - pPlayer.getEyeY(), p.getZ() - pPlayer.getZ());
                 return BSFCommonUtil.vec3AngleCos(vec31, cameraVec) > 0.9363291776 && isNotBlocked(vec31, vec32, pPlayer, pLevel);
             });
-            NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> pPlayer), new ForwardConeParticlesToClient(pPlayer.getEyePosition(), cameraVec, 4.5F, 30, 0.5F, 0.2, BSFParticleType.SNOWFLAKE.ordinal()));
-            if (itemStack.getOrCreateTag().getByte("SnowType") == 1) {
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(pPlayer.getEyePosition(), cameraVec, 4.5F, 30, 0.5F, 0.2), BSFParticleType.SNOWFLAKE.ordinal()));
+            if (snowType == 1) {
                 addEffectsToLivingEntities(list, pPlayer, pLevel, p -> p < 5F ? 180 : (int) (180F - 6.6666667F * (p - 5F) * (p - 5F) * (p - 5F)), p -> p < 5F ? 2 : 1, 20);
             } else {
                 addEffectsToLivingEntities(list, pPlayer, pLevel, p -> p < 4F ? 240 : (int) (-4F * p * p * p + 49F * p * p - 200F * p + 512F), p -> p < 3.0F ? 3 : (p < 6.0F ? 2 : 1), 30);
             }
             if (!pPlayer.getAbilities().instabuild) {
-                itemStack.getOrCreateTag().remove("SnowType");
+                itemStack.remove(DataComponentRegister.BASIN_SNOW_TYPE);
             }
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.POWDER_SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
@@ -101,9 +102,9 @@ public class BasinItem extends Item {
 
     @Override
     public @NotNull Component getName(ItemStack pStack) {
-        CompoundTag compoundTag = pStack.getOrCreateTag();
-        if (compoundTag.contains("SnowType")) {
-            if (compoundTag.getByte("SnowType") == 1) {
+        int snowType = pStack.getOrDefault(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 0);
+        if (snowType != 0) {
+            if (snowType == 1) {
                 return MutableComponent.create(new TranslatableContents("item.bsf.basin_of_snow", null, new Object[0]));
             }
             return MutableComponent.create(new TranslatableContents("item.bsf.basin_of_powder_snow", null, new Object[0]));
@@ -112,10 +113,10 @@ public class BasinItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("basin0.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("basin1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("basin2.tooltip", null, new Object[]{Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("basin0.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("basin1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("basin2.tooltip", null, new Object[]{Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     /**
@@ -189,7 +190,7 @@ public class BasinItem extends Item {
                 livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, (int) (t * 0.5), amp));
                 livingEntity.hurt(pLevel.damageSources().playerAttack(pPlayer), Float.MIN_VALUE);
             }
-            livingEntity.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM.get(), jamTime, 0));
+            livingEntity.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, jamTime, 0));
         }
     }
 }

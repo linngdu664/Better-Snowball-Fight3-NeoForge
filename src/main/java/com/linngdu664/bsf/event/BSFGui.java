@@ -7,10 +7,8 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -42,7 +40,7 @@ public class BSFGui {
         public int holeHeight;
 
         public GuiTexture(String path, int holeWidth, int holeHeight) {
-            this.texture = new ResourceLocation(Main.MODID, path);
+            this.texture = Main.makeResLoc(path);
             this.holeWidth = holeWidth;
             this.holeHeight = holeHeight;
         }
@@ -113,18 +111,14 @@ public class BSFGui {
 
 //        renderFillTool(guiGraphics);
     }
-    public static void renderFillTool(GuiGraphics guiGraphics, Vec2 a, Vec2 b, Vec2 c, Vec2 d, int pColor){
+    public static void renderFillTool(GuiGraphics guiGraphics, Vec2 a, Vec2 b, Vec2 c, Vec2 d, int pColor) {
         Matrix4f matrix4f = guiGraphics.pose.last().pose();
 
-        float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
-        float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
-        float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
-        float f2 = (float) FastColor.ARGB32.blue(pColor) / 255.0F;
         VertexConsumer vertexconsumer = guiGraphics.bufferSource.getBuffer(RenderType.gui());
-        vertexconsumer.vertex(matrix4f, a.x, a.y, 0).color(f, f1, f2, f3).endVertex();
-        vertexconsumer.vertex(matrix4f, b.x,b.y, 0).color(f, f1, f2, f3).endVertex();
-        vertexconsumer.vertex(matrix4f, c.x,c.y, 0).color(f, f1, f2, f3).endVertex();
-        vertexconsumer.vertex(matrix4f, d.x,d.y, 0).color(f, f1, f2, f3).endVertex();
+        vertexconsumer.addVertex(matrix4f, a.x, a.y, 0).setColor(pColor);
+        vertexconsumer.addVertex(matrix4f, b.x, b.y, 0).setColor(pColor);
+        vertexconsumer.addVertex(matrix4f, c.x, c.y, 0).setColor(pColor);
+        vertexconsumer.addVertex(matrix4f, d.x, d.y, 0).setColor(pColor);
         guiGraphics.flushIfUnmanaged();
     }
 

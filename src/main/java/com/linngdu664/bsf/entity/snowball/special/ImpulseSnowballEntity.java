@@ -4,6 +4,7 @@ import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.network.ScreenshakeToClient;
+import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -22,6 +23,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -76,7 +78,7 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
                 entity.push(aVec.x, aVec.y, aVec.z);
                 if (entity instanceof ServerPlayer player) {
                     player.connection.send(new ClientboundSetEntityMotionPacket(entity));
-                    NetworkRegister.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ScreenshakeToClient(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
+                    PacketDistributor.sendToPlayer(player, new ScreenShakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
                 }
             }
         }

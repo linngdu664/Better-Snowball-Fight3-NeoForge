@@ -17,7 +17,7 @@ public class LooseSnowBlock extends Block {
     public static final IntegerProperty FROZEN = IntegerProperty.create("frozen", 0, 1);
 
     public LooseSnowBlock() {
-        super(Properties.copy(Blocks.SNOW_BLOCK)
+        super(Properties.ofLegacyCopy(Blocks.SNOW_BLOCK)
                 .noLootTable()
                 .noOcclusion()
                 .strength(0.1f)

@@ -8,16 +8,15 @@ import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
-import com.linngdu664.bsf.network.SwitchSoundToServer;
-import com.linngdu664.bsf.network.SwitchTweakerStatusModeToServer;
-import com.linngdu664.bsf.network.SwitchTweakerTargetModeToServer;
+import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;
+import com.linngdu664.bsf.network.to_server.SwitchTweakerStatusModePayload;
+import com.linngdu664.bsf.network.to_server.SwitchTweakerTargetModePayload;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -25,20 +24,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.ComputeFovModifierEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.LinkedList;
 
-@Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientForgeEvents {
     public static final RandomSource BSF_RANDOM_SOURCE = RandomSource.create();
 
@@ -48,13 +43,13 @@ public class ClientForgeEvents {
         Player player = minecraft.player;
         ItemStack itemStack = player.getMainHandItem();
         if (itemStack.is(ItemRegister.SCULK_SNOWBALL_LAUNCHER.get()) && player.isShiftKeyDown()) {
-            NetworkRegister.PACKET_HANDLER.sendToServer(new SwitchSoundToServer(event.getScrollDelta() > 0));
+            PacketDistributor.sendToServer(new SculkSnowballLauncherSwitchSoundPayload(event.getScrollDeltaY() > 0));
             event.setCanceled(true);
-        }else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keyShift.isDown()){
-            NetworkRegister.PACKET_HANDLER.sendToServer(new SwitchTweakerTargetModeToServer(event.getScrollDelta() < 0));
+        } else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keyShift.isDown()) {
+            PacketDistributor.sendToServer(new SwitchTweakerTargetModePayload(event.getScrollDeltaY() < 0));
             event.setCanceled(true);
-        }else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keySprint.isDown()){
-            NetworkRegister.PACKET_HANDLER.sendToServer(new SwitchTweakerStatusModeToServer(event.getScrollDelta() < 0));
+        } else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keySprint.isDown()) {
+            PacketDistributor.sendToServer(new SwitchTweakerStatusModePayload(event.getScrollDeltaY() < 0));
             event.setCanceled(true);
         }
     }
@@ -122,87 +117,85 @@ public class ClientForgeEvents {
                 event.setNewFovModifier(f);
             }
         }
-        
     }
 
     @SubscribeEvent
-    public static void onRenderOverlay(RenderGuiOverlayEvent.Pre event) {
-        if (event.getOverlay().equals(VanillaGuiOverlay.HOTBAR.type())) {
-            Minecraft instance = Minecraft.getInstance();
-            Player player = instance.player;
-            AbstractBSFWeaponItem weaponItem = null;
-            ItemStack mainHandItem = player.getMainHandItem();
-            ItemStack offHandItem = player.getOffhandItem();
-            if (mainHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
-                weaponItem = item;
-            } else if (offHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
-                weaponItem = item;
-            }
-            GuiGraphics guiGraphics = event.getGuiGraphics();
-            Window window = event.getWindow();
-            if (weaponItem != null) {
-                ItemStack current = weaponItem.getCurrentAmmoItemStack();
-                ItemStack prev = weaponItem.getPrevAmmoItemStack();
-                ItemStack next = weaponItem.getNextAmmoItemStack();
-                BSFGui.V2I v2I = BSFGui.SNOWBALL_GUI.renderCenterVertically(guiGraphics, window, 0);
-                int startPos = v2I.y;
-                guiGraphics.renderItem(prev, 3, startPos + 3);
-                guiGraphics.renderItem(current, 3, startPos + 23);
-                guiGraphics.renderItem(next, 3, startPos + 43);
-                guiGraphics.drawString(instance.font, String.valueOf(prev.getCount()), 24, startPos + 7, 0xffffffff);
-                guiGraphics.drawString(instance.font, String.valueOf(current.getCount()), 24, startPos + 27, 0xffffffff);
-                guiGraphics.drawString(instance.font, String.valueOf(next.getCount()), 24, startPos + 47, 0xffffffff);
-            }
-            HitResult pick = instance.hitResult;
-            BSFGui.V2I locateV2I = null,statusV2I = null;
-            if (pick.getType() == HitResult.Type.ENTITY && ((EntityHitResult) pick).getEntity() instanceof BSFSnowGolemEntity entity && player.equals(entity.getOwner())) {
-                byte locator = entity.getLocator();
-                byte status = entity.getStatus();
-                locateV2I = BSFGui.GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
-                locateV2I.set(locateV2I.x-1,locateV2I.y-1+locator*20);
-                BSFGui.GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
-                statusV2I = BSFGui.GOLEM_STATUS_GUI.renderRatio(guiGraphics,window,0.7,0.5,60,0);
-                statusV2I.set(statusV2I.x-1,statusV2I.y-1+status*20);
-                BSFGui.GOLEM_SELECTOR_GUI.render(guiGraphics, statusV2I.x, statusV2I.y);
+    public static void onRenderGui(RenderGuiEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.hideGui) {
+            return;
+        }
+        Player player = mc.player;
+        AbstractBSFWeaponItem weaponItem = null;
+        ItemStack mainHandItem = player.getMainHandItem();
+        ItemStack offHandItem = player.getOffhandItem();
+        if (mainHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
+            weaponItem = item;
+        } else if (offHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
+            weaponItem = item;
+        }
+        GuiGraphics guiGraphics = event.getGuiGraphics();
+        Window window = mc.getWindow();
+        if (weaponItem != null) {
+            ItemStack current = weaponItem.getCurrentAmmoItemStack();
+            ItemStack prev = weaponItem.getPrevAmmoItemStack();
+            ItemStack next = weaponItem.getNextAmmoItemStack();
+            BSFGui.V2I v2I = BSFGui.SNOWBALL_GUI.renderCenterVertically(guiGraphics, window, 0);
+            int startPos = v2I.y;
+            guiGraphics.renderItem(prev, 3, startPos + 3);
+            guiGraphics.renderItem(current, 3, startPos + 23);
+            guiGraphics.renderItem(next, 3, startPos + 43);
+            guiGraphics.drawString(mc.font, String.valueOf(prev.getCount()), 24, startPos + 7, 0xffffffff);
+            guiGraphics.drawString(mc.font, String.valueOf(current.getCount()), 24, startPos + 27, 0xffffffff);
+            guiGraphics.drawString(mc.font, String.valueOf(next.getCount()), 24, startPos + 47, 0xffffffff);
+        }
+        HitResult pick = mc.hitResult;
+        BSFGui.V2I locateV2I = null,statusV2I = null;
+        if (pick.getType() == HitResult.Type.ENTITY && ((EntityHitResult) pick).getEntity() instanceof BSFSnowGolemEntity entity && player.equals(entity.getOwner())) {
+            byte locator = entity.getLocator();
+            byte status = entity.getStatus();
+            locateV2I = BSFGui.GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
+            locateV2I.set(locateV2I.x-1,locateV2I.y-1+locator*20);
+            BSFGui.GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
+            statusV2I = BSFGui.GOLEM_STATUS_GUI.renderRatio(guiGraphics,window,0.7,0.5,60,0);
+            statusV2I.set(statusV2I.x-1,statusV2I.y-1+status*20);
+            BSFGui.GOLEM_SELECTOR_GUI.render(guiGraphics, statusV2I.x, statusV2I.y);
 //                BSFGui.renderLineTool(guiGraphics,50,50,100,100,0xffffffff);
+        }
+        ItemStack tweaker = null;
+        if (mainHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
+            tweaker = mainHandItem;
+        } else if (offHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
+            tweaker = offHandItem;
+        }
+        if (tweaker != null) {
+            byte status = tweaker.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0);
+            byte target = tweaker.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
+            BSFGui.V2I locateV2IT = BSFGui.TWEAKER_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5,30,0);
+            locateV2IT.set(locateV2IT.x-1, locateV2IT.y-1+target*20);
+            BSFGui.TWEAKER_SELECTOR_GUI.render(guiGraphics, locateV2IT.x, locateV2IT.y);
+            BSFGui.V2I statusV2IT = BSFGui.TWEAKER_STATUS_GUI.renderRatio(guiGraphics,window,0.7,0.5,90,0);
+            statusV2IT.set(statusV2IT.x-1, statusV2IT.y-1+status*20);
+            BSFGui.TWEAKER_SELECTOR_GUI.render(guiGraphics, statusV2IT.x, statusV2IT.y);
+            if (locateV2I!=null &&  locateV2I.y!=locateV2IT.y){
+                BSFGui.SETTER_ARROW.render(guiGraphics, locateV2I.x+23, locateV2IT.y+2);
             }
-            ItemStack tweaker = null;
-            if (mainHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
-                tweaker = mainHandItem;
-            } else if (offHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
-                tweaker = offHandItem;
-            }
-            if (tweaker != null) {
-                CompoundTag tag = tweaker.getOrCreateTag();
-                byte locator = tag.getByte("Locator");
-                byte status = tag.getByte("Status");
-                BSFGui.V2I locateV2IT = BSFGui.TWEAKER_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5,30,0);
-                locateV2IT.set(locateV2IT.x-1, locateV2IT.y-1+locator*20);
-                BSFGui.TWEAKER_SELECTOR_GUI.render(guiGraphics, locateV2IT.x, locateV2IT.y);
-                BSFGui.V2I statusV2IT = BSFGui.TWEAKER_STATUS_GUI.renderRatio(guiGraphics,window,0.7,0.5,90,0);
-                statusV2IT.set(statusV2IT.x-1, statusV2IT.y-1+status*20);
-                BSFGui.TWEAKER_SELECTOR_GUI.render(guiGraphics, statusV2IT.x, statusV2IT.y);
-                if (locateV2I!=null &&  locateV2I.y!=locateV2IT.y){
-                    BSFGui.SETTER_ARROW.render(guiGraphics, locateV2I.x+23, locateV2IT.y+2);
-                }
-                if (statusV2I!=null &&  statusV2I.y!=statusV2IT.y){
-                    BSFGui.SETTER_ARROW.render(guiGraphics, statusV2I.x+23, statusV2IT.y+2);
-                }
+            if (statusV2I!=null &&  statusV2I.y!=statusV2IT.y){
+                BSFGui.SETTER_ARROW.render(guiGraphics, statusV2I.x+23, statusV2IT.y+2);
             }
         }
     }
+
     @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase.equals(TickEvent.Phase.END)) {
-            Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.level != null) {
-                if (minecraft.isPaused()) {
-                    return;
-                }
-                Camera camera = minecraft.gameRenderer.getMainCamera();
-                ScreenshakeHandler.clientTick(camera, null);
-                ScreenshakeHandler.clientTick(camera, BSF_RANDOM_SOURCE);
+    public static void clientTick(ClientTickEvent.Post event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level != null) {
+            if (minecraft.isPaused()) {
+                return;
             }
+            Camera camera = minecraft.gameRenderer.getMainCamera();
+            ScreenshakeHandler.clientTick(camera, null);
+            ScreenshakeHandler.clientTick(camera, BSF_RANDOM_SOURCE);
         }
     }
 }

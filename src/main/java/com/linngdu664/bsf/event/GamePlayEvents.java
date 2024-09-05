@@ -7,11 +7,10 @@ import com.linngdu664.bsf.item.misc.IceSkatesItem;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
-import com.linngdu664.bsf.network.TeamMembersToClient;
+import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.EffectRegister;
-import com.linngdu664.bsf.registry.EnchantmentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
+import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import com.linngdu664.bsf.util.BSFTeamSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,6 +27,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.SnowGolem;
@@ -38,36 +38,37 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.BinomialDistributionGenerator;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.*;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
     public static final UUID SKATES_SPEED_ID = UUID.fromString("00a3641b-33e0-4022-8d92-1c7b74c380b0");
 
     @SubscribeEvent
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(LivingDamageEvent.Pre event) {
         if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {
-            BSFTeamSavedData savedData = player1.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team");
+            BSFTeamSavedData savedData = player1.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             int id = savedData.getTeam(player1.getUUID());
             String msgId = event.getSource().getMsgId();
             if (id >= 0 && id == savedData.getTeam(player2.getUUID()) && msgId.equals("thrown") && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
-                event.setCanceled(true);
+                event.setNewDamage(0);
             }
         }
     }
@@ -75,15 +76,15 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
-        BSFTeamSavedData savedData = player.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team");
-        NetworkRegister.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new TeamMembersToClient(savedData.getMembers(savedData.getTeam(player.getUUID()))));
+        BSFTeamSavedData savedData = player.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        PacketDistributor.sendToPlayer(player, new TeamMembersPayload(savedData.getMembers(savedData.getTeam(player.getUUID()))));
     }
 
     @SubscribeEvent
     public static void onLivingUseItemTick(LivingEntityUseItemEvent.Tick event) {
         LivingEntity livingEntity = event.getEntity();
         ItemStack itemStack = event.getItem();
-        if (EnchantmentHelper.getTagEnchantmentLevel(EnchantmentRegister.FLOATING_SHOOTING.get(), itemStack) > 0) {
+        if (EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(livingEntity, BSFEnchantmentHelper.FLOATING_SHOOTING), itemStack) > 0) {
             livingEntity.resetFallDistance();
             double vy = livingEntity.getDeltaMovement().y;
             livingEntity.push(0, -0.25 * vy, 0);
@@ -106,7 +107,7 @@ public class GamePlayEvents {
                     target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 2));
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 150, 1));
                 }
-                target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM.get(), 80, 0));
+                target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, 80, 0));
                 if (level instanceof ServerLevel serverLevel) {
                     serverLevel.sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getEyeY(), target.getZ(), 16, 0, 0, 0, 0);
                     serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getEyeY(), target.getZ(), 16, 0, 0, 0, 0.04);
@@ -126,7 +127,7 @@ public class GamePlayEvents {
                     target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1));
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 30, 1));
                 }
-                target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM.get(), 40, 0));
+                target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, 40, 0));
                 if (!player.getAbilities().instabuild) {
                     player.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
                 }
@@ -164,10 +165,11 @@ public class GamePlayEvents {
                     event.setDamageMultiplier(0);
                     float h = event.getDistance();
                     ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY(), player.getZ(), (int) h * 8, 0, 0, 0, h * 0.01);
-                    shoes.hurtAndBreak((int) Math.ceil((h - 3) * 0.25), player, (p) -> p.broadcastBreakEvent(EquipmentSlot.FEET));
+                    shoes.hurtAndBreak((int) Math.ceil((h - 3) * 0.25), player, EquipmentSlot.FEET);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                    if (EnchantmentHelper.getTagEnchantmentLevel(EnchantmentRegister.KINETIC_ENERGY_STORAGE.get(), shoes) > 0 && h > 5) {
-                        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, (int) h * 6, EnchantmentHelper.getTagEnchantmentLevel(EnchantmentRegister.KINETIC_ENERGY_STORAGE.get(), shoes) - 1));
+                    int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(player, BSFEnchantmentHelper.KINETIC_ENERGY_STORAGE), shoes);
+                    if (enchantmentLevel > 0 && h > 5) {
+                        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, (int) h * 6, enchantmentLevel - 1));
                     }
                 }
             }
@@ -176,7 +178,7 @@ public class GamePlayEvents {
 
     @SubscribeEvent
     public static void onLootTableLoad(LootTableLoadEvent event) {
-        if (event.getName().equals(new ResourceLocation("minecraft:chests/shipwreck_treasure")) || event.getName().equals(new ResourceLocation("minecraft:chests/igloo_chest"))) {
+        if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure")) || event.getName().equals(ResourceLocation.withDefaultNamespace("chests/igloo_chest"))) {
             LootTable lootTable = event.getTable();
             lootTable.addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1.0F))
@@ -184,7 +186,7 @@ public class GamePlayEvents {
                     .add(LootItem.lootTableItem(ItemRegister.SNOWBALL_CANNON_UPGRADE_SMITHING_TEMPLATE.get()))
                     .build());
             event.setTable(lootTable);
-        } else if (event.getName().equals(new ResourceLocation("minecraft:chests/pillager_outpost"))) {
+        } else if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"))) {
             LootTable lootTable = event.getTable();
             lootTable.addPool(LootPool.lootPool()
                     .setRolls(BinomialDistributionGenerator.binomial(2, 0.4F))
@@ -196,23 +198,21 @@ public class GamePlayEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            Player player = event.player;
-            ItemStack shoes = player.getItemBySlot(EquipmentSlot.FEET);
-            if (!shoes.isEmpty()) {
-                if (shoes.getItem() instanceof IceSkatesItem && player.isSprinting() && player.onGround()) {
-                    Level level = player.level();
-                    BlockPos pos = player.blockPosition().below();
-                    if (level.getBlockState(pos).is(BlockTags.ICE)) {
-                        level.addParticle(ParticleTypes.SNOWFLAKE, player.getX(), player.getEyeY() - 1.4, player.getZ(), 0, 0, 0);
-                        addSpeedGoodEffect(player);
-                    } else {
-                        addSpeedBadEffect(player);
-                    }
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+        Player player = event.getEntity();
+        ItemStack shoes = player.getItemBySlot(EquipmentSlot.FEET);
+        if (!shoes.isEmpty()) {
+            if (shoes.getItem() instanceof IceSkatesItem && player.isSprinting() && player.onGround()) {
+                Level level = player.level();
+                BlockPos pos = player.blockPosition().below();
+                if (level.getBlockState(pos).is(BlockTags.ICE)) {
+                    level.addParticle(ParticleTypes.SNOWFLAKE, player.getX(), player.getEyeY() - 1.4, player.getZ(), 0, 0, 0);
+                    addSpeedGoodEffect(player);
                 } else {
-                    clearSpeedEffect(player);
+                    addSpeedBadEffect(player);
                 }
+            } else {
+                clearSpeedEffect(player);
             }
         }
     }
@@ -235,26 +235,44 @@ public class GamePlayEvents {
         return false;
     }
 
+    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed_buff"), 0.15, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier SKATES_STEP_HEIGHT_BUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_buff"), 1.4, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed_debuff"), -0.25, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier SKATES_STEP_HEIGHT_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_debuff"), -0.1, AttributeModifier.Operation.ADD_VALUE);
+
     private static void clearSpeedEffect(Player player) {
-        if (player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED).getModifier(SKATES_SPEED_ID) != null) {
-            player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_ID);
-            player.setMaxUpStep(0.6f);
+        AttributeMap attributes = player.getAttributes();
+        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_debuff"))) {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_DEBUFF);
+            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_DEBUFF);
+        }
+        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_buff"))) {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_BUFF);
+            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_BUFF);
         }
     }
 
     private static void addSpeedGoodEffect(Player player) {
-        AttributeModifier skatesSpeed = new AttributeModifier(SKATES_SPEED_ID, "skates_speed", 0.15, AttributeModifier.Operation.ADDITION);
-        if (!player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED).hasModifier(skatesSpeed)) {
-            player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED).addPermanentModifier(skatesSpeed);
-            player.setMaxUpStep(2);
+        AttributeMap attributes = player.getAttributes();
+        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_debuff"))) {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_DEBUFF);
+            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_DEBUFF);
+        }
+        if (!attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_buff"))) {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).addPermanentModifier(SKATES_SPEED_BUFF);
+            attributes.getInstance(Attributes.STEP_HEIGHT).addPermanentModifier(SKATES_STEP_HEIGHT_BUFF);
         }
     }
 
     private static void addSpeedBadEffect(Player player) {
-        AttributeModifier skatesSpeed = new AttributeModifier(SKATES_SPEED_ID, "skates_speed", -0.25, AttributeModifier.Operation.MULTIPLY_BASE);
-        if (!player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED).hasModifier(skatesSpeed)) {
-            player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED).addPermanentModifier(skatesSpeed);
-            player.setMaxUpStep(0.5f);
+        AttributeMap attributes = player.getAttributes();
+        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_buff"))) {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_BUFF);
+            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_BUFF);
+        }
+        if (!attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_debuff"))) {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).addPermanentModifier(SKATES_SPEED_DEBUFF);
+            attributes.getInstance(Attributes.STEP_HEIGHT).addPermanentModifier(SKATES_STEP_HEIGHT_DEBUFF);
         }
     }
 }

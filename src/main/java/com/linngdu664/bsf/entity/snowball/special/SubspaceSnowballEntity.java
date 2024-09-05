@@ -3,8 +3,8 @@ package com.linngdu664.bsf.entity.snowball.special;
 import com.linngdu664.bsf.entity.Absorbable;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.network.SubspaceSnowballParticlesToClient;
-import com.linngdu664.bsf.network.SubspaceSnowballReleaseTraceParticlesToClient;
+import com.linngdu664.bsf.network.to_client.SubspaceSnowballParticlesPayload;
+import com.linngdu664.bsf.network.to_client.SubspaceSnowballReleaseTraceParticlesPayload;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,7 +24,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -133,7 +133,7 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         if (!level.isClientSide) {
             if (release){
                 Vec3 deltaMovement = this.getDeltaMovement();
-                NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this), new SubspaceSnowballReleaseTraceParticlesToClient(vec3.x, vec3.y, vec3.z, deltaMovement.x, deltaMovement.y, deltaMovement.z));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballReleaseTraceParticlesPayload(vec3.x, vec3.y, vec3.z, deltaMovement.x, deltaMovement.y, deltaMovement.z));
             }else{
                 ((ServerLevel) level).sendParticles(ParticleRegister.SUBSPACE_SNOWBALL_ATTACK_TRACE.get(), vec3.x, vec3.y+0.1, vec3.z, 1, 0, 0, 0, 0);
             }
@@ -157,7 +157,7 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                 float r = damage < 5 ? 2 : damage / 5 + 1;
                 List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.LIVING_ENTITY_STILL_ALIVE);
                 damageList(list,damage,r,location);
-                NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this), new SubspaceSnowballParticlesToClient(location.x, location.y, location.z, r,(int)(25*r)));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r,(int) (25 * r)));
             }
             level.playSound(null, location.x,location.y,location.z, SoundRegister.SUBSPACE_SNOWBALL_ATTACK.get(), SoundSource.PLAYERS, 1.3F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             this.discard();
@@ -176,7 +176,7 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                 float r = damage < 5 ? 2 : damage / 5 + 1;
                 List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_SPECTATORS);
                 damageList(list,damage,r,location);
-                NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> this), new SubspaceSnowballParticlesToClient(location.x, location.y, location.z, r,(int)(25*r)));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
                 this.discard();
             }
             level.playSound(null, location.x,location.y,location.z, SoundRegister.SUBSPACE_SNOWBALL_ATTACK.get(), SoundSource.PLAYERS, 0.7F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);

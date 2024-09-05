@@ -35,9 +35,9 @@ public abstract class AbstractExecutor extends Entity implements Absorbable {
     }
 
     @Override
-    protected void defineSynchedData() {
-        entityData.define(TIMER, 0);
-        entityData.define(MAX_TIME, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(TIMER, 0);
+        builder.define(MAX_TIME, 0);
     }
 
     @Override

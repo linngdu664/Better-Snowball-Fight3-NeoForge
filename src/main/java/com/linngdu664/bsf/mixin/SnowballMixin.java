@@ -15,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -72,10 +71,10 @@ public abstract class SnowballMixin extends ThrowableItemProjectile {
                     player.isUsingItem() && bsf$isHeadingToSnowball(player)) {
                 player.getInventory().placeItemBackInInventory(Items.SNOWBALL.getDefaultInstance(), true);
                 if (mainHand.getItem() instanceof GloveItem glove) {
-                    mainHand.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+                    mainHand.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                     glove.releaseUsing(mainHand, level, player, 1);
                 } else if (offHand.getItem() instanceof GloveItem glove) {
-                    offHand.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.OFFHAND));
+                    offHand.hurtAndBreak(1, player, EquipmentSlot.OFFHAND);
                     glove.releaseUsing(offHand, level, player, 1);
                 }
                 if (!level.isClientSide) {

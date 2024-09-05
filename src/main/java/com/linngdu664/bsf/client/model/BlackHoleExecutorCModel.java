@@ -2,6 +2,7 @@ package com.linngdu664.bsf.client.model;
 // Made with Blockbench 4.9.3
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.entity.snowball.special.BlackHoleSnowballEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -10,13 +11,12 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 
 public class BlackHoleExecutorCModel<T extends BlackHoleSnowballEntity> extends EntityModel<T> {
 	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("bsf:textures/models/black_hole_executor_c.png"), "main");
+	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("textures/models/black_hole_executor_c.png"), "main");
 	private final ModelPart body;
 	private final ModelPart plate;
 
@@ -2032,8 +2032,8 @@ public class BlackHoleExecutorCModel<T extends BlackHoleSnowballEntity> extends 
 	}
 
 	@Override
-	public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		plate.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, int i2) {
+		body.render(poseStack, vertexConsumer, i, i1, i2);
+		plate.render(poseStack, vertexConsumer, i, i1, i2);
 	}
 }
