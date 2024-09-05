@@ -8,9 +8,8 @@ import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
-import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -30,12 +29,7 @@ import java.util.List;
 public class SpectralSnowballItem extends AbstractBSFSnowballItem {
     public SpectralSnowballItem() {
         super(Rarity.UNCOMMON, new SnowballProperties().idForTank(9).allowLaunchTypeFlag(AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG));
-        DispenserBlock.registerBehavior(this, new AbstractProjectileDispenseBehavior() {
-            protected @NotNull Projectile getProjectile(@NotNull Level p_123476_, @NotNull Position p_123477_, @NotNull ItemStack p_123478_) {
-                return Util.make(new SpectralSnowballEntity(p_123476_, p_123477_.x(), p_123477_.y(), p_123477_.z()), (p_123474_) -> {
-                });
-            }
-        });
+        DispenserBlock.registerProjectileBehavior(this);
     }
 
     @Override
@@ -48,7 +42,14 @@ public class SpectralSnowballItem extends AbstractBSFSnowballItem {
         return new SpectralSnowballEntity(livingEntity, level, launchAdjustment);
     }
 
-//    @Override
+    @Override
+    public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
+        SpectralSnowballEntity snowball = new SpectralSnowballEntity(level, position.x(), position.y(), position.z());
+        snowball.setItem(itemStack);
+        return snowball;
+    }
+
+    //    @Override
 //    public int getTypeFlag() {
 //        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG;
 //    }

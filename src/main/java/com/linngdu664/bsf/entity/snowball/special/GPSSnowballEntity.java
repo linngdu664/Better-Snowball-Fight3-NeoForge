@@ -1,16 +1,15 @@
 package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
+import com.linngdu664.bsf.item.component.UuidData;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -48,7 +47,7 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
         if (!isCaught && pResult.getEntity() instanceof LivingEntity livingEntity && targetLocator != null) {
-            targetLocator.getOrCreateTag().putUUID("UUID", livingEntity.getUUID());
+            targetLocator.set(DataComponentRegister.TARGET_UUID, new UuidData(livingEntity.getUUID()));
             if (getOwner() instanceof Player player) {
 //                player.displayClientMessage(MutableComponent.create(new TranslatableContents("target.tip", null, new Object[0])).append(livingEntity.getName().getString() + " UUID:" + livingEntity.getUUID()), false);
                 if (pResult.getEntity() instanceof Player player1) {
@@ -56,7 +55,7 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
                 }
                 level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.7F, 1.0F / (level().getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }
-            targetLocator.setHoverName(MutableComponent.create(new TranslatableContents("item.bsf.target_locator", null, new Object[]{}))
+            targetLocator.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new TranslatableContents("item.bsf.target_locator", null, new Object[]{}))
                     .append(": ").append(MutableComponent.create(new TranslatableContents("target.tip", null, new Object[]{})))
                     .append(livingEntity.getName().getString() + "  UUID: " + livingEntity.getUUID()));
         }

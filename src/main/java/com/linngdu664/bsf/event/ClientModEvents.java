@@ -101,7 +101,7 @@ public class ClientModEvents {
                 }
                 return -1;
             });
-            ItemProperties.register(ItemRegister.SNOW_GOLEM_CONTAINER.get(), ResourceLocation.withDefaultNamespace("has_golem"), (itemStack, world, livingEntity, num) -> itemStack.getOrCreateTag().getBoolean("HasGolem") ? 1.0F : 0.0F);
+            ItemProperties.register(ItemRegister.SNOW_GOLEM_CONTAINER.get(), ResourceLocation.withDefaultNamespace("has_golem"), (itemStack, world, livingEntity, num) -> itemStack.has(DataComponentRegister.SNOW_GOLEM_DATA) ? 1.0F : 0.0F);
             ItemProperties.register(ItemRegister.BASIN.get(), ResourceLocation.withDefaultNamespace("snow_type"), (itemStack, world, livingEntity, num) -> (itemStack.getOrDefault(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 0)));
         });
     }

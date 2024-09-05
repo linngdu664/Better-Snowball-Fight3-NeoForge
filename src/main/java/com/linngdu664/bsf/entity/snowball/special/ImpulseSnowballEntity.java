@@ -3,7 +3,6 @@ package com.linngdu664.bsf.entity.snowball.special;
 import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.network.ScreenshakeToClient;
 import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
@@ -22,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 

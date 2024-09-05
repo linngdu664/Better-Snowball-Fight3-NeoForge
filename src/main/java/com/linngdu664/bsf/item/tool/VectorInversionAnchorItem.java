@@ -1,9 +1,8 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.client.screenshake.Easing;
-import com.linngdu664.bsf.network.ScreenshakeToClient;
-import com.linngdu664.bsf.network.VectorInversionParticleToClient;
-import com.linngdu664.bsf.registry.NetworkRegister;
+import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
+import com.linngdu664.bsf.network.to_client.VectorInversionParticlesPayload;
 import com.linngdu664.bsf.registry.SoundRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,7 +23,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,20 +48,21 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
                         double z = 0.5 * (aabb.maxZ - aabb.minZ);
                         ((ServerLevel) pLevel).sendParticles(ParticleTypes.ENCHANT, center.x, center.y, center.z, (int) (400 * z * x * y), x, y, z, 0.3);
                         if (p instanceof ServerPlayer player) {
-                            NetworkRegister.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ScreenshakeToClient(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.5F));
+                            PacketDistributor.sendToPlayer(player, new ScreenShakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.5F));
                         }
                     }
                 });
         if (!pLevel.isClientSide) {
-            NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> pPlayer), new VectorInversionParticleToClient(pPlayer.getX(), pPlayer.getEyeY(), pPlayer.getZ(), 10, 0.24, 400));
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new VectorInversionParticlesPayload(pPlayer.getX(), pPlayer.getEyeY(), pPlayer.getZ(), 10, 0.24, 400));
         }
         pPlayer.getCooldowns().addCooldown(this, 40);
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
         pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.VECTOR_INVERSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         return InteractionResultHolder.success(itemStack);
     }
+
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("vector_inversion_anchor.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("vector_inversion_anchor.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

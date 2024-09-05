@@ -31,7 +31,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -104,7 +103,7 @@ public class SnowmanInHandItem extends Item {
                     pLevel.addFreshEntity(snowballEntity);
                 }
                 pLevel.playSound(null, pLivingEntity.getX(), pLivingEntity.getY(), pLivingEntity.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.PLAYERS, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
-                pStack.hurtAndBreak(1, pLivingEntity, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+                pStack.hurtAndBreak(1, pLivingEntity, LivingEntity.getSlotForHand(pLivingEntity.getUsedItemHand()));
             }
         }
     }
@@ -119,7 +118,7 @@ public class SnowmanInHandItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
-        if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM.get())) {
+        if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
             return InteractionResultHolder.fail(stack);
         }
         pPlayer.startUsingItem(pUsedHand);
@@ -132,7 +131,7 @@ public class SnowmanInHandItem extends Item {
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return 1200;
     }
 
@@ -142,10 +141,10 @@ public class SnowmanInHandItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Options options = Minecraft.getInstance().options;
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand1.tooltip", null, new Object[]{options.keyShift.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand2.tooltip", null, new Object[]{options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand1.tooltip", null, new Object[]{options.keyShift.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand2.tooltip", null, new Object[]{options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

@@ -3,12 +3,12 @@ package com.linngdu664.bsf.item.weapon;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
-import com.linngdu664.bsf.network.ForwardConeParticlesToClient;
+import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
+import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
 import com.linngdu664.bsf.registry.EffectRegister;
-import com.linngdu664.bsf.registry.EnchantmentRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
+import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -23,9 +23,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -99,7 +98,7 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
 
     public void launch(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving, int pTimeLeft, float velocity) {
         if (pEntityLiving instanceof Player player) {
-            int i = this.getUseDuration(pStack) - pTimeLeft;
+            int i = this.getUseDuration(pStack, pEntityLiving) - pTimeLeft;
             float f = getPowerForTime(i);
             if (f >= 0.1F) {
                 ItemStack itemStack = getAmmo(player, pStack);
@@ -107,14 +106,14 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
                     AbstractBSFSnowballEntity snowballEntity = ItemToEntity(itemStack, player, pLevel, getLaunchAdjustment(f, itemStack.getItem()));
                     BSFShootFromRotation(snowballEntity, player.getXRot(), player.getYRot(), f * velocity, 0.5F);
                     pLevel.addFreshEntity(snowballEntity);
-                    pStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(p.getUsedItemHand()));
+                    pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
                     Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
                     //add push
                     if (pLevel.isClientSide()) {
                         player.push(-0.066666667F * velocity * cameraVec.x * f, -0.066666667F * velocity * cameraVec.y * f, -0.066666667F * velocity * cameraVec.z * f);
                         //add particles
                     } else {
-                        NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new ForwardConeParticlesToClient(player.getEyePosition(), cameraVec, 4.5F, 90, 1.5F, 0.1, BSFParticleType.SNOWFLAKE.ordinal()));
+                        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 90, 1.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
                         pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SNOWBALL_CANNON_SHOOT.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
                     }
                     consumeAmmo(itemStack, player);
@@ -127,7 +126,8 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pHand);
-        if (EnchantmentHelper.getTagEnchantmentLevel(EnchantmentRegister.SNOW_GOLEM_EXCLUSIVE.get(), itemStack) <= 0 && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM.get())) {
+        int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(pPlayer, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), itemStack);
+        if (enchantmentLevel <= 0 && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
             pPlayer.startUsingItem(pHand);
             return InteractionResultHolder.consume(itemStack);
         }
@@ -135,7 +135,7 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return 72000;
     }
 
@@ -145,9 +145,9 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_cannon1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_cannon1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

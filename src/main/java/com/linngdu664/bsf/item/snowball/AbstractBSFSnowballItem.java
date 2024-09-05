@@ -3,12 +3,15 @@ package com.linngdu664.bsf.item.snowball;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
+import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -20,18 +23,14 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class AbstractBSFSnowballItem extends Item {
+public abstract class AbstractBSFSnowballItem extends Item implements ProjectileItem {
     public static final int HAND_TYPE_FLAG = 1;
     private final SnowballProperties snowballProperties;
 //    private final int id;
@@ -98,13 +97,12 @@ public abstract class AbstractBSFSnowballItem extends Item {
         ItemStack mainHand = pPlayer.getMainHandItem();
         int count = mainHand.getCount();
         if (offhand.getItem() instanceof SnowballTankItem) {
-            CompoundTag compoundTag = offhand.getOrCreateTag();
-            String path = ForgeRegistries.ITEMS.getKey(this).getPath();
+            Item item = offhand.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
             int offHandDamage = offhand.getDamageValue();
             int offHandMaxDamage = offhand.getMaxDamage();
-            if ((path.equals(compoundTag.getString("Snowball")) && offHandDamage != 0) || offHandDamage == offHandMaxDamage) {
+            if ((this.equals(item) && offHandDamage != 0) || offHandDamage == offHandMaxDamage) {
                 if (offHandDamage == offHandMaxDamage) {
-                    compoundTag.putString("Snowball", path);
+                    offhand.set(DataComponentRegister.SNOWBALL_TANK_TYPE, new ItemData(this));
                 }
                 if (offHandDamage < count) {
                     if (!pPlayer.getAbilities().instabuild) {
@@ -198,10 +196,10 @@ public abstract class AbstractBSFSnowballItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        generateWeaponTips(pTooltipComponents);
-        addUsageTips(pTooltipComponents);
-        addLastTips(pTooltipComponents);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        generateWeaponTips(tooltipComponents);
+        addUsageTips(tooltipComponents);
+        addLastTips(tooltipComponents);
     }
 
     /**
@@ -212,6 +210,17 @@ public abstract class AbstractBSFSnowballItem extends Item {
      * @return The corresponding entity.
      */
     public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment) {
+        return null;
+    }
+
+    /**
+     * You must override this fucking method if you want to launch the snowball by dispensers.
+     *
+     * @param level        Level.
+     * @return The corresponding entity.
+     */
+    @Override
+    public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
         return null;
     }
 

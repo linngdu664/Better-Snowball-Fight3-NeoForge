@@ -1,10 +1,10 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -32,17 +32,16 @@ public class SnowGolemContainer extends Item {
     public @NotNull InteractionResult useOn(UseOnContext pContext) {
         Level level = pContext.getLevel();
         ItemStack itemStack = pContext.getItemInHand();
-        CompoundTag tag = itemStack.getOrCreateTag();
         Player player = pContext.getPlayer();
-        if (tag.getBoolean("HasGolem")) {
+        if (itemStack.has(DataComponentRegister.SNOW_GOLEM_DATA)) {
             if (!level.isClientSide) {
                 BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(level);
-                snowGolem.readAdditionalSaveData(tag);
+                snowGolem.readAdditionalSaveData(itemStack.get(DataComponentRegister.SNOW_GOLEM_DATA));
                 BlockPos blockPos = pContext.getClickedPos();
                 snowGolem.moveTo(blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5, 0.0F, 0.0F);
                 snowGolem.setOwnerUUID(player.getUUID());
                 level.addFreshEntity(snowGolem);
-                tag.putBoolean("HasGolem", false);
+                itemStack.remove(DataComponentRegister.SNOW_GOLEM_DATA);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_PLACE, SoundSource.NEUTRAL, 1.0F, 1.0F);
             }
             player.awardStat(Stats.ITEM_USED.get(this));
@@ -52,7 +51,7 @@ public class SnowGolemContainer extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_golem_container.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_golem_container.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

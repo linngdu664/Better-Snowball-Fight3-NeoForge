@@ -3,9 +3,8 @@ package com.linngdu664.bsf.item.snowball.normal;
 import com.linngdu664.bsf.entity.snowball.nomal.DuckSnowballEntity;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
-import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -27,12 +26,7 @@ import java.util.List;
 public class DuckSnowballItem extends AbstractBSFSnowballItem {
     public DuckSnowballItem() {
         super(Rarity.COMMON, new SnowballProperties().allowLaunchTypeFlag(HAND_TYPE_FLAG));
-        DispenserBlock.registerBehavior(this, new AbstractProjectileDispenseBehavior() {
-            protected @NotNull Projectile getProjectile(@NotNull Level p_123476_, @NotNull Position p_123477_, @NotNull ItemStack p_123478_) {
-                return Util.make(new DuckSnowballEntity(p_123476_, p_123477_.x(), p_123477_.y(), p_123477_.z()), (p_123474_) -> {
-                });
-            }
-        });
+        DispenserBlock.registerProjectileBehavior(this);
     }
 
     @Override
@@ -49,6 +43,13 @@ public class DuckSnowballItem extends AbstractBSFSnowballItem {
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
         return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
+    }
+
+    @Override
+    public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
+        DuckSnowballEntity snowball = new DuckSnowballEntity(level, position.x(), position.y(), position.z());
+        snowball.setItem(itemStack);
+        return snowball;
     }
 
 //    @Override

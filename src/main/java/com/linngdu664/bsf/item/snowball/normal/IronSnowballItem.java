@@ -9,9 +9,8 @@ import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import com.linngdu664.bsf.item.weapon.TargetLocatorItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
-import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -36,12 +35,7 @@ public class IronSnowballItem extends AbstractBSFSnowballItem {
                 .machineGunRecoil(0.12)
                 .shotgunPushRank(0.16)
         );
-        DispenserBlock.registerBehavior(this, new AbstractProjectileDispenseBehavior() {
-            protected @NotNull Projectile getProjectile(@NotNull Level p_123476_, @NotNull Position p_123477_, @NotNull ItemStack p_123478_) {
-                return Util.make(new IronSnowballEntity(p_123476_, p_123477_.x(), p_123477_.y(), p_123477_.z()), (p_123474_) -> {
-                });
-            }
-        });
+        DispenserBlock.registerProjectileBehavior(this);
     }
 
     @Override
@@ -52,6 +46,13 @@ public class IronSnowballItem extends AbstractBSFSnowballItem {
     @Override
     public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment) {
         return new IronSnowballEntity(livingEntity, level, launchAdjustment);
+    }
+
+    @Override
+    public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
+        IronSnowballEntity snowball = new IronSnowballEntity(level, position.x(), position.y(), position.z());
+        snowball.setItem(itemStack);
+        return snowball;
     }
 
 //    @Override

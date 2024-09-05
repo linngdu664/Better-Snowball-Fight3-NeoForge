@@ -1,14 +1,12 @@
 package com.linngdu664.bsf.item.weapon;
 
-import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
-import com.linngdu664.bsf.network.AmmoTypeToServer;
-import com.linngdu664.bsf.registry.NetworkRegister;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import com.linngdu664.bsf.network.to_server.AmmoTypePayload;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -19,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,7 +52,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
             if (itemStack.getItem() instanceof SnowballTankItem) {
                 itemStack.setDamageValue(itemStack.getDamageValue() + 1);
                 if (itemStack.getDamageValue() == itemStack.getMaxDamage()) {
-                    itemStack.getOrCreateTag().remove("Snowball");
+                    itemStack.remove(DataComponentRegister.SNOWBALL_TANK_TYPE);
                 }
             } else {
                 itemStack.shrink(1);
@@ -68,7 +66,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
     protected AbstractBSFSnowballEntity ItemToEntity(ItemStack itemStack, Player player, Level level, ILaunchAdjustment launchAdjustment) {
         Item item = itemStack.getItem();
         if (item instanceof SnowballTankItem) {
-            item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, itemStack.getOrCreateTag().getString("Snowball")));
+            item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
         }
         if (item instanceof AbstractBSFSnowballItem snowball) {
             return snowball.getCorrespondingEntity(level, player, launchAdjustment);
@@ -95,9 +93,8 @@ public abstract class AbstractBSFWeaponItem extends Item {
             for (int i = 0; i < k; i++) {
                 ItemStack itemStack = inventory.getItem(i);
                 Item item = itemStack.getItem();
-                CompoundTag compoundTag = itemStack.getOrCreateTag();
-                if (item instanceof SnowballTankItem && compoundTag.contains("Snowball")) {
-                    AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, compoundTag.getString("Snowball")));
+                if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.SNOWBALL_TANK_TYPE)) {
+                    AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
                     if (!arrayList.contains(snowball) && (typeFlag & snowball.getTypeFlag()) != 0) {
                         arrayList.add(snowball);
                     }
@@ -148,8 +145,8 @@ public abstract class AbstractBSFWeaponItem extends Item {
                 for (int i = 0; i < k; i++) {
                     ItemStack itemStack = inventory.getItem(i);
                     Item item = itemStack.getItem();
-                    if (item instanceof SnowballTankItem && itemStack.getOrCreateTag().contains("Snowball")) {
-                        AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, itemStack.getOrCreateTag().getString("Snowball")));
+                    if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.SNOWBALL_TANK_TYPE)) {
+                        AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
                         if (snowball.equals(item1)) {
                             i1 += itemStack.getMaxDamage() - itemStack.getDamageValue();
                         } else if (snowball.equals(item2)) {
@@ -175,15 +172,14 @@ public abstract class AbstractBSFWeaponItem extends Item {
                 nextAmmoItemStack = new ItemStack(item3, i3);
             }
             Item newItem = currentAmmoItemStack.getItem();
-            if (!newItem.equals(ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, pStack.getOrCreateTag().getString("AmmoItem"))))) {
-                NetworkRegister.PACKET_HANDLER.sendToServer(new AmmoTypeToServer(newItem, pSlotId));
+            if (!newItem.equals(pStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item())) {
+                PacketDistributor.sendToServer(new AmmoTypePayload(newItem, pSlotId));
             }
         }
     }
 
     public ItemStack getAmmo(Player player, ItemStack weaponItemStack) {
-        CompoundTag compoundTag = weaponItemStack.getOrCreateTag();
-        Item ammoItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, compoundTag.getString("AmmoItem")));
+        Item ammoItem = weaponItemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (ammoItem == Items.AIR) {
             return null;
         }
@@ -192,7 +188,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
         ItemStack ammoItemStack = null;
         for (int i = 0; i < k; i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (itemStack.getItem() instanceof SnowballTankItem && ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, itemStack.getOrCreateTag().getString("Snowball"))).equals(ammoItem) && (ammoItemStack == null || ammoItemStack.getDamageValue() < itemStack.getDamageValue())) {
+            if (itemStack.getItem() instanceof SnowballTankItem && itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item().equals(ammoItem) && (ammoItemStack == null || ammoItemStack.getDamageValue() < itemStack.getDamageValue())) {
                 ammoItemStack = itemStack;
             }
         }

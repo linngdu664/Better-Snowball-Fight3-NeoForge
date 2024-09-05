@@ -65,7 +65,7 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
                     pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
 
                     if (!player.getAbilities().instabuild) {
-                        pStack.hurtAndBreak(1, player, e -> e.broadcastBreakEvent(player.getUsedItemHand()));
+                        pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
                     }
                     player.awardStat(Stats.ITEM_USED.get(this));
                 } else {
@@ -94,7 +94,7 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return 60;
     }
 
@@ -109,7 +109,7 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_block_blender.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_block_blender.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

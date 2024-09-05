@@ -43,7 +43,7 @@ public class SnowballClampItem extends TieredItem {
                 } else {
                     player.getInventory().placeItemBackInInventory(ItemRegister.SMOOTH_SNOWBALL.get().getDefaultInstance(), true);
                 }
-                itemStack.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(pContext.getHand()));
+                itemStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(pContext.getHand()));
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
@@ -58,7 +58,7 @@ public class SnowballClampItem extends TieredItem {
             } else {
                 pPlayer.getInventory().placeItemBackInInventory(ItemRegister.SMOOTH_SNOWBALL.get().getDefaultInstance(), true);
             }
-            pStack.hurtAndBreak(1, pPlayer, (e) -> e.broadcastBreakEvent(pUsedHand));
+            pStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
             pPlayer.awardStat(Stats.ITEM_USED.get(this));
             return InteractionResult.SUCCESS;
         }
@@ -66,7 +66,7 @@ public class SnowballClampItem extends TieredItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_clamp.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_clamp.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

@@ -16,7 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class GloveItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return Integer.MAX_VALUE;
     }
 
@@ -65,7 +64,7 @@ public class GloveItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("glove.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("glove.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

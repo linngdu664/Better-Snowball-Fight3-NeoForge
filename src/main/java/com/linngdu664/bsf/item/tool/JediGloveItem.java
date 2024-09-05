@@ -18,7 +18,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -47,12 +46,12 @@ public class JediGloveItem extends GloveItem {
                 pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 3F, 0.4F / pLevel.getRandom().nextFloat() * 0.4F + 0.8F);
                 releaseUsing(pStack, pLevel, pLivingEntity, 0);
             }
-            pStack.hurtAndBreak(list.size() + list1.size(), player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+            pStack.hurtAndBreak(list.size() + list1.size(), player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
         }
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("jedi_glove.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("jedi_glove.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

@@ -213,7 +213,7 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return 72000;
 //        if (isExplosive) {
 //            return 60;
@@ -227,9 +227,9 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_machine_gun1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_machine_gun2.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_machine_gun1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_machine_gun2.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

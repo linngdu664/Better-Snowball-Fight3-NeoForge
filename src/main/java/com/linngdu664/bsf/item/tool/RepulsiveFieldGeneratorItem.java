@@ -23,7 +23,6 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Vector;
@@ -48,13 +47,13 @@ public class RepulsiveFieldGeneratorItem extends AbstractBSFEnhanceableToolItem 
                 }
             }
             if (!player.getAbilities().instabuild) {
-                pStack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+                pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
             }
             player.awardStat(Stats.ITEM_USED.get(this));
             if (pLevel.isClientSide) {
                 ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(5)).setIntensity(0.5f).setEasing(Easing.EXPO_IN_OUT));
             }
-            player.getCooldowns().addCooldown(this, getUseDuration(pStack) - pTimeCharged + 20);
+            player.getCooldowns().addCooldown(this, getUseDuration(pStack, pLivingEntity) - pTimeCharged + 20);
             pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.FIELD_PUSH.get(), SoundSource.PLAYERS, 0.5F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
     }
@@ -99,7 +98,7 @@ public class RepulsiveFieldGeneratorItem extends AbstractBSFEnhanceableToolItem 
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return 60;
     }
 
@@ -114,7 +113,7 @@ public class RepulsiveFieldGeneratorItem extends AbstractBSFEnhanceableToolItem 
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("repulsive_field_generator.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("repulsive_field_generator.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
     }
 }

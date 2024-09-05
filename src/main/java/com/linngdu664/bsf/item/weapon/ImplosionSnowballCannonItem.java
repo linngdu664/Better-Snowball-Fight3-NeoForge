@@ -5,12 +5,12 @@ import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeInstance;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.network.ForwardRaysParticlesToClient;
-import com.linngdu664.bsf.network.ImplosionSnowballCannonParticleToClient;
-import com.linngdu664.bsf.network.ToggleMovingSoundToClient;
+import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
+import com.linngdu664.bsf.network.to_client.ImplosionSnowballCannonParticlesPayload;
+import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
+import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.EffectRegister;
-import com.linngdu664.bsf.registry.NetworkRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
@@ -38,9 +38,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -62,7 +61,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM.get())) {
+        if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
             return InteractionResultHolder.fail(itemStack);
         }
         ItemStack stack = getAmmo(pPlayer, itemStack);
@@ -70,11 +69,11 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
             Vec3 cameraVec = pPlayer.getViewVector(1);
             if (!pLevel.isClientSide) {
                 ServerLevel serverLevel = (ServerLevel) pLevel;
-                NetworkRegister.PACKET_HANDLER.send(PacketDistributor.DIMENSION.with(pLevel::dimension), new ToggleMovingSoundToClient(pPlayer, SoundRegister.IMPLOSION_SNOWBALL_CANNON.get(), ToggleMovingSoundToClient.PLAY_ONCE));
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pPlayer.getId(), SoundRegister.IMPLOSION_SNOWBALL_CANNON.get(), ToggleMovingSoundPayload.PLAY_ONCE));
                 Vec3 eyePosition = pPlayer.getEyePosition();
                 for (double l = 0; l < DISTANCE; l+=0.5) {
                     Vec3 paPos = eyePosition.add(cameraVec.scale(l));
-                    NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> pPlayer), new ImplosionSnowballCannonParticleToClient(paPos.x, paPos.y, paPos.z, cameraVec.x, cameraVec.y, cameraVec.z));
+                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ImplosionSnowballCannonParticlesPayload(paPos.x, paPos.y, paPos.z, cameraVec.x, cameraVec.y, cameraVec.z));
                 }
                 AABB aabb = pPlayer.getBoundingBox().inflate(RADIUM).expandTowards(cameraVec.scale(DISTANCE + RADIUM));
                 BlockPos.betweenClosedStream(aabb)
@@ -86,7 +85,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                                 serverLevel.setBlockAndUpdate(p, snow);
                             }
                             serverLevel.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F / (serverLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                            NetworkRegister.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> pPlayer), new ForwardRaysParticlesToClient(new Vec3(p.getX(), p.getY(), p.getZ()), new Vec3(p.getX() + 1, p.getY() + 1, p.getZ() + 1), cameraVec, 0.2, 0.6, 10, BSFParticleType.SNOWFLAKE.ordinal()));
+                            PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(new Vec3(p.getX(), p.getY(), p.getZ()), new Vec3(p.getX() + 1, p.getY() + 1, p.getZ() + 1), cameraVec, 0.2, 0.6, 10), BSFParticleType.SNOWFLAKE.ordinal()));
                         });
 
                 serverLevel.getEntitiesOfClass(
@@ -114,7 +113,8 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                         serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(p));
                     }
                 });
-                itemStack.hurtAndBreak(1, pPlayer, p -> p.broadcastBreakEvent(pUsedHand));
+                itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
+
                 pPlayer.getCooldowns().addCooldown(this, 60);
                 if (stack != null) {
                     consumeAmmo(stack, pPlayer);
@@ -140,11 +140,10 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("implosion_snowball_cannon.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("implosion_snowball_cannon1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("implosion_snowball_cannon.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("implosion_snowball_cannon1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
-
 }
