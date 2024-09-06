@@ -9,9 +9,9 @@ import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFTeamSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -69,75 +69,83 @@ public class BSFGolemRangedAttackGoal extends Goal {
 
     private boolean canShoot(LivingEntity pTarget) {
         ItemStack weapon = golem.getWeapon();
-        if (!weapon.isEmpty() && !golem.hasEffect(EffectRegister.WEAPON_JAM)) {
-            AbstractBSFWeaponItem weaponItem = (AbstractBSFWeaponItem) weapon.getItem();
-            float v = 3.0F;
-            float acc = 1.0F;
-            if (weaponItem.equals(ItemRegister.POWERFUL_SNOWBALL_CANNON.get())) {
-                v = 4.0F;
-            } else if (weaponItem.equals(ItemRegister.SNOWBALL_SHOTGUN.get())) {
-                v = 2.0F;
-                acc = 10.0F;
+        if (weapon.isEmpty() || golem.hasEffect(EffectRegister.WEAPON_JAM)) {
+            return false;
+        }
+        AbstractBSFWeaponItem weaponItem = (AbstractBSFWeaponItem) weapon.getItem();
+        float v = 3.0F;
+        float acc = 1.0F;
+        if (weaponItem.equals(ItemRegister.POWERFUL_SNOWBALL_CANNON.get())) {
+            v = 4.0F;
+        } else if (weaponItem.equals(ItemRegister.SNOWBALL_SHOTGUN.get())) {
+            v = 2.0F;
+            acc = 10.0F;
+        }
+        double h = pTarget.getEyeY() - golem.getEyeY();
+        double dx = pTarget.getX() - golem.getX();
+        double dz = pTarget.getZ() - golem.getZ();
+        double x2 = BSFCommonUtil.lengthSqr(dx, dz);
+        double d = Math.sqrt(x2 + h * h);
+        double x = Math.sqrt(x2);
+        double k = 0.015 * x2 / (v * v);    // 0.5 * g / 400.0, g = 12
+        double cosTheta = 0.7071067811865475 / d * Math.sqrt(x2 - 2 * k * h + x * Math.sqrt(x2 - 4 * k * k - 4 * k * h));
+        double sinTheta;
+        dx /= x;
+        dz /= x;
+        if (cosTheta > 1) {
+            sinTheta = 0;
+        } else {
+            sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
+            dx *= cosTheta;
+            dz *= cosTheta;
+            if (h < -k) {
+                sinTheta = -sinTheta;
             }
-            double h = pTarget.getEyeY() - golem.getEyeY();
-            double dx = pTarget.getX() - golem.getX();
-            double dz = pTarget.getZ() - golem.getZ();
-            double x2 = BSFCommonUtil.lengthSqr(dx, dz);
-            double d = Math.sqrt(x2 + h * h);
-            double x = Math.sqrt(x2);
-            double k = 0.015 * x2 / (v * v);    // 0.5 * g / 400.0, g = 12
-            double cosTheta = 0.7071067811865475 / d * Math.sqrt(x2 - 2 * k * h + x * Math.sqrt(x2 - 4 * k * k - 4 * k * h));
-            double sinTheta;
-            dx /= x;
-            dz /= x;
-            if (cosTheta > 1) {
-                sinTheta = 0;
-            } else {
-                sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
-                dx *= cosTheta;
-                dz *= cosTheta;
-                if (h < -k) {
-                    sinTheta = -sinTheta;
-                }
+        }
+        List<LivingEntity> list = golem.level().getEntitiesOfClass(LivingEntity.class, golem.getBoundingBox().inflate(x), p -> !golem.equals(p) && !pTarget.equals(p));
+        for (LivingEntity entity : list) {
+            double dx1 = entity.getX() - golem.getX();
+            double dz1 = entity.getZ() - golem.getZ();
+            double cosAlpha = BSFCommonUtil.vec2AngleCos(dx, dz, dx1, dz1);
+            if (cosAlpha <= 0.17) {
+                continue;
             }
-            List<LivingEntity> list = golem.level().getEntitiesOfClass(LivingEntity.class, golem.getBoundingBox().inflate(x), p -> !golem.equals(p) && !pTarget.equals(p));
-            for (LivingEntity entity : list) {
-                double dx1 = entity.getX() - golem.getX();
-                double dz1 = entity.getZ() - golem.getZ();
-                double cosAlpha = BSFCommonUtil.vec2AngleCos(dx, dz, dx1, dz1);
-                if (cosAlpha > 0.17) {
-                    AABB aabb = entity.getBoundingBox();
-                    double sinAlpha = Math.sqrt(1 - cosAlpha * cosAlpha);
-                    double r = Math.sqrt(BSFCommonUtil.lengthSqr(dx1, dz1));
-                    if (r < x && r * sinAlpha < Math.sqrt(BSFCommonUtil.lengthSqr(aabb.maxX - aabb.minX, aabb.maxZ - aabb.minZ)) * 0.5 + 0.8) {
-                        double t = r * cosAlpha / (v * cosTheta);
-                        double y = v * sinTheta * t - 0.015 * t * t + golem.getEyeY();
-                        if (y >= aabb.minY - 0.8 && y <= aabb.maxY + 0.8) {
-                            LivingEntity owner = golem.getOwner();
-                            if (golem.getLocator() == 0 && entity.getType().equals(golem.getTarget().getType())
-                                    || golem.getLocator() == 2 && !golem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team").isSameTeam(entity, owner)
-                                    || golem.getLocator() == 3 && (owner != null && (!(entity instanceof Player) && golem.wantsToAttack(entity, owner)
-                                    || entity instanceof Player player && !player.isCreative() && !player.isSpectator() && !player.equals(owner))
-                                    || owner == null && entity instanceof Player player && !player.isCreative() && !player.isSpectator())) {
+            AABB aabb = entity.getBoundingBox();
+            double sinAlpha = Math.sqrt(1 - cosAlpha * cosAlpha);
+            double r = Math.sqrt(BSFCommonUtil.lengthSqr(dx1, dz1));
+            if (r < x && r * sinAlpha < Math.sqrt(BSFCommonUtil.lengthSqr(aabb.maxX - aabb.minX, aabb.maxZ - aabb.minZ)) * 0.5 + 0.8) {
+                double t = r * cosAlpha / (v * cosTheta);
+                double y = v * sinTheta * t - 0.015 * t * t + golem.getEyeY();
+                if (y >= aabb.minY - 0.8 && y <= aabb.maxY + 0.8) {
+                    LivingEntity owner = golem.getOwner();
+                    if (golem.getLocator() == 0) {
+                        if (entity.getType().equals(golem.getTarget().getType())) {
+                            golem.setTarget(entity);
+                        }
+                    } else if (golem.getLocator() == 2) {
+                        if (golem.canAttackInAttackEnemyTeamMode(entity)) {
+                            golem.setTarget(entity);
+                        }
+                    } else if (golem.getLocator() == 3 && owner != null) {
+                        if (entity.getType().equals(EntityType.PLAYER)) {
+                            if (!entity.isSpectator() && !entity.equals(owner)) {
                                 golem.setTarget(entity);
                             }
-//                            if (entity.getType().equals(golem.getTarget().getType()) && !entity.equals(golem.getOwner()) && golem.getLocator()==0) {
-//                                golem.setTarget(entity);
-//                            }
-                            attackTime = 1;
-                            return false;
+                        } else if (golem.wantsToAttack(entity, owner)) {
+                            golem.setTarget(entity);
                         }
                     }
+                    attackTime = 1;
+                    return false;
                 }
             }
-            golem.setShootX(dx);
-            golem.setShootY(sinTheta);
-            golem.setShootZ(dz);
-            golem.setLaunchAccuracy(acc);
-            golem.setLaunchVelocity(v);
-            return true;
         }
-        return false;
+        golem.setShootX(dx);
+        golem.setShootY(sinTheta);
+        golem.setShootZ(dz);
+        golem.setLaunchAccuracy(acc);
+        golem.setLaunchVelocity(v);
+        return true;
     }
 
     public void tick() {

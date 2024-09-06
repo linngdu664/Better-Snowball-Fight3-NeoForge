@@ -1,13 +1,9 @@
 package com.linngdu664.bsf.entity.ai.goal.target;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.util.BSFTeamSavedData;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.saveddata.SavedData;
 
 public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
     private final BSFSnowGolemEntity snowGolem;
@@ -23,21 +19,35 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
 //     3: all
     @Override
     public boolean canUse() {
-        if (snowGolem.getLocator() == 0) {
-            if (snowGolem.getLastHurtByMob() instanceof Enemy) {
-                return super.canUse();
-            }
-        } else if (snowGolem.getLocator() == 2) {
-            BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            LivingEntity target = snowGolem.getLastHurtByMob();
-            LivingEntity owner = snowGolem.getOwner();
-            if (target instanceof Player && !savedData.isSameTeam(target, owner) || target instanceof OwnableEntity ownableEntity && !savedData.isSameTeam(target, ownableEntity.getOwner())) {
-                return super.canUse();
-            }
-        } else if (snowGolem.getLocator() == 3) {
-            return super.canUse();
+        LivingEntity lastHurtByMob = snowGolem.getLastHurtByMob();
+        LivingEntity owner = snowGolem.getOwner();
+        if (lastHurtByMob == null) {
+            return false;
         }
-        return false;
+        // 待测试主人
+        return switch (snowGolem.getLocator()) {
+            case 0 -> {
+                if (lastHurtByMob instanceof Enemy) {
+                    yield super.canUse();
+                }
+                yield false;
+            }
+            case 2 -> {
+                if (snowGolem.canAttackInAttackEnemyTeamMode(lastHurtByMob)) {
+                    yield super.canUse();
+                }
+                yield false;
+            }
+            case 3 -> {
+                if (owner == null) {
+                    yield super.canUse();
+                }
+                yield snowGolem.wantsToAttack(lastHurtByMob, owner) && super.canUse();
+            }
+            default -> false;
+        };
+
+
 //        if (snowGolem.getLocator()==1 && snowGolem.getTarget() != null && !snowGolem.getTarget().isRemoved()) {
 //            return false;
 //        }

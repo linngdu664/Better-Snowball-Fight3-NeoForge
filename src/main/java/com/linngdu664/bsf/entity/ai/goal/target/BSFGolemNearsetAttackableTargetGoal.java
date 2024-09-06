@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 
@@ -19,7 +20,7 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     protected final int randomInterval;
     @Nullable
     protected LivingEntity target;
-    private BSFSnowGolemEntity snowGolem;
+    private final BSFSnowGolemEntity snowGolem;
 
 
     public BSFGolemNearsetAttackableTargetGoal(BSFSnowGolemEntity snowGolem) {
@@ -48,20 +49,21 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
             return;
         }
         TargetingConditions targetConditions = TargetingConditions.forCombat().range(SEARCH_DISTANCE);
+        Level level = snowGolem.level();
         if (snowGolem.getLocator() == 0) {
             targetConditions.selector(p -> p instanceof Enemy);
-            target = snowGolem.level().getNearestEntity(snowGolem.level().getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else if (snowGolem.getLocator() == 2) {
             BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            targetConditions.selector(p -> !savedData.isSameTeam(snowGolem.getOwner(), p));
-            target = snowGolem.level().getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+            targetConditions.selector(p -> !savedData.isSameTeam(snowGolem.getOwner(), p) && !p.isSpectator() && !((Player) p).isCreative());
+            target = level.getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else {
             if (snowGolem.getOwner() != null) {
                 targetConditions.selector(p -> !(p instanceof Player) && snowGolem.wantsToAttack(p, snowGolem.getOwner()) || p instanceof Player player && !player.isCreative() && !player.isSpectator() && !player.equals(snowGolem.getOwner()));
-                target = snowGolem.level().getNearestEntity(snowGolem.level().getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+                target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
             } else {
-                targetConditions.selector(p -> p instanceof Player player && !player.isCreative() && !player.isSpectator());
-                target = snowGolem.level().getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+                targetConditions.selector(p -> !p.isSpectator());
+                target = level.getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
             }
         }
     }

@@ -20,6 +20,7 @@ import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
+import com.linngdu664.bsf.util.BSFTeamSavedData;
 import com.linngdu664.bsf.util.BSFTiers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -59,6 +60,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
@@ -66,6 +68,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 // I call this "shit mountain".
@@ -280,7 +283,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
         targetSelector.addGoal(1, new BSFGolemHurtByTargetGoal(this));
         targetSelector.addGoal(2, new BSFGolemOwnerHurtByTargetGoal(this));
-        targetSelector.addGoal(3, new BSFGolemOwnerHurtPlayerGoal(this));
+        targetSelector.addGoal(3, new BSFGolemOwnerHurtEnemyTeamGoal(this));
         targetSelector.addGoal(4, new BSFGolemNearsetAttackableTargetGoal(this));
     }
 
@@ -639,6 +642,23 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     @Override
     public boolean wantsToAttack(@NotNull LivingEntity pTarget, @NotNull LivingEntity pOwner) {
         return !(pTarget instanceof OwnableEntity ownableEntity && pOwner.equals(ownableEntity.getOwner()));
+    }
+
+    public boolean canAttackInAttackEnemyTeamMode(@NotNull Entity entity) {
+        BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        if (getOwnerUUID() == null) {
+            return true;
+        }
+        if (entity.getType().equals(EntityType.PLAYER)) {
+            return !savedData.isSameTeam(getOwner(), entity);
+        } else if (entity instanceof OwnableEntity ownableEntity) {
+            if (savedData.getTeam(getOwnerUUID()) < 0) {
+                return !Objects.equals(getOwner(), ownableEntity.getOwner());
+            }
+            return !savedData.isSameTeam(getOwner(), ownableEntity.getOwner());
+        } else {
+            return false;
+        }
     }
 
     public void resetCoreCoolDown() {

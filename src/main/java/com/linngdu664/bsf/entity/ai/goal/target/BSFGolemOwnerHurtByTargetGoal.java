@@ -1,13 +1,10 @@
 package com.linngdu664.bsf.entity.ai.goal.target;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.util.BSFTeamSavedData;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.EnumSet;
 
@@ -27,32 +24,37 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
 //     2: enemy player
 //     3: all
     public boolean canUse() {
-        if (snowGolem.isTame() && !snowGolem.isOrderedToSit()) {
-            LivingEntity owner = snowGolem.getOwner();
-            if (owner == null) {
-                return false;
-            } else {
-                this.ownerLastHurtBy = owner.getLastHurtByMob();
-                if (snowGolem.getLocator() == 0) {
-                    if (!(ownerLastHurtBy instanceof Enemy)) {
-                        return false;
-                    }
-                } else if (snowGolem.getLocator() == 1) {
-                    return false;
-                } else if (snowGolem.getLocator() == 2) {
-                    if (!(ownerLastHurtBy instanceof Player)) {
-                        return false;
-                    }
-                    if (snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team").isSameTeam(owner, ownerLastHurtBy)) {
-                        return false;
-                    }
-                }
-                int $$1 = owner.getLastHurtByMobTimestamp();
-                return $$1 != timestamp && canAttack(ownerLastHurtBy, TargetingConditions.DEFAULT) && snowGolem.wantsToAttack(ownerLastHurtBy, owner);
-            }
-        } else {
+        if (!snowGolem.isTame() || snowGolem.isOrderedToSit()) {
             return false;
         }
+        LivingEntity owner = snowGolem.getOwner();
+        if (owner == null) {
+            return false;
+        }
+        ownerLastHurtBy = owner.getLastHurtByMob();
+        if (ownerLastHurtBy == null) {
+            return false;
+        }
+        switch (snowGolem.getLocator()) {
+            case 0:
+                if (!(ownerLastHurtBy instanceof Enemy)) {
+                    return false;
+                }
+                break;
+            case 1:
+                return false;
+            case 2:
+                if (!snowGolem.canAttackInAttackEnemyTeamMode(ownerLastHurtBy)) {
+                    return false;
+                }
+                break;
+            default:
+                if (!snowGolem.wantsToAttack(ownerLastHurtBy, owner)) {
+                    return false;
+                }
+        }
+        int $$1 = owner.getLastHurtByMobTimestamp();
+        return $$1 != timestamp && canAttack(ownerLastHurtBy, TargetingConditions.DEFAULT);
     }
 
     public void start() {
