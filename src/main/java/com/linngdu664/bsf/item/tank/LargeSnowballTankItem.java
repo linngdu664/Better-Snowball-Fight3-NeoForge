@@ -19,7 +19,7 @@ public class LargeSnowballTankItem extends SnowballTankItem {
 
     @Override
     public @NotNull Component getName(ItemStack pStack) {
-        Item item = pStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+        Item item = pStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (!Items.AIR.equals(item)) {
             String path = BuiltInRegistries.ITEM.getKey(item).getPath();
             return MutableComponent.create(new TranslatableContents("item.bsf.large_" + path + "_tank", null, new Object[0]));

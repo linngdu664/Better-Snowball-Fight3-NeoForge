@@ -23,7 +23,7 @@
     }
   },
   "result": {
-    "item": "bsf:reconstruct_snowball",
+    "id": "bsf:reconstruct_snowball",
     "count": 2
   }
 }

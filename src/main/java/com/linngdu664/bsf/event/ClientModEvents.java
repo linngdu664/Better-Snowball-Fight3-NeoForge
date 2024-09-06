@@ -88,14 +88,14 @@ public class ClientModEvents {
             ItemProperties.register(ItemRegister.JEDI_GLOVE.get(), ResourceLocation.withDefaultNamespace("using"), (itemStack, world, livingEntity, num)
                     -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
             ItemProperties.register(ItemRegister.LARGE_SNOWBALL_TANK.get(), ResourceLocation.withDefaultNamespace("snowball"), (itemStack, world, livingEntity, num) -> {
-                Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+                Item item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
                 if (item instanceof AbstractBSFSnowballItem snowballItem) {
                     return snowballItem.getIdForTank();
                 }
                 return -1;
             });
             ItemProperties.register(ItemRegister.SNOWBALL_TANK.get(), ResourceLocation.withDefaultNamespace("snowball"), (itemStack, world, livingEntity, num) -> {
-                Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+                Item item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
                 if (item instanceof AbstractBSFSnowballItem snowballItem) {
                     return snowballItem.getIdForTank();
                 }

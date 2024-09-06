@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "bsf:snowman_in_hand",
+    "id": "bsf:snowman_in_hand",
     "count": 1
   }
 }

@@ -52,7 +52,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
             if (itemStack.getItem() instanceof SnowballTankItem) {
                 itemStack.setDamageValue(itemStack.getDamageValue() + 1);
                 if (itemStack.getDamageValue() == itemStack.getMaxDamage()) {
-                    itemStack.remove(DataComponentRegister.SNOWBALL_TANK_TYPE);
+                    itemStack.remove(DataComponentRegister.AMMO_ITEM);
                 }
             } else {
                 itemStack.shrink(1);
@@ -66,7 +66,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
     protected AbstractBSFSnowballEntity ItemToEntity(ItemStack itemStack, Player player, Level level, ILaunchAdjustment launchAdjustment) {
         Item item = itemStack.getItem();
         if (item instanceof SnowballTankItem) {
-            item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+            item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         }
         if (item instanceof AbstractBSFSnowballItem snowball) {
             return snowball.getCorrespondingEntity(level, player, launchAdjustment);
@@ -93,8 +93,8 @@ public abstract class AbstractBSFWeaponItem extends Item {
             for (int i = 0; i < k; i++) {
                 ItemStack itemStack = inventory.getItem(i);
                 Item item = itemStack.getItem();
-                if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.SNOWBALL_TANK_TYPE)) {
-                    AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+                if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.AMMO_ITEM)) {
+                    AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
                     if (!arrayList.contains(snowball) && (typeFlag & snowball.getTypeFlag()) != 0) {
                         arrayList.add(snowball);
                     }
@@ -145,8 +145,8 @@ public abstract class AbstractBSFWeaponItem extends Item {
                 for (int i = 0; i < k; i++) {
                     ItemStack itemStack = inventory.getItem(i);
                     Item item = itemStack.getItem();
-                    if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.SNOWBALL_TANK_TYPE)) {
-                        AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+                    if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.AMMO_ITEM)) {
+                        AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
                         if (snowball.equals(item1)) {
                             i1 += itemStack.getMaxDamage() - itemStack.getDamageValue();
                         } else if (snowball.equals(item2)) {
@@ -188,7 +188,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
         ItemStack ammoItemStack = null;
         for (int i = 0; i < k; i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (itemStack.getItem() instanceof SnowballTankItem && itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item().equals(ammoItem) && (ammoItemStack == null || ammoItemStack.getDamageValue() < itemStack.getDamageValue())) {
+            if (itemStack.getItem() instanceof SnowballTankItem && itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item().equals(ammoItem) && (ammoItemStack == null || ammoItemStack.getDamageValue() < itemStack.getDamageValue())) {
                 ammoItemStack = itemStack;
             }
         }

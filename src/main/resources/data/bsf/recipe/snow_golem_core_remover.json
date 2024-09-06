@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "bsf:snow_golem_core_remover",
+    "id": "bsf:snow_golem_core_remover",
     "count": 1
   }
 }

@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "bsf:ender_teleportation_golem_core",
+    "id": "bsf:ender_teleportation_golem_core",
     "count": 1
   }
 }

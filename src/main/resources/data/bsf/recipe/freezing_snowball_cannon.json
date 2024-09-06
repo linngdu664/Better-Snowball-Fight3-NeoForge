@@ -7,7 +7,7 @@
     "item": "bsf:snowball_cannon"
   },
   "result": {
-    "item": "bsf:freezing_snowball_cannon"
+    "id": "bsf:freezing_snowball_cannon"
   },
   "template": {
     "item": "bsf:snowball_cannon_upgrade_smithing_template"

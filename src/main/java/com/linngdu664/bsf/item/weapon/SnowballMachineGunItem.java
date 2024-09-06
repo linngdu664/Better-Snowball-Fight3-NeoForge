@@ -82,7 +82,7 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
         ammo = getAmmo(pPlayer, stack);
         if (ammo != null && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM) && !stack.getOrDefault(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, false)) {
-            Item ammoItem = ammo.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+            Item ammoItem = ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
             recoil = ((AbstractBSFSnowballItem) ammoItem).getMachineGunRecoil();
             isExplosive = ammoItem.equals(ItemRegister.EXPLOSIVE_SNOWBALL.get()) || ammoItem.equals(ItemRegister.EXPLOSIVE_MONSTER_TRACKING_SNOWBALL.get()) || ammoItem.equals(ItemRegister.EXPLOSIVE_PLAYER_TRACKING_SNOWBALL.get());
             int timer = stack.getOrDefault(DataComponentRegister.MACHINE_GUN_TIMER, 0);
@@ -106,7 +106,7 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
                 pStack.set(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, true);
                 this.releaseUsing(pStack, pLevel, player, pRemainingUseDuration);
                 return;
-            } else if (ammo == null || ammo.isEmpty() || !ammo.has(DataComponentRegister.SNOWBALL_TANK_TYPE) || player.hasEffect(EffectRegister.WEAPON_JAM)) {
+            } else if (ammo == null || ammo.isEmpty() || !ammo.has(DataComponentRegister.AMMO_ITEM) || player.hasEffect(EffectRegister.WEAPON_JAM)) {
                 this.releaseUsing(pStack, pLevel, player, pRemainingUseDuration);
                 return;
             }

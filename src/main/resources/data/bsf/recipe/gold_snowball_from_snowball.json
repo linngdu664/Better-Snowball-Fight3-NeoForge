@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "bsf:gold_snowball",
+    "id": "bsf:gold_snowball",
     "count": 8
   }
 }

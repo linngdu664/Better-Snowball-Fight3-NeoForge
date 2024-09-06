@@ -529,17 +529,17 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         ItemStack ammo = getAmmo();
 //        CompoundTag compoundTag = ammo.getOrCreateTag();
         AbstractBSFWeaponItem weaponItem = (AbstractBSFWeaponItem) weapon.getItem();
-        if (!ammo.has(DataComponentRegister.SNOWBALL_TANK_TYPE) || (((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item()).getTypeFlag() & weaponItem.getTypeFlag()) == 0) {
+        if (!ammo.has(DataComponentRegister.AMMO_ITEM) || (((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getTypeFlag() & weaponItem.getTypeFlag()) == 0) {
             return;
         }
         float damageChance = 1.0F / (1.0F + EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.UNBREAKING), weapon));
         ILaunchAdjustment launchAdjustment = weaponItem.getLaunchAdjustment(1, ammo.getItem());
         int j = weapon.getItem() instanceof SnowballShotgunItem ? 4 : 1;
         for (int i = 0; i < j; i++) {
-            if (!ammo.has(DataComponentRegister.SNOWBALL_TANK_TYPE)) {
+            if (!ammo.has(DataComponentRegister.AMMO_ITEM)) {
                 break;
             }
-            AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment);
+            AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment);
             snowball.shoot(shootX, shootY, shootZ, launchVelocity, launchAccuracy);
             level.addFreshEntity(snowball);
             if (!getEnhance()) {

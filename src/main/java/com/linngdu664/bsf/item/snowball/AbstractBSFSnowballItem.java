@@ -97,12 +97,12 @@ public abstract class AbstractBSFSnowballItem extends Item implements Projectile
         ItemStack mainHand = pPlayer.getMainHandItem();
         int count = mainHand.getCount();
         if (offhand.getItem() instanceof SnowballTankItem) {
-            Item item = offhand.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+            Item item = offhand.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
             int offHandDamage = offhand.getDamageValue();
             int offHandMaxDamage = offhand.getMaxDamage();
             if ((this.equals(item) && offHandDamage != 0) || offHandDamage == offHandMaxDamage) {
                 if (offHandDamage == offHandMaxDamage) {
-                    offhand.set(DataComponentRegister.SNOWBALL_TANK_TYPE, new ItemData(this));
+                    offhand.set(DataComponentRegister.AMMO_ITEM, new ItemData(this));
                 }
                 if (offHandDamage < count) {
                     if (!pPlayer.getAbilities().instabuild) {

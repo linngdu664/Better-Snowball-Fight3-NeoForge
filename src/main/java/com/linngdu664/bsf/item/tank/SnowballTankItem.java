@@ -35,7 +35,7 @@ public class SnowballTankItem extends Item {
         if (!pPlayer.getOffhandItem().isEmpty()) {
             return InteractionResultHolder.pass(itemStack);
         }
-        Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+        Item item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (Items.AIR.equals(item)) {
             return InteractionResultHolder.pass(itemStack);
         }
@@ -47,7 +47,7 @@ public class SnowballTankItem extends Item {
                 int k = maxDamage - damageValue;
                 if (!pPlayer.getAbilities().instabuild) {
                     itemStack.setDamageValue(maxDamage);
-                    itemStack.remove(DataComponentRegister.SNOWBALL_TANK_TYPE);
+                    itemStack.remove(DataComponentRegister.AMMO_ITEM);
                 }
                 for (int i = 0; i < k / 16; i++) {
                     inventory.placeItemBackInInventory(new ItemStack(item, 16), true);
@@ -66,7 +66,7 @@ public class SnowballTankItem extends Item {
 
     @Override
     public @NotNull Component getName(ItemStack pStack) {
-        Item item = pStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+        Item item = pStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (!Items.AIR.equals(item)) {
             String path = BuiltInRegistries.ITEM.getKey(item).getPath();
             return MutableComponent.create(new TranslatableContents("item.bsf." + path + "_tank", null, new Object[0]));
@@ -76,7 +76,7 @@ public class SnowballTankItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        Item item = stack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+        Item item = stack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (item instanceof AbstractBSFSnowballItem snowballItem) {
             snowballItem.generateWeaponTips(tooltipComponents);
             snowballItem.addLastTips(tooltipComponents);

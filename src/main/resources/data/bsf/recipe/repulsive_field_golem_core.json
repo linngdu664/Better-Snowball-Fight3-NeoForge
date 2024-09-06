@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "bsf:repulsive_field_golem_core",
+    "id": "bsf:repulsive_field_golem_core",
     "count": 1
   }
 }

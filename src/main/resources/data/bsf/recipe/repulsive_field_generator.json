@@ -23,6 +23,6 @@
     }
   },
   "result": {
-    "item": "bsf:repulsive_field_generator"
+    "id": "bsf:repulsive_field_generator"
   }
 }
