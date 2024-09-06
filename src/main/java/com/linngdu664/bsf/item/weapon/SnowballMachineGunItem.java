@@ -1,19 +1,19 @@
 package com.linngdu664.bsf.item.weapon;
 
-import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
+import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
+import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -25,9 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -82,16 +80,16 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
-        CompoundTag tag = stack.getOrCreateTag();
         ammo = getAmmo(pPlayer, stack);
-        if (ammo != null && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM.get()) && !tag.getBoolean("IsCoolDown")) {
-            String path = ammo.getOrCreateTag().getString("Snowball");
-            recoil = ((AbstractBSFSnowballItem) ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, path))).getMachineGunRecoil();
-            isExplosive = path.contains("explosive");
+        if (ammo != null && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM) && !stack.getOrDefault(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, false)) {
+            Item ammoItem = ammo.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+            recoil = ((AbstractBSFSnowballItem) ammoItem).getMachineGunRecoil();
+            isExplosive = ammoItem.equals(ItemRegister.EXPLOSIVE_SNOWBALL.get()) || ammoItem.equals(ItemRegister.EXPLOSIVE_MONSTER_TRACKING_SNOWBALL.get()) || ammoItem.equals(ItemRegister.EXPLOSIVE_PLAYER_TRACKING_SNOWBALL.get());
+            int timer = stack.getOrDefault(DataComponentRegister.MACHINE_GUN_TIMER, 0);
             if (isExplosive) {
-                tag.putInt("Timer", (tag.getInt("Timer") / 6 + 1) * 6); // ceil to multiple of 6
+                stack.set(DataComponentRegister.MACHINE_GUN_TIMER, (timer / 6 + 1) * 6);     // ceil to multiple of 6
             } else {
-                tag.putInt("Timer", (tag.getInt("Timer") / 3 + 1) * 3); // ceil to multiple of 3
+                stack.set(DataComponentRegister.MACHINE_GUN_TIMER, (timer / 3 + 1) * 3);     // ceil to multiple of 3
             }
             pPlayer.startUsingItem(pUsedHand);
             return InteractionResultHolder.consume(stack);
@@ -102,14 +100,13 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     @Override
     public void onUseTick(@NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, @NotNull ItemStack pStack, int pRemainingUseDuration) {
         if (pLivingEntity instanceof Player player) {
-            CompoundTag tag = pStack.getOrCreateTag();
-            int timer = tag.getInt("Timer");
+            int timer = pStack.getOrDefault(DataComponentRegister.MACHINE_GUN_TIMER, 0);
             if (timer >= 360) {
                 player.playSound(SoundRegister.MACHINE_GUN_COOLING.get(), 3.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                tag.putBoolean("IsCoolDown", true);
+                pStack.set(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, true);
                 this.releaseUsing(pStack, pLevel, player, pRemainingUseDuration);
                 return;
-            } else if (ammo == null || ammo.isEmpty() || !ammo.getOrCreateTag().contains("Snowball") || player.hasEffect(EffectRegister.WEAPON_JAM.get())) {
+            } else if (ammo == null || ammo.isEmpty() || !ammo.has(DataComponentRegister.SNOWBALL_TANK_TYPE) || player.hasEffect(EffectRegister.WEAPON_JAM)) {
                 this.releaseUsing(pStack, pLevel, player, pRemainingUseDuration);
                 return;
             }
@@ -129,14 +126,14 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
                     ((ServerLevel) pLevel).sendParticles(ParticleTypes.SNOWFLAKE, player.getX() + cameraVec.x, player.getEyeY() + cameraVec.y, player.getZ() + cameraVec.z, 4, 0, 0, 0, 0.32);
                     // handle ammo consume and damage weapon.
                     consumeAmmo(ammo, player);
-                    pStack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+                    pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
                 }
             }
             // set pitch according to recoil.
             if (pitch > -90.0F && pLevel.isClientSide() && (!isExplosive || timer % 36 < 18)) {
                 player.setXRot(pitch - (float) recoil);
             }
-            tag.putInt("Timer", isExplosive ? timer + 6 : timer + 3);
+            pStack.set(DataComponentRegister.MACHINE_GUN_TIMER, isExplosive ? timer + 6 : timer + 3);
         }
     }
 /*
@@ -189,14 +186,13 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
         if (pEntity instanceof Player player && !pStack.equals(player.getUseItem())) {
-            CompoundTag tag = pStack.getOrCreateTag();
-            int timer = tag.getInt("Timer");
+            int timer = pStack.getOrDefault(DataComponentRegister.MACHINE_GUN_TIMER, 0);
             if (timer > 0) {
                 if (timer > 2) {
-                    tag.putInt("Timer", timer - 2);
+                    pStack.set(DataComponentRegister.MACHINE_GUN_TIMER, timer - 2);
                 } else {
-                    tag.putInt("Timer", 0);
-                    tag.putBoolean("IsCoolDown", false);
+                    pStack.set(DataComponentRegister.MACHINE_GUN_TIMER, 0);
+                    pStack.set(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, false);
                 }
             }
         }

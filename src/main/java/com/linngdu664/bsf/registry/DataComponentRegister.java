@@ -26,7 +26,7 @@ public class DataComponentRegister {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SCULK_SOUND_ID =
             DATA_COMPONENTS.registerComponentType(
                     "sculk_sound_id",
-                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT)
+                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
             );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Byte>> TWEAKER_STATUS_MODE =
             DATA_COMPONENTS.registerComponentType(
@@ -53,5 +53,14 @@ public class DataComponentRegister {
                     "snow_golem_data",
                     builder -> builder.persistent(CompoundTag.CODEC).networkSynchronized(ByteBufCodecs.COMPOUND_TAG)
             );
-
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MACHINE_GUN_TIMER =
+            DATA_COMPONENTS.registerComponentType(
+                    "machine_gun_timer",
+                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> MACHINE_GUN_IS_COOL_DOWN =
+            DATA_COMPONENTS.registerComponentType(
+                    "machine_gun_is_cool_down",
+                    builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
+            );
 }

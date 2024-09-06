@@ -11,7 +11,7 @@ import net.neoforged.fml.config.ModConfig;
 
 @Mod(Main.MODID)
 public class Main {
-    public static final String MODID = "bsf";
+    public static final String MODID = "assets/bsf";
 
     public static ResourceLocation makeResLoc(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
