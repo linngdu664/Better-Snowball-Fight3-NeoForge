@@ -4,7 +4,6 @@ import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.particle.util.ParticleUtil;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -27,11 +26,11 @@ public record VectorInversionParticlesPayload(double px, double py, double pz, d
     public static void handleDataInClient(VectorInversionParticlesPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             ParticleUtil.spawnVectorInversionParticles(
-                    Minecraft.getInstance().level, ParticleRegister.VECTOR_INVERSION_PURPLE.get(),
+                    context.player().level(), ParticleRegister.VECTOR_INVERSION_PURPLE.get(),
                     new Vec3(payload.px, payload.py, payload.pz), payload.range, payload.num, payload.v
             );
             ParticleUtil.spawnVectorInversionParticles(
-                    Minecraft.getInstance().level, ParticleRegister.VECTOR_INVERSION_RED.get(),
+                    context.player().level(), ParticleRegister.VECTOR_INVERSION_RED.get(),
                     new Vec3(payload.px, payload.py, payload.pz), payload.range, payload.num, -payload.v
             );
         });

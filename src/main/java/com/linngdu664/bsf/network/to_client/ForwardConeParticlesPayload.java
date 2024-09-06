@@ -6,7 +6,6 @@ import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
 import com.linngdu664.bsf.particle.util.ParticleUtil;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -22,7 +21,7 @@ public record ForwardConeParticlesPayload(ForwardConeParticlesParas paras, int p
     );
 
     public static void handleDataInClient(ForwardConeParticlesPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> ParticleUtil.spawnForwardConeParticles(Minecraft.getInstance().level, BSFParticleType.values()[payload.particleType].get(), payload.paras));
+        context.enqueueWork(() -> ParticleUtil.spawnForwardConeParticles(context.player().level(), BSFParticleType.values()[payload.particleType].get(), payload.paras));
     }
 
     @Override
