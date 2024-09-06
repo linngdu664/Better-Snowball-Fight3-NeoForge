@@ -21,9 +21,6 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
     public boolean canUse() {
         LivingEntity lastHurtByMob = snowGolem.getLastHurtByMob();
         LivingEntity owner = snowGolem.getOwner();
-        if (lastHurtByMob == null) {
-            return false;
-        }
         // 待测试主人
         return switch (snowGolem.getLocator()) {
             case 0 -> {

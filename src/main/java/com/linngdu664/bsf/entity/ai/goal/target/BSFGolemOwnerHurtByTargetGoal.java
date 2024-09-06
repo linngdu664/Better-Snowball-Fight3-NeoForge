@@ -32,9 +32,6 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
             return false;
         }
         ownerLastHurtBy = owner.getLastHurtByMob();
-        if (ownerLastHurtBy == null) {
-            return false;
-        }
         switch (snowGolem.getLocator()) {
             case 0:
                 if (!(ownerLastHurtBy instanceof Enemy)) {

@@ -66,6 +66,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -640,15 +641,21 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     @Override
-    public boolean wantsToAttack(@NotNull LivingEntity pTarget, @NotNull LivingEntity pOwner) {
+    public boolean wantsToAttack(@Nullable LivingEntity pTarget, @NotNull LivingEntity pOwner) {
+        if (pTarget == null) {
+            return false;
+        }
         return !(pTarget instanceof OwnableEntity ownableEntity && pOwner.equals(ownableEntity.getOwner()));
     }
 
-    public boolean canAttackInAttackEnemyTeamMode(@NotNull Entity entity) {
-        BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+    public boolean canAttackInAttackEnemyTeamMode(Entity entity) {
+        if (entity == null) {
+            return false;
+        }
         if (getOwnerUUID() == null) {
             return true;
         }
+        BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
         if (entity.getType().equals(EntityType.PLAYER)) {
             return !savedData.isSameTeam(getOwner(), entity);
         } else if (entity instanceof OwnableEntity ownableEntity) {
