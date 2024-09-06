@@ -136,11 +136,6 @@ public class SnowmanInHandItem extends Item {
     }
 
     @Override
-    public int getEnchantmentValue(ItemStack stack) {
-        return 25;
-    }
-
-    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Options options = Minecraft.getInstance().options;
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

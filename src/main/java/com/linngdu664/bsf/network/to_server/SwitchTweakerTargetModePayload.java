@@ -17,7 +17,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public record SwitchTweakerTargetModePayload(boolean isIncrease) implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<SwitchTweakerTargetModePayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("switch_tweaker_status_mode"));
+    public static final CustomPacketPayload.Type<SwitchTweakerTargetModePayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("switch_tweaker_target_mode"));
     public static final StreamCodec<ByteBuf, SwitchTweakerTargetModePayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.BOOL, SwitchTweakerTargetModePayload::isIncrease,
             SwitchTweakerTargetModePayload::new

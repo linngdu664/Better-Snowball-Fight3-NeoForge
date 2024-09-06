@@ -6,13 +6,13 @@
   "weight": 1,
   "min_cost": {
     "base": 1,
-    "per_level_above_first": 9
+    "per_level_above_first": 0
   },
   "max_cost": {
     "base": 6,
-    "per_level_above_first": 9
+    "per_level_above_first": 0
   },
   "anvil_cost": 4,
   "supported_items": ["bsf:snowball_cannon", "bsf:freezing_snowball_cannon", "bsf:powerful_snowball_cannon", "bsf:snowball_shotgun"],
-  "slots": ["hand"]
+  "slots": ["any"]
 }

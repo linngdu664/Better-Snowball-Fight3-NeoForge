@@ -1,0 +1,11 @@
+{
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_21",
+  "package": "com.linngdu664.bsf.mixin",
+  "refmap": "bsf.mixins.refmap.json",
+  "mixins": [
+    "SnowballMixin"
+  ],
+  "client": ["MinecraftMixin", "CameraMixin"],
+  "server": []
+}

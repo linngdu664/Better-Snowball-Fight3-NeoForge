@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "bsf:snowball_cannon",
+    "bsf:freezing_snowball_cannon",
+    "bsf:powerful_snowball_cannon",
+    "bsf:snowball_machine_gun",
+    "bsf:snowball_shotgun",
+    "bsf:target_locator",
+    "bsf:sculk_snowball_launcher",
+    "bsf:implosion_snowball_cannon",
+    "bsf:glove",
+    "bsf:jedi_glove",
+    "bsf:repulsive_field_generator",
+    "bsf:snow_block_blender",
+    "bsf:snow_trap_setter",
+    "bsf:vector_inversion_anchor",
+    "bsf:wood_snowball_clamp",
+    "bsf:stone_snowball_clamp",
+    "bsf:iron_snowball_clamp",
+    "bsf:gold_snowball_clamp",
+    "bsf:diamond_snowball_clamp",
+    "bsf:netherite_snowball_clamp",
+    "bsf:emerald_snowball_clamp",
+    "bsf:ice_skates",
+    "bsf:snow_fall_boots"
+  ]
+}

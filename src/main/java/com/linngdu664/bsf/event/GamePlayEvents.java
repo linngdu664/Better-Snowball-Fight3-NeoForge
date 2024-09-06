@@ -3,7 +3,6 @@ package com.linngdu664.bsf.event;
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.item.misc.IceSkatesItem;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
@@ -55,12 +54,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.UUID;
-
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
-    public static final UUID SKATES_SPEED_ID = UUID.fromString("00a3641b-33e0-4022-8d92-1c7b74c380b0");
-
     @SubscribeEvent
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
         if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {
@@ -84,7 +79,7 @@ public class GamePlayEvents {
     public static void onLivingUseItemTick(LivingEntityUseItemEvent.Tick event) {
         LivingEntity livingEntity = event.getEntity();
         ItemStack itemStack = event.getItem();
-        if (EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(livingEntity, BSFEnchantmentHelper.FLOATING_SHOOTING), itemStack) > 0) {
+        if (EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(livingEntity, BSFEnchantmentHelper.FLOATING_SHOOTING), itemStack) > 0) {
             livingEntity.resetFallDistance();
             double vy = livingEntity.getDeltaMovement().y;
             livingEntity.push(0, -0.25 * vy, 0);
@@ -167,7 +162,7 @@ public class GamePlayEvents {
                     ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY(), player.getZ(), (int) h * 8, 0, 0, 0, h * 0.01);
                     shoes.hurtAndBreak((int) Math.ceil((h - 3) * 0.25), player, EquipmentSlot.FEET);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                    int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(player, BSFEnchantmentHelper.KINETIC_ENERGY_STORAGE), shoes);
+                    int enchantmentLevel = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(player, BSFEnchantmentHelper.KINETIC_ENERGY_STORAGE), shoes);
                     if (enchantmentLevel > 0 && h > 5) {
                         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, (int) h * 6, enchantmentLevel - 1));
                     }
@@ -197,23 +192,25 @@ public class GamePlayEvents {
         }
     }
 
+    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), 0.15, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
         ItemStack shoes = player.getItemBySlot(EquipmentSlot.FEET);
-        if (!shoes.isEmpty()) {
-            if (shoes.getItem() instanceof IceSkatesItem && player.isSprinting() && player.onGround()) {
-                Level level = player.level();
-                BlockPos pos = player.blockPosition().below();
-                if (level.getBlockState(pos).is(BlockTags.ICE)) {
-                    level.addParticle(ParticleTypes.SNOWFLAKE, player.getX(), player.getEyeY() - 1.4, player.getZ(), 0, 0, 0);
-                    addSpeedGoodEffect(player);
-                } else {
-                    addSpeedBadEffect(player);
-                }
+        AttributeMap attributes = player.getAttributes();
+        if (!shoes.isEmpty() && shoes.getItem().equals(ItemRegister.ICE_SKATES_ITEM.get()) && player.isSprinting() && player.onGround()) {
+            Level level = player.level();
+            BlockPos pos = player.blockPosition().below();
+            if (level.getBlockState(pos).is(BlockTags.ICE)) {
+                level.addParticle(ParticleTypes.SNOWFLAKE, player.getX(), player.getEyeY() - 1.4, player.getZ(), 0, 0, 0);
+                attributes.getInstance(Attributes.MOVEMENT_SPEED).addOrReplacePermanentModifier(SKATES_SPEED_BUFF);
             } else {
-                clearSpeedEffect(player);
+                attributes.getInstance(Attributes.MOVEMENT_SPEED).addOrReplacePermanentModifier(SKATES_SPEED_DEBUFF);
             }
+        } else {
+            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(Main.makeResLoc("skates_speed"));
         }
     }
 
@@ -235,44 +232,8 @@ public class GamePlayEvents {
         return false;
     }
 
-    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed_buff"), 0.15, AttributeModifier.Operation.ADD_VALUE);
-    private static final AttributeModifier SKATES_STEP_HEIGHT_BUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_buff"), 1.4, AttributeModifier.Operation.ADD_VALUE);
-    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed_debuff"), -0.25, AttributeModifier.Operation.ADD_VALUE);
-    private static final AttributeModifier SKATES_STEP_HEIGHT_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_debuff"), -0.1, AttributeModifier.Operation.ADD_VALUE);
-
-    private static void clearSpeedEffect(Player player) {
-        AttributeMap attributes = player.getAttributes();
-        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_debuff"))) {
-            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_DEBUFF);
-            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_DEBUFF);
-        }
-        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_buff"))) {
-            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_BUFF);
-            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_BUFF);
-        }
-    }
-
-    private static void addSpeedGoodEffect(Player player) {
-        AttributeMap attributes = player.getAttributes();
-        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_debuff"))) {
-            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_DEBUFF);
-            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_DEBUFF);
-        }
-        if (!attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_buff"))) {
-            attributes.getInstance(Attributes.MOVEMENT_SPEED).addPermanentModifier(SKATES_SPEED_BUFF);
-            attributes.getInstance(Attributes.STEP_HEIGHT).addPermanentModifier(SKATES_STEP_HEIGHT_BUFF);
-        }
-    }
-
-    private static void addSpeedBadEffect(Player player) {
-        AttributeMap attributes = player.getAttributes();
-        if (attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_buff"))) {
-            attributes.getInstance(Attributes.MOVEMENT_SPEED).removeModifier(SKATES_SPEED_BUFF);
-            attributes.getInstance(Attributes.STEP_HEIGHT).removeModifier(SKATES_STEP_HEIGHT_BUFF);
-        }
-        if (!attributes.getInstance(Attributes.MOVEMENT_SPEED).hasModifier(Main.makeResLoc("skates_speed_debuff"))) {
-            attributes.getInstance(Attributes.MOVEMENT_SPEED).addPermanentModifier(SKATES_SPEED_DEBUFF);
-            attributes.getInstance(Attributes.STEP_HEIGHT).addPermanentModifier(SKATES_STEP_HEIGHT_DEBUFF);
-        }
-    }
+//    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed_buff"), 0.15, AttributeModifier.Operation.ADD_VALUE);
+//    private static final AttributeModifier SKATES_STEP_HEIGHT_BUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_buff"), 1.4, AttributeModifier.Operation.ADD_VALUE);
+//    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed_debuff"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+//    private static final AttributeModifier SKATES_STEP_HEIGHT_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_debuff"), -0.1, AttributeModifier.Operation.ADD_VALUE);
 }

@@ -32,31 +32,36 @@ public class SnowballTankItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        if (pPlayer.getOffhandItem().isEmpty()) {
-            Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
-            if (!Items.AIR.equals(item)) {
-                int damageValue = itemStack.getDamageValue();
-                int maxDamage = itemStack.getMaxDamage();
-                Inventory inventory = pPlayer.getInventory();
-                if (pPlayer.isShiftKeyDown() || damageValue >= maxDamage - 16) {
-                    int k = maxDamage - damageValue;
+        if (!pPlayer.getOffhandItem().isEmpty()) {
+            return InteractionResultHolder.pass(itemStack);
+        }
+        Item item = itemStack.getOrDefault(DataComponentRegister.SNOWBALL_TANK_TYPE, ItemData.EMPTY).item();
+        if (Items.AIR.equals(item)) {
+            return InteractionResultHolder.pass(itemStack);
+        }
+        if (!pLevel.isClientSide) {
+            int damageValue = itemStack.getDamageValue();
+            int maxDamage = itemStack.getMaxDamage();
+            Inventory inventory = pPlayer.getInventory();
+            if (pPlayer.isShiftKeyDown() || damageValue >= maxDamage - 16) {
+                int k = maxDamage - damageValue;
+                if (!pPlayer.getAbilities().instabuild) {
                     itemStack.setDamageValue(maxDamage);
-                    if (!pPlayer.getAbilities().instabuild) {
-                        itemStack.remove(DataComponentRegister.SNOWBALL_TANK_TYPE);
-                    }
-                    for (int i = 0; i < k / 16; i++) {
-                        inventory.placeItemBackInInventory(new ItemStack(item, 16), true);
-                    }
-                    inventory.placeItemBackInInventory(new ItemStack(item, k % 16), true);
-                } else {
-                    itemStack.setDamageValue(damageValue + 16);
+                    itemStack.remove(DataComponentRegister.SNOWBALL_TANK_TYPE);
+                }
+                for (int i = 0; i < k / 16; i++) {
                     inventory.placeItemBackInInventory(new ItemStack(item, 16), true);
                 }
-                pPlayer.awardStat(Stats.ITEM_USED.get(this));
-                return InteractionResultHolder.success(itemStack);
+                inventory.placeItemBackInInventory(new ItemStack(item, k % 16), true);
+            } else {
+                if (!pPlayer.getAbilities().instabuild) {
+                    itemStack.setDamageValue(damageValue + 16);
+                }
+                inventory.placeItemBackInInventory(new ItemStack(item, 16), true);
             }
+            pPlayer.awardStat(Stats.ITEM_USED.get(this));
         }
-        return InteractionResultHolder.pass(itemStack);
+        return InteractionResultHolder.success(itemStack);
     }
 
     @Override

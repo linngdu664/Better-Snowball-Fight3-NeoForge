@@ -120,7 +120,7 @@ public class ClientForgeEvents {
     }
 
     @SubscribeEvent
-    public static void onRenderGui(RenderGuiEvent event) {
+    public static void onRenderGui(RenderGuiEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) {
             return;

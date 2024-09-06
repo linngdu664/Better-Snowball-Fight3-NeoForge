@@ -5,14 +5,14 @@
   "max_level": 3,
   "weight": 10,
   "min_cost": {
-    "base": 5,
+    "base": 10,
     "per_level_above_first": 10
   },
   "max_cost": {
-    "base": 15,
+    "base": 25,
     "per_level_above_first": 10
   },
   "anvil_cost": 4,
   "supported_items": ["bsf:snow_fall_boots"],
-  "slots": ["feet"]
+  "slots": ["any"]
 }
