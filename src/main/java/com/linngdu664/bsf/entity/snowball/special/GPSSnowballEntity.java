@@ -56,8 +56,7 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
                 level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.7F, 1.0F / (level().getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }
             targetLocator.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new TranslatableContents("item.bsf.target_locator", null, new Object[]{}))
-                    .append(": ").append(MutableComponent.create(new TranslatableContents("target.tip", null, new Object[]{})))
-                    .append(livingEntity.getName().getString() + "  UUID: " + livingEntity.getUUID()));
+                    .append(": ").append(MutableComponent.create(new TranslatableContents("target.tip", null, new Object[]{livingEntity.getName()}))));
         }
     }
 

@@ -153,11 +153,12 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                 level.addFreshEntity(itemEntity);
             }
             if(!release){
-                float damage = getDamage();
-                float r = damage < 5 ? 2 : damage / 5 + 1;
-                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.LIVING_ENTITY_STILL_ALIVE);
-                damageList(list,damage,r,location);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r,(int) (25 * r)));
+                subspaceRangeDamage(location);
+//                float damage = getDamage();
+//                float r = damage < 5 ? 2 : damage / 5 + 1;
+//                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable()));
+//                damageList(list,damage,r,location);
+//                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r,(int) (25 * r)));
             }
             level.playSound(null, location.x,location.y,location.z, SoundRegister.SUBSPACE_SNOWBALL_ATTACK.get(), SoundSource.PLAYERS, 1.3F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             this.discard();
@@ -172,26 +173,42 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         Level level = level();
         if (!level.isClientSide){
             if (!release) {
-                float damage = getDamage();
-                float r = damage < 5 ? 2 : damage / 5 + 1;
-                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_SPECTATORS);
-                damageList(list,damage,r,location);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
+                subspaceRangeDamage(location);
+//                float damage = getDamage();
+//                float r = damage < 5 ? 2 : damage / 5 + 1;
+//                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable()));
+//                damageList(list,damage,r,location);
+//                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
                 this.discard();
             }
             level.playSound(null, location.x,location.y,location.z, SoundRegister.SUBSPACE_SNOWBALL_ATTACK.get(), SoundSource.PLAYERS, 0.7F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
     }
 
-
-    private void damageList(List<? extends LivingEntity> list, float damage,float range,Vec3 location) {
+    private void subspaceRangeDamage(Vec3 location) {
+        Level level = level();
+        float damage = getDamage();
+        float r = damage < 5 ? 2 : damage / 5 + 1;
+        List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable()));
         for (LivingEntity entity : list) {
             Vec3 rVec = new Vec3(entity.getX(), (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) * 0.5, entity.getZ()).add(location.reverse());
-            if (rVec.length() < range) {
-                entity.hurt(level().damageSources().fellOutOfWorld(), (float) (damage/rVec.length()));
+            float len = (float) rVec.length();
+            if (len < r) {
+                entity.hurt(level.damageSources().fellOutOfWorld(), damage / len);
             }
         }
+        PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
     }
+
+
+//    private void damageList(List<? extends LivingEntity> list, float damage,float range,Vec3 location) {
+//        for (LivingEntity entity : list) {
+//            Vec3 rVec = new Vec3(entity.getX(), (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) * 0.5, entity.getZ()).add(location.reverse());
+//            if (rVec.length() < range) {
+//                entity.hurt(level().damageSources().fellOutOfWorld(), (float) (damage/rVec.length()));
+//            }
+//        }
+//    }
 
 //    @Override
 //    public boolean canBeCaught() {

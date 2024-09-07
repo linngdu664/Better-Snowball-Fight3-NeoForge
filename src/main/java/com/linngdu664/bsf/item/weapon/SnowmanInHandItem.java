@@ -31,6 +31,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.item.Items;
 
 import java.util.List;
 
@@ -133,6 +134,11 @@ public class SnowmanInHandItem extends Item {
     @Override
     public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return 1200;
+    }
+
+    @Override
+    public int getEnchantmentValue(ItemStack stack) {
+        return 25;
     }
 
     @Override

@@ -69,4 +69,9 @@ public abstract class AbstractExecutor extends Entity implements Absorbable {
         double d0 = 32 * getViewScale();
         return pDistance < d0 * d0;
     }
+
+    @Override
+    public boolean isPickable() {
+        return true;
+    }
 }

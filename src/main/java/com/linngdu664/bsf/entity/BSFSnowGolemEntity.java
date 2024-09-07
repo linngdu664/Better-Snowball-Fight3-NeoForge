@@ -68,6 +68,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.world.entity.monster.Skeleton;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -277,8 +279,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     protected void registerGoals() {
         goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         goalSelector.addGoal(2, new BSFGolemTargetNearGoal(this));
-        goalSelector.addGoal(3, new BSFGolemRangedAttackGoal(this, 1.0, 30, 50.0F));
-        goalSelector.addGoal(4, new BSFGolemFollowOwnerGoal(this, 1.0, 8.0F, 3.0F));
+        goalSelector.addGoal(3, new BSFGolemFollowOwnerGoal(this, 1.0, 8.0F, 4.0F, 20.0F, 8.0F));
+        goalSelector.addGoal(4, new BSFGolemRangedAttackGoal(this, 1.0, 30, 50.0F));
         goalSelector.addGoal(5, new BSFGolemRandomStrollGoal(this, 0.8, 1E-5F));
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));
         goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
@@ -352,7 +354,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                         playSound(SoundEvents.GLASS_BREAK, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                     }
                 } else {
-                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("potionSickness.tip", null, new Object[0])).append(String.valueOf(POTION_SICKNESS)), false);
+                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("potionSickness.tip", null, new Object[]{String.valueOf(getPotionSickness())})), false);
                 }
             } else if (item.equals(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get())) {
                 int targetMode = itemStack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
@@ -369,7 +371,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 Entity entity = ((ServerLevel) level).getEntity(itemStack.getOrDefault(DataComponentRegister.TARGET_UUID, new UuidData(new UUID(0, 0))).uuid());
                 if (entity instanceof LivingEntity livingEntity && entity != this) {
                     pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("snow_golem_locator_tip", null, new Object[0])), false);
-//                    System.out.println(livingEntity.getType().getDescriptionId());
                     setTarget(livingEntity);
                 }
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
@@ -390,7 +391,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                     pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("copy.tip", null, new Object[0])), false);
                 } else {
                     setEnhance(!getEnhance());
-                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("golem_enhance.tip", null, new Object[0])).append(String.valueOf(ENHANCE)), false);
+                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("golem_enhance.tip", null, new Object[]{String.valueOf(getEnhance())})), false);
                 }
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.SNOW_GOLEM_CONTAINER.get())) {

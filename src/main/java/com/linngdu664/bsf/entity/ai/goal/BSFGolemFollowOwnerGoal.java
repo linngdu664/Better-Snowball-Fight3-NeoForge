@@ -19,41 +19,50 @@ public class BSFGolemFollowOwnerGoal extends Goal {
     private final LevelReader level;
     private final double speedModifier;
     private final PathNavigation navigation;
-    private final float stopDistance;
-    private final float startDistance;
+    private final double stopDisSqr;
+    private final double startDisSqr;
+    private final double hasTargetStartDisSqr;
+    private final double hasTargetStopDisSqr;
     private LivingEntity owner;
     private int timeToRecalcPath;
 
-    public BSFGolemFollowOwnerGoal(BSFSnowGolemEntity golem, double pSpeedModifier, float pStartDistance, float pStopDistance) {
+    public BSFGolemFollowOwnerGoal(BSFSnowGolemEntity golem, double pSpeedModifier, double pStartDistance, double pStopDistance, double hasTargetStartDistance, double hasTargetStopDistance) {
         this.golem = golem;
         this.level = golem.level();
         this.speedModifier = pSpeedModifier;
         this.navigation = golem.getNavigation();
-        this.startDistance = pStartDistance;
-        this.stopDistance = pStopDistance;
+        this.startDisSqr = pStartDistance * pStartDistance;
+        this.stopDisSqr = pStopDistance * pStopDistance;
+        this.hasTargetStartDisSqr = hasTargetStartDistance * hasTargetStartDistance;
+        this.hasTargetStopDisSqr = hasTargetStopDistance * hasTargetStopDistance;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
     }
 
     @Override
     public boolean canUse() {
         LivingEntity livingentity = golem.getOwner();
-        if (livingentity == null || livingentity.isSpectator() || golem.isOrderedToSit() ||
-                golem.distanceToSqr(livingentity) < (double) (startDistance * startDistance) ||
-                golem.getStatus() == 3 || golem.getStatus() == 4) {
+        int status = golem.getStatus();
+        if (livingentity == null || livingentity.isSpectator() || golem.isOrderedToSit() || status == 3 || status == 4) {
             return false;
-        } else {
-            owner = livingentity;
-            return true;
         }
+        double ownerDisSqr = golem.distanceToSqr(livingentity);
+        if (status == 1 && ownerDisSqr < startDisSqr || status == 2 && (
+                golem.getTarget() == null && ownerDisSqr < startDisSqr || golem.getTarget() != null && ownerDisSqr < hasTargetStartDisSqr)) {
+            return false;
+        }
+        owner = livingentity;
+        return true;
     }
 
     @Override
     public boolean canContinueToUse() {
         if (navigation.isDone() || golem.isOrderedToSit()) {
             return false;
-        } else {
-            return !(golem.distanceToSqr(owner) <= (double) (stopDistance * stopDistance));
         }
+        if (golem.getStatus() == 1 || golem.getTarget() == null) {
+            return !(golem.distanceToSqr(owner) <= stopDisSqr);
+        }
+        return !(golem.distanceToSqr(owner) <= hasTargetStopDisSqr);
     }
 
     @Override
@@ -65,6 +74,7 @@ public class BSFGolemFollowOwnerGoal extends Goal {
     public void stop() {
         owner = null;
         navigation.stop();
+        golem.setTarget(null);
     }
 
     @Override

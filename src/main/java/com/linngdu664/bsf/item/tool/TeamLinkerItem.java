@@ -21,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,11 +49,11 @@ public class TeamLinkerItem extends Item {
             }
         } else if (!pLevel.isClientSide) {
             BSFTeamSavedData savedData = pPlayer.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            String playerName = pPlayer.getName().getString();
+            Component playerName = pPlayer.getName();
             UUID uuid = pPlayer.getUUID();
             int oldId = savedData.getTeam(uuid);
-            String[] oldNameParam = new String[]{playerName, MutableComponent.create(new TranslatableContents(getColorNameKeyById(oldId), null, new Object[]{})).getString()};
-            String[] newNameParam = new String[]{playerName, MutableComponent.create(new TranslatableContents(getColorNameKeyById(teamId), null, new Object[]{})).getString()};
+            Object[] oldNameParam = new Object[]{playerName, MutableComponent.create(new TranslatableContents(getColorNameKeyById(oldId), null, new Object[]{}))};
+            Object[] newNameParam = new Object[]{playerName, MutableComponent.create(new TranslatableContents(getColorNameKeyById(teamId), null, new Object[]{}))};
             HashSet<UUID> oldMembers = savedData.getMembers(oldId);
             oldMembers.stream()
                     .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))

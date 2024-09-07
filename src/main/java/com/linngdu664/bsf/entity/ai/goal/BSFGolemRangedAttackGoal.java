@@ -1,21 +1,22 @@
 package com.linngdu664.bsf.entity.ai.goal;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
-import com.linngdu664.bsf.util.BSFTeamSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -28,9 +29,9 @@ public class BSFGolemRangedAttackGoal extends Goal {
     private final int attackInterval;
     private final float attackRadius;
     private final float attackRadiusSqr;
-    private int attackTime;
     private int seeTime;
-    private int strafingTime;
+    private int attackTime = -1;
+    private int strafingTime = -1;
     private boolean strafingClockwise;
     private boolean strafingBackwards;
 
@@ -46,8 +47,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity livingEntity = golem.getTarget();
-        BSFTeamSavedData savedData = golem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-        return livingEntity != null && !savedData.isSameTeam(golem.getOwner(), livingEntity) && livingEntity.isAlive() && golem.getStatus() != 1;
+        return livingEntity != null && livingEntity.isAlive() && golem.getStatus() != 1;
     }
 
     @Override
@@ -58,8 +58,10 @@ public class BSFGolemRangedAttackGoal extends Goal {
     @Override
     public void stop() {
         seeTime = 0;
-        attackTime = 0;
-        golem.getMoveControl().strafe(0, 0);
+        attackTime = -1;
+        golem.setZza(0);
+        golem.setXxa(0);
+        golem.setSpeed(0);
     }
 
     @Override
@@ -85,23 +87,29 @@ public class BSFGolemRangedAttackGoal extends Goal {
         double dx = pTarget.getX() - golem.getX();
         double dz = pTarget.getZ() - golem.getZ();
         double x2 = BSFCommonUtil.lengthSqr(dx, dz);
-        double d = Math.sqrt(x2 + h * h);
+        double d = Math.sqrt(x2 + h * h);   // d是总距离
         double x = Math.sqrt(x2);
-        double k = 0.015 * x2 / (v * v);    // 0.5 * g / 400.0, g = 12
-        double cosTheta = 0.7071067811865475 / d * Math.sqrt(x2 - 2 * k * h + x * Math.sqrt(x2 - 4 * k * k - 4 * k * h));
-        double sinTheta;
         dx /= x;
         dz /= x;
-        if (cosTheta > 1) {
-            sinTheta = 0;
+        double cosTheta, sinTheta;
+        boolean isNoGravity = golem.getAmmo().getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item().equals(ItemRegister.GHOST_SNOWBALL.get());
+        if (isNoGravity) {
+            cosTheta = x / d;
+            sinTheta = h / d;
         } else {
-            sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
-            dx *= cosTheta;
-            dz *= cosTheta;
-            if (h < -k) {
-                sinTheta = -sinTheta;
+            double k = 0.015 * x2 / (v * v);    // 0.5 * g / 400.0, g = 12
+            cosTheta = 0.7071067811865475 / d * Math.sqrt(x2 - 2 * k * h + x * Math.sqrt(x2 - 4 * k * k - 4 * k * h));
+            if (cosTheta > 1) {
+                sinTheta = 0;
+            } else {
+                sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
+                if (h < -k) {
+                    sinTheta = -sinTheta;
+                }
             }
         }
+        dx *= cosTheta;
+        dz *= cosTheta;
         List<LivingEntity> list = golem.level().getEntitiesOfClass(LivingEntity.class, golem.getBoundingBox().inflate(x), p -> !golem.equals(p) && !pTarget.equals(p));
         for (LivingEntity entity : list) {
             double dx1 = entity.getX() - golem.getX();
@@ -115,27 +123,9 @@ public class BSFGolemRangedAttackGoal extends Goal {
             double r = Math.sqrt(BSFCommonUtil.lengthSqr(dx1, dz1));
             if (r < x && r * sinAlpha < Math.sqrt(BSFCommonUtil.lengthSqr(aabb.maxX - aabb.minX, aabb.maxZ - aabb.minZ)) * 0.5 + 0.8) {
                 double t = r * cosAlpha / (v * cosTheta);
-                double y = v * sinTheta * t - 0.015 * t * t + golem.getEyeY();
+                double y = (isNoGravity ? v * sinTheta * t : v * sinTheta * t - 0.015 * t * t) + golem.getEyeY();
                 if (y >= aabb.minY - 0.8 && y <= aabb.maxY + 0.8) {
-                    LivingEntity owner = golem.getOwner();
-                    if (golem.getLocator() == 0) {
-                        if (entity.getType().equals(golem.getTarget().getType())) {
-                            golem.setTarget(entity);
-                        }
-                    } else if (golem.getLocator() == 2) {
-                        if (golem.canAttackInAttackEnemyTeamMode(entity)) {
-                            golem.setTarget(entity);
-                        }
-                    } else if (golem.getLocator() == 3 && owner != null) {
-                        if (entity.getType().equals(EntityType.PLAYER)) {
-                            if (!entity.isSpectator() && !entity.equals(owner)) {
-                                golem.setTarget(entity);
-                            }
-                        } else if (golem.wantsToAttack(entity, owner)) {
-                            golem.setTarget(entity);
-                        }
-                    }
-                    attackTime = 1;
+                    changeTargetWhenNecessary(entity);
                     return false;
                 }
             }
@@ -146,6 +136,28 @@ public class BSFGolemRangedAttackGoal extends Goal {
         golem.setLaunchAccuracy(acc);
         golem.setLaunchVelocity(v);
         return true;
+    }
+
+    private void changeTargetWhenNecessary(LivingEntity entity) {
+        LivingEntity owner = golem.getOwner();
+        if (golem.getLocator() == 0) {
+            if (entity instanceof Enemy) {
+                golem.setTarget(entity);
+            }
+        } else if (golem.getLocator() == 2) {
+            if (golem.canAttackInAttackEnemyTeamMode(entity)) {
+                golem.setTarget(entity);
+            }
+        } else if (golem.getLocator() == 3 && owner != null) {
+            if (entity.getType().equals(EntityType.PLAYER)) {
+                if (!entity.isSpectator() && !entity.equals(owner)) {
+                    golem.setTarget(entity);
+                }
+            } else if (golem.wantsToAttack(entity, owner)) {
+                golem.setTarget(entity);
+            }
+        }
+        attackTime = 1;
     }
 
     public void tick() {

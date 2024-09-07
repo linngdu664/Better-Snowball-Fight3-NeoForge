@@ -80,9 +80,11 @@ public class GamePlayEvents {
         LivingEntity livingEntity = event.getEntity();
         ItemStack itemStack = event.getItem();
         if (EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(livingEntity, BSFEnchantmentHelper.FLOATING_SHOOTING), itemStack) > 0) {
-            livingEntity.resetFallDistance();
             double vy = livingEntity.getDeltaMovement().y;
-            livingEntity.push(0, -0.25 * vy, 0);
+            if (vy < 0) {
+                livingEntity.resetFallDistance();
+                livingEntity.push(0, -0.25 * vy, 0);
+            }
         }
     }
 
@@ -91,8 +93,8 @@ public class GamePlayEvents {
         Player player = event.getEntity();
         Entity entity = event.getTarget();
         Level level = player.level();
-        Item item = player.getMainHandItem().getItem();
-        if (!player.isSpectator() && entity instanceof LivingEntity target) {
+        if (!level.isClientSide && !player.isSpectator() && entity instanceof LivingEntity target) {
+            Item item = player.getMainHandItem().getItem();
             if (item instanceof SolidBucketItem) {
                 if (!(target instanceof BSFSnowGolemEntity) && !(target instanceof SnowGolem)) {
                     if (target.getTicksFrozen() < 240) {
@@ -103,10 +105,8 @@ public class GamePlayEvents {
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 150, 1));
                 }
                 target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, 80, 0));
-                if (level instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getEyeY(), target.getZ(), 16, 0, 0, 0, 0);
-                    serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getEyeY(), target.getZ(), 16, 0, 0, 0, 0.04);
-                }
+                ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getEyeY(), target.getZ(), 16, 0, 0, 0, 0);
+                ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getEyeY(), target.getZ(), 16, 0, 0, 0, 0.04);
                 if (target instanceof Blaze) {
                     target.hurt(level.damageSources().playerAttack(player), 8);
                 }
@@ -126,10 +126,8 @@ public class GamePlayEvents {
                 if (!player.getAbilities().instabuild) {
                     player.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
                 }
-                if (level instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getEyeY(), target.getZ(), 8, 0, 0, 0, 0);
-                    serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getEyeY(), target.getZ(), 8, 0, 0, 0, 0.04);
-                }
+                ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, target.getX(), target.getEyeY(), target.getZ(), 8, 0, 0, 0, 0);
+                ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getEyeY(), target.getZ(), 8, 0, 0, 0, 0.04);
                 if (target instanceof Blaze) {
                     target.hurt(level.damageSources().playerAttack(player), 4);
                 }
@@ -231,9 +229,4 @@ public class GamePlayEvents {
         }
         return false;
     }
-
-//    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed_buff"), 0.15, AttributeModifier.Operation.ADD_VALUE);
-//    private static final AttributeModifier SKATES_STEP_HEIGHT_BUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_buff"), 1.4, AttributeModifier.Operation.ADD_VALUE);
-//    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed_debuff"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-//    private static final AttributeModifier SKATES_STEP_HEIGHT_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_step_height_debuff"), -0.1, AttributeModifier.Operation.ADD_VALUE);
 }

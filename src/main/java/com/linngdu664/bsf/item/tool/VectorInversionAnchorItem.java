@@ -9,6 +9,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -25,7 +26,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -37,10 +37,10 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p->p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10)
-                .forEach(p -> {
-                    p.setDeltaMovement(p.getDeltaMovement().reverse());
-                    if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide) {
+            pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p->p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10)
+                    .forEach(p -> {
+                        p.setDeltaMovement(p.getDeltaMovement().reverse());
                         AABB aabb = p.getBoundingBox();
                         Vec3 center = aabb.getCenter();
                         double x = 0.5 * (aabb.maxX - aabb.minX);
@@ -48,16 +48,15 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
                         double z = 0.5 * (aabb.maxZ - aabb.minZ);
                         ((ServerLevel) pLevel).sendParticles(ParticleTypes.ENCHANT, center.x, center.y, center.z, (int) (400 * z * x * y), x, y, z, 0.3);
                         if (p instanceof ServerPlayer player) {
+                            player.connection.send(new ClientboundSetEntityMotionPacket(p));
                             PacketDistributor.sendToPlayer(player, new ScreenShakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.5F));
                         }
-                    }
-                });
-        if (!pLevel.isClientSide) {
+                    });
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new VectorInversionParticlesPayload(pPlayer.getX(), pPlayer.getEyeY(), pPlayer.getZ(), 10, 0.24, 400));
+            pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.VECTOR_INVERSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
         pPlayer.getCooldowns().addCooldown(this, 40);
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
-        pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.VECTOR_INVERSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         return InteractionResultHolder.success(itemStack);
     }
 
