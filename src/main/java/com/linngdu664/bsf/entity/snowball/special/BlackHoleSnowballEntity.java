@@ -19,7 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -100,8 +99,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
     }
 
     private void startBlackHole() {
-        List<Player> nearbyPlayers = level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
-                new AABB(this.position().add(100, 100, 100), this.position().subtract(100, 100, 100)));
+        List<Player> nearbyPlayers = level().getNearbyPlayers(TargetingConditions.forNonCombat(), null, getBoundingBox().inflate(100));
         nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenShakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.6F)));
         discard();
         Level level = level();

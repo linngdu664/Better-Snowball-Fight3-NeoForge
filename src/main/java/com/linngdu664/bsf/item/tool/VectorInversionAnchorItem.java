@@ -49,7 +49,7 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
                         ((ServerLevel) pLevel).sendParticles(ParticleTypes.ENCHANT, center.x, center.y, center.z, (int) (400 * z * x * y), x, y, z, 0.3);
                         if (p instanceof ServerPlayer player) {
                             player.connection.send(new ClientboundSetEntityMotionPacket(p));
-                            PacketDistributor.sendToPlayer(player, new ScreenShakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.5F));
+                            PacketDistributor.sendToPlayer(player, new ScreenShakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
                         }
                     });
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new VectorInversionParticlesPayload(pPlayer.getX(), pPlayer.getEyeY(), pPlayer.getZ(), 10, 0.24, 400));

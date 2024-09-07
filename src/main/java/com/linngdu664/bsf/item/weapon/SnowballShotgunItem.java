@@ -90,56 +90,79 @@ public class SnowballShotgunItem extends AbstractBSFWeaponItem {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
-        int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(player, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), stack);
+        int enchantmentLevel = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(player, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), stack);
         if (enchantmentLevel > 0 || player.hasEffect(EffectRegister.WEAPON_JAM)) {
             return InteractionResultHolder.fail(stack);
         }
         double pushRank = 0.24;
+        // add push or summon projectile
         int i;
         for (i = 0; i < 4; i++) {
             ItemStack itemStack = getAmmo(player, stack);
             if (itemStack == null || !player.isShiftKeyDown() && (itemStack.getItem().equals(ItemRegister.THRUST_SNOWBALL.get()) || itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item().equals(ItemRegister.THRUST_SNOWBALL.get()))) {
                 break;
             }
-            AbstractBSFSnowballEntity snowballEntity = ItemToEntity(itemStack, player, level, getLaunchAdjustment(1, itemStack.getItem()));
-            Item item = itemStack.getItem();
-            if (item instanceof SnowballTankItem) {
-                item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
-            }
-            if (item instanceof AbstractBSFSnowballItem snowball) {
-                pushRank += snowball.getShotgunPushRank();
-            }
             if (!player.isShiftKeyDown()) {
+                AbstractBSFSnowballEntity snowballEntity = ItemToEntity(itemStack, player, level, getLaunchAdjustment(1, itemStack.getItem()));
                 BSFShootFromRotation(snowballEntity, player.getXRot(), player.getYRot(), 2.0F, 10.0F);
                 level.addFreshEntity(snowballEntity);
+            } else {
+                Item item = itemStack.getItem();
+                if (item instanceof SnowballTankItem) {
+                    item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
+                }
+                pushRank += ((AbstractBSFSnowballItem) item).getShotgunPushRank();
             }
             consumeAmmo(itemStack, player);
         }
-        if (i > 0) {
-            Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
-            if (!player.isShiftKeyDown()) {
-                if (level.isClientSide) {
-                    player.push(-0.24 * cameraVec.x, -0.24 * cameraVec.y, -0.24 * cameraVec.z);
-                } else {
-                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 45, 1.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SHOTGUN_FIRE_2.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                    player.getCooldowns().addCooldown(this, 20);
-                }
+        if (i == 0) {
+            return InteractionResultHolder.pass(stack);
+        }
+        // finally push player
+        Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
+        if (level.isClientSide) {
+//            if (!player.isShiftKeyDown()) {
+//                pushRank = 0.24;
+//            }
+            player.push(-pushRank * cameraVec.x, -pushRank * cameraVec.y, -pushRank * cameraVec.z);
+            ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(3)).setIntensity(0.8f).setEasing(Easing.ELASTIC_IN));
+        } else {
+            if (player.isShiftKeyDown()) {
+                PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 45, 0.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SHOTGUN_FIRE_1.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else {
-                if (level.isClientSide) {
-                    player.push(-pushRank * cameraVec.x, -pushRank * cameraVec.y, -pushRank * cameraVec.z);
-                } else {
-                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 45, 0.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SHOTGUN_FIRE_1.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                    player.getCooldowns().addCooldown(this, 30);
-                }
-            }
-            stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
-            player.awardStat(Stats.ITEM_USED.get(this));
-            if (level.isClientSide) {
-                ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(3)).setIntensity(0.8f).setEasing(Easing.ELASTIC_IN));
+                PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 45, 1.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SHOTGUN_FIRE_2.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }
         }
+        stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
+        player.getCooldowns().addCooldown(this, player.isShiftKeyDown() ? 30 : 20);
+        player.awardStat(Stats.ITEM_USED.get(this));
+
+
+//            Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
+//            if (!player.isShiftKeyDown()) {
+//                if (level.isClientSide) {
+//                    player.push(-0.24 * cameraVec.x, -0.24 * cameraVec.y, -0.24 * cameraVec.z);
+//                } else {
+//                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 45, 1.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
+//                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SHOTGUN_FIRE_2.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+//                }
+//                player.getCooldowns().addCooldown(this, 20);
+//            } else {
+//                if (level.isClientSide) {
+//                    player.push(-pushRank * cameraVec.x, -pushRank * cameraVec.y, -pushRank * cameraVec.z);
+//                } else {
+//                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(player.getEyePosition(), cameraVec, 4.5F, 45, 0.5F, 0.1), BSFParticleType.SNOWFLAKE.ordinal()));
+//                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SHOTGUN_FIRE_1.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+//                }
+//                player.getCooldowns().addCooldown(this, 30);
+//            }
+//            stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
+//            player.awardStat(Stats.ITEM_USED.get(this));
+//            if (level.isClientSide) {
+//                ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(3)).setIntensity(0.8f).setEasing(Easing.ELASTIC_IN));
+//            }
         return InteractionResultHolder.pass(stack);
     }
 

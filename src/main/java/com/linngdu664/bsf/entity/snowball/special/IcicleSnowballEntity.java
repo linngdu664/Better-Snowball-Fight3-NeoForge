@@ -22,7 +22,6 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -96,7 +95,6 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
 
     @Override
     public void tick() {
-
         Level level = level();
         if (isBuildingIcicle) {
             this.setDeltaMovement(0, 0, 0);
@@ -136,7 +134,6 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     }
 
     private void tryAddBlockState(Level level, int x, int y, int z) {
-
         BlockPos blockPos = new BlockPos(x, y, z);
         BlockState blockState = level.getBlockState(blockPos);
         if (posIsLooseSnow(level, blockPos) && blockState.getValue(LooseSnowBlock.FROZEN) == 0 && level.random.nextDouble() < FREEZE_PROPAGATION_RATE && freezingCount < initSnowStock * FREEZE_PERCENTAGE) {
@@ -148,8 +145,7 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     }
 
     private void icicleInit(Level level) {
-        List<Player> nearbyPlayers = level.getNearbyPlayers(TargetingConditions.forNonCombat(), null,
-                new AABB(this.position().add(100, 100, 100), this.position().subtract(100, 100, 100)));
+        List<Player> nearbyPlayers = level.getNearbyPlayers(TargetingConditions.forNonCombat(), null, getBoundingBox().inflate(100));
         nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenShakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.5F)));
 //        stopTheSnowball(impactPoint.getCenter());
         this.setDeltaMovement(0, 0, 0);

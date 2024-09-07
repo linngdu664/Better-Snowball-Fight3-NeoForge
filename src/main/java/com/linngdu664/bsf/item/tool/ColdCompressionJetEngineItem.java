@@ -1,10 +1,9 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.client.screenshake.Easing;
-import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
-import com.linngdu664.bsf.client.screenshake.ScreenshakeInstance;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
+import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
 import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
@@ -17,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -65,11 +65,53 @@ public class ColdCompressionJetEngineItem extends Item {
 
     @Override
     public void onUseTick(@NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, @NotNull ItemStack pStack, int pRemainingUseDuration) {
-        if (pStack.getDamageValue() == pStack.getMaxDamage() - 1) {
+        if (!(pLivingEntity instanceof Player) || pStack.getDamageValue() == pStack.getMaxDamage() - 1) {
             pLivingEntity.stopUsingItem();
             return;
         }
         int i = this.getUseDuration(pStack, pLivingEntity) - pRemainingUseDuration;
+        Vec3 vec3 = Vec3.directionFromRotation(pLivingEntity.getXRot(), pLivingEntity.getYRot());
+        Vec3 particlesPos = pLivingEntity.getEyePosition();
+        if (pLevel.isClientSide) {
+            if (i == STARTUP_DURATION) {
+                Vec3 aVec = vec3.scale(2);
+                pLivingEntity.push(aVec.x, aVec.y, aVec.z);
+            } else if (i > STARTUP_DURATION) {
+                Vec3 aVec = vec3.scale(0.2);
+                pLivingEntity.push(aVec.x, aVec.y, aVec.z);
+            }
+        } else {
+            pStack.hurtAndBreak(1, (ServerLevel) pLevel, pLivingEntity, p -> {});
+            if (i == 0) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP1.get(), ToggleMovingSoundPayload.PLAY_ONCE));
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.PLAY_LOOP));
+            }
+            if (i < STARTUP_DURATION) {
+                Vec3 newPos = particlesPos.add(vec3.reverse());
+                ((ServerLevel) pLevel).sendParticles(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), newPos.x, newPos.y, newPos.z, 1, 0, 0, 0, 0.04);
+                return;
+            }
+            if (i == STARTUP_DURATION) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.PLAY_LOOP));
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP3.get(), ToggleMovingSoundPayload.PLAY_ONCE));
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP4.get(), ToggleMovingSoundPayload.PLAY_LOOP));
+                PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse().scale(0.5), 5F, 10, 0.2F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
+                PacketDistributor.sendToPlayer((ServerPlayer) pLivingEntity, new ScreenShakePayload(6).setIntensity(0.7F).setEasing(Easing.EXPO_IN_OUT));       // 服务端发包防止其他人抖动，我也不知道为什么会这样
+            } else {
+                List<LivingEntity> list = pLevel.getEntitiesOfClass(LivingEntity.class, pLivingEntity.getBoundingBox().inflate(2), p -> !pLivingEntity.equals(p));
+                for (LivingEntity entity : list) {
+                    if (entity.getTicksFrozen() < 100) {
+                        entity.setTicksFrozen(100);
+                    }
+                    entity.hurt(pLevel.damageSources().playerAttack((Player) pLivingEntity), Float.MIN_VALUE);
+                }
+                if (vec3.y > 0) {
+                    pLivingEntity.resetFallDistance();
+                }
+            }
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse(), 2F, 60, 0.5F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
+        }
+        /*
         Vec3 vec3 = Vec3.directionFromRotation(pLivingEntity.getXRot(), pLivingEntity.getYRot());
         Vec3 particlesPos = pLivingEntity.getEyePosition();
         if (!pLevel.isClientSide) {
@@ -116,6 +158,7 @@ public class ColdCompressionJetEngineItem extends Item {
         if (!pLevel.isClientSide) {
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse(), 2F, 60, 0.5F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
         }
+        */
     }
 
     @Override
