@@ -3,7 +3,7 @@ package com.linngdu664.bsf.item.tool;
 import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
-import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
+import com.linngdu664.bsf.network.to_client.ScreenshakePayload;
 import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
@@ -96,7 +96,7 @@ public class ColdCompressionJetEngineItem extends Item {
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP3.get(), ToggleMovingSoundPayload.PLAY_ONCE));
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP4.get(), ToggleMovingSoundPayload.PLAY_LOOP));
                 PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse().scale(0.5), 5F, 10, 0.2F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
-                PacketDistributor.sendToPlayer((ServerPlayer) pLivingEntity, new ScreenShakePayload(6).setIntensity(0.7F).setEasing(Easing.EXPO_IN_OUT));       // 服务端发包防止其他人抖动，我也不知道为什么会这样
+                PacketDistributor.sendToPlayer((ServerPlayer) pLivingEntity, new ScreenshakePayload(6).setIntensity(0.7F).setEasing(Easing.EXPO_IN_OUT));       // 服务端发包防止其他人抖动，我也不知道为什么会这样
             } else {
                 List<LivingEntity> list = pLevel.getEntitiesOfClass(LivingEntity.class, pLivingEntity.getBoundingBox().inflate(2), p -> !pLivingEntity.equals(p));
                 for (LivingEntity entity : list) {

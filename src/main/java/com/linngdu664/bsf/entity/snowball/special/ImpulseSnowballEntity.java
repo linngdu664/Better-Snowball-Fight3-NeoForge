@@ -3,7 +3,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
+import com.linngdu664.bsf.network.to_client.ScreenshakePayload;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -76,7 +76,7 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
                 entity.push(aVec.x, aVec.y, aVec.z);
                 if (entity instanceof ServerPlayer player) {
                     player.connection.send(new ClientboundSetEntityMotionPacket(entity));
-                    PacketDistributor.sendToPlayer(player, new ScreenShakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
+                    PacketDistributor.sendToPlayer(player, new ScreenshakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
                 }
             }
         }

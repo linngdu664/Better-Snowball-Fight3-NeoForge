@@ -26,9 +26,7 @@ public record ToggleMovingSoundPayload(int entityId, SoundEvent soundEvent, byte
     );
 
     public static void handleDataInClient(ToggleMovingSoundPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            SOUND_PAYLOADS.add(payload);        // handle the payload in client tick event to prevent class loading
-        });
+        context.enqueueWork(() -> SOUND_PAYLOADS.add(payload));     // handle the payload in client tick event to prevent class loading
     }
 
     @Override

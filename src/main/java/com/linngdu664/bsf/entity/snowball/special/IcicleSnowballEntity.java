@@ -4,7 +4,7 @@ import com.linngdu664.bsf.block.LooseSnowBlock;
 import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.network.to_client.ScreenShakePayload;
+import com.linngdu664.bsf.network.to_client.ScreenshakePayload;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
@@ -146,7 +146,7 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
 
     private void icicleInit(Level level) {
         List<Player> nearbyPlayers = level.getNearbyPlayers(TargetingConditions.forNonCombat(), null, getBoundingBox().inflate(100));
-        nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenShakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.5F)));
+        nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenshakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.5F)));
 //        stopTheSnowball(impactPoint.getCenter());
         this.setDeltaMovement(0, 0, 0);
         this.setNoGravity(true);

@@ -11,8 +11,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public class ScreenShakePayload implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<ScreenShakePayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("screen_shake"));
+public class ScreenshakePayload implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<ScreenshakePayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("screen_shake"));
     public final int duration;
     public float intensity1;
     public float intensity2;
@@ -20,47 +20,47 @@ public class ScreenShakePayload implements CustomPacketPayload {
     public Easing intensityCurveStartEasing;
     public Easing intensityCurveEndEasing;
 
-    public ScreenShakePayload(int duration) {
+    public ScreenshakePayload(int duration) {
         this.intensityCurveStartEasing = Easing.LINEAR;
         this.intensityCurveEndEasing = Easing.LINEAR;
         this.duration = duration;
     }
 
-    public ScreenShakePayload setIntensity(float intensity) {
+    public ScreenshakePayload setIntensity(float intensity) {
         return this.setIntensity(intensity, intensity);
     }
 
-    public ScreenShakePayload setIntensity(float intensity1, float intensity2) {
+    public ScreenshakePayload setIntensity(float intensity1, float intensity2) {
         return this.setIntensity(intensity1, intensity2, intensity2);
     }
 
-    public ScreenShakePayload setIntensity(float intensity1, float intensity2, float intensity3) {
+    public ScreenshakePayload setIntensity(float intensity1, float intensity2, float intensity3) {
         this.intensity1 = intensity1;
         this.intensity2 = intensity2;
         this.intensity3 = intensity3;
         return this;
     }
 
-    public ScreenShakePayload setEasing(Easing easing) {
+    public ScreenshakePayload setEasing(Easing easing) {
         this.intensityCurveStartEasing = easing;
         this.intensityCurveEndEasing = easing;
         return this;
     }
 
-    public ScreenShakePayload setEasing(Easing intensityCurveStartEasing, Easing intensityCurveEndEasing) {
+    public ScreenshakePayload setEasing(Easing intensityCurveStartEasing, Easing intensityCurveEndEasing) {
         this.intensityCurveStartEasing = intensityCurveStartEasing;
         this.intensityCurveEndEasing = intensityCurveEndEasing;
         return this;
     }
 
-    public static final StreamCodec<ByteBuf, ScreenShakePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, ScreenShakePayload::getDuration,
-            ByteBufCodecs.FLOAT, ScreenShakePayload::getIntensity1,
-            ByteBufCodecs.FLOAT, ScreenShakePayload::getIntensity2,
-            ByteBufCodecs.FLOAT, ScreenShakePayload::getIntensity3,
-            ByteBufCodecs.STRING_UTF8, ScreenShakePayload::getIntensityCurveStartEasing,
-            ByteBufCodecs.STRING_UTF8, ScreenShakePayload::getIntensityCurveEndEasing,
-            ScreenShakePayload::new
+    public static final StreamCodec<ByteBuf, ScreenshakePayload> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, ScreenshakePayload::getDuration,
+            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity1,
+            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity2,
+            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity3,
+            ByteBufCodecs.STRING_UTF8, ScreenshakePayload::getIntensityCurveStartEasing,
+            ByteBufCodecs.STRING_UTF8, ScreenshakePayload::getIntensityCurveEndEasing,
+            ScreenshakePayload::new
     );
 
     private int getDuration() {
@@ -87,7 +87,7 @@ public class ScreenShakePayload implements CustomPacketPayload {
         return intensityCurveEndEasing.name;
     }
 
-    private ScreenShakePayload(int duration, float intensity1, float intensity2, float intensity3, String intensityCurveStartEasing, String intensityCurveEndEasing) {
+    private ScreenshakePayload(int duration, float intensity1, float intensity2, float intensity3, String intensityCurveStartEasing, String intensityCurveEndEasing) {
         this.duration = duration;
         this.intensity1 = intensity1;
         this.intensity2 = intensity2;
@@ -96,7 +96,7 @@ public class ScreenShakePayload implements CustomPacketPayload {
         this.intensityCurveEndEasing = Easing.valueOf(intensityCurveEndEasing);
     }
 
-    public static void handleDataInClient(ScreenShakePayload payload, IPayloadContext context) {
+    public static void handleDataInClient(ScreenshakePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(payload.duration)).setIntensity(payload.intensity1, payload.intensity2, payload.intensity3).setEasing(payload.intensityCurveStartEasing, payload.intensityCurveEndEasing)));
     }
 

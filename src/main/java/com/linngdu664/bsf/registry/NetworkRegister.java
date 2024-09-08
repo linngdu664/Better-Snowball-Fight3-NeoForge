@@ -19,7 +19,7 @@ public class NetworkRegister {
         registrar.playToClient(ForwardConeParticlesPayload.TYPE, ForwardConeParticlesPayload.STREAM_CODEC, ForwardConeParticlesPayload::handleDataInClient);
         registrar.playToClient(ForwardRaysParticlesPayload.TYPE, ForwardRaysParticlesPayload.STREAM_CODEC, ForwardRaysParticlesPayload::handleDataInClient);
         registrar.playToClient(ImplosionSnowballCannonParticlesPayload.TYPE, ImplosionSnowballCannonParticlesPayload.STREAM_CODEC, ImplosionSnowballCannonParticlesPayload::handleDataInClient);
-        registrar.playToClient(ScreenShakePayload.TYPE, ScreenShakePayload.STREAM_CODEC, ScreenShakePayload::handleDataInClient);
+        registrar.playToClient(ScreenshakePayload.TYPE, ScreenshakePayload.STREAM_CODEC, ScreenshakePayload::handleDataInClient);
         registrar.playToClient(SubspaceSnowballParticlesPayload.TYPE, SubspaceSnowballParticlesPayload.STREAM_CODEC, SubspaceSnowballParticlesPayload::handleDataInClient);
         registrar.playToClient(SubspaceSnowballReleaseTraceParticlesPayload.TYPE, SubspaceSnowballReleaseTraceParticlesPayload.STREAM_CODEC, SubspaceSnowballReleaseTraceParticlesPayload::handleDataInClient);
         registrar.playToClient(TeamMembersPayload.TYPE, TeamMembersPayload.STREAM_CODEC, TeamMembersPayload::handleDataInClient);

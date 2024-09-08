@@ -14,6 +14,8 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -112,5 +114,10 @@ public class SnowTrap extends Block {
         if (pLevel.getBrightness(LightLayer.BLOCK, pPos) > 11) {
             pLevel.removeBlock(pPos, false);
         }
+    }
+
+    @Override
+    public @NotNull Item asItem() {
+        return Items.SNOW;
     }
 }
