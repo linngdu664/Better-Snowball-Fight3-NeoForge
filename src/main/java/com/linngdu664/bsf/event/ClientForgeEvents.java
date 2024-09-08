@@ -158,6 +158,8 @@ public class ClientForgeEvents {
             selectItem = offHandItem;
         }
         GuiGraphics guiGraphics = event.getGuiGraphics();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0F, 0F, 4932F);        // 显示在原版gui的上方
         Window window = instance.getWindow();
         if (weaponItem != null) {
             ItemStack current = weaponItem.getCurrentAmmoItemStack();
@@ -287,6 +289,7 @@ public class ClientForgeEvents {
             guiGraphics.drawString(instance.font, lStr, v2I.x, v2I.y, 0xffffffff);
             guiGraphics.drawString(instance.font, sStr, v2I.x, v2I.y+10, 0xffffffff);
         }
+        guiGraphics.pose().popPose();
     }
 
     @SubscribeEvent
