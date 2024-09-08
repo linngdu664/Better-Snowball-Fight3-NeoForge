@@ -36,7 +36,7 @@ public class SoundRegister {
     public static final DeferredHolder<SoundEvent, SoundEvent> COLD_COMPRESSION_JET_ENGINE_STARTUP5 = build("cold_compression_jet_engine_startup5");
     public static final DeferredHolder<SoundEvent, SoundEvent> VECTOR_INVERSION = build("vector_inversion");
     public static final DeferredHolder<SoundEvent, SoundEvent> SUBSPACE_SNOWBALL_ATTACK = build("subspace_snowball_attack");
-    public static final DeferredHolder<SoundEvent, SoundEvent> IMPLOSION_SNOWBALL_CANNON = build("implosion_snowball_cannon", 24);
+    public static final DeferredHolder<SoundEvent, SoundEvent> IMPLOSION_SNOWBALL_CANNON = build("implosion_snowball_cannon", 32);
 
     private static DeferredHolder<SoundEvent, SoundEvent> build(String id, float range) {
         return SOUNDS.register(id, () -> SoundEvent.createFixedRangeEvent(Main.makeResLoc(id), range));

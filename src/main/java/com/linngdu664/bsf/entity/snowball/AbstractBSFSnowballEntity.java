@@ -34,23 +34,26 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile implements Absorbable {
     protected float particleGenerationStepSize = 0.5F;
     protected float particleGeneratePointOffset;
-    protected Vec3 previousTickPosition = getPosition(0);
+    protected Vec3 previousTickPosition;
     protected boolean isCaught = false;
     private final BSFSnowballEntityProperties properties;
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pLevel);
         this.properties = pProperties;
+        previousTickPosition = position();
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, double pX, double pY, double pZ, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pX, pY, pZ, pLevel);
         this.properties = pProperties;
+        previousTickPosition = position();
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pShooter, pLevel);
         this.properties = pProperties;
+        previousTickPosition = position();
     }
 
     @Override
@@ -63,6 +66,8 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         pCompound.putDouble("Punch", properties.punch);
         pCompound.putBoolean("CanBeCaught", properties.canBeCaught);
         pCompound.putInt("LaunchFrom", properties.launchFrom.ordinal());
+        pCompound.putFloat("ParticleGenerationStepSize", particleGenerationStepSize);
+        pCompound.putFloat("ParticleGenerationPointOffset", particleGeneratePointOffset);
     }
 
     @Override
@@ -75,6 +80,8 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         properties.punch = pCompound.getDouble("Punch");
         properties.canBeCaught = pCompound.getBoolean("CanBeCaught");
         properties.launchFrom = LaunchFrom.values()[pCompound.getInt("LaunchFrom")];
+        particleGenerationStepSize = pCompound.getFloat("ParticleGenerationStepSize");
+        particleGeneratePointOffset = pCompound.getFloat("ParticleGenerationPointOffset");
     }
 
     @Override
@@ -131,42 +138,49 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
      */
     @Override
     public void tick() {
+        if (!firstTick) {
+            callTraceParticles();
+        }
         super.tick();
-        callTrackParticles();
     }
-    protected void callTrackParticles(){
-        float v = (float)this.getDeltaMovement().length();
-        int n = (int) (v/ particleGenerationStepSize);
-        int num=0;
-        for (int i = 0; i <= n && particleGeneratePointOffset+i* particleGenerationStepSize <v; i++) {
-            generateParticles(this.getPreviousPosition((particleGeneratePointOffset+i* particleGenerationStepSize)/v,previousTickPosition));
+
+    protected void callTraceParticles() {
+        float v = (float) this.getDeltaMovement().length();
+        int n = (int) (v / particleGenerationStepSize);
+        int num = 0;
+        for (int i = 0; i <= n && particleGeneratePointOffset + i * particleGenerationStepSize < v; i++) {
+            generateVelIndependentTraceParticles(this.getPreviousPosition((particleGeneratePointOffset + i * particleGenerationStepSize) / v, previousTickPosition));
             num++;
         }
-        particleGeneratePointOffset=num* particleGenerationStepSize +particleGeneratePointOffset-v;
-        previousTickPosition=this.getPosition(0);
+        particleGeneratePointOffset = num * particleGenerationStepSize + particleGeneratePointOffset - v;
+        previousTickPosition = this.getPosition(0);
     }
-    protected void callTrackParticlesEnd(Vec3 pos){
-        float v = (float)this.getPosition(1).distanceTo(pos);
+
+    protected void callTraceParticlesEnd(Vec3 pos) {
+        float v = (float) this.getPosition(1).distanceTo(pos);
         Vec3 vec3d = this.getPosition(1).add(this.getDeltaMovement().normalize().scale(v));
-        int n = (int) (v/ particleGenerationStepSize);
-        for (int i = 0; i <= n && particleGeneratePointOffset+i* particleGenerationStepSize <v; i++) {
-            generateParticles(this.getCurrentlyPosition((particleGeneratePointOffset+i* particleGenerationStepSize)/v,vec3d));
+        int n = (int) (v / particleGenerationStepSize);
+        for (int i = 0; i <= n && particleGeneratePointOffset + i * particleGenerationStepSize < v; i++) {
+            generateVelIndependentTraceParticles(this.getCurrentlyPosition((particleGeneratePointOffset + i * particleGenerationStepSize) / v, vec3d));
         }
     }
-    protected void generateParticles(Vec3 vec3) {
+
+    protected void generateVelIndependentTraceParticles(Vec3 vec3) {
         // Spawn trace particles
         Level level = level();
         if (level.isClientSide) {
-            level.addParticle(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), vec3.x, vec3.y+0.1, vec3.z, 0, 0, 0);
+            level.addParticle(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), vec3.x, vec3.y + 0.1, vec3.z, 0, 0, 0);
         }
     }
-    public final Vec3 getPreviousPosition(float pPartialTicks,Vec3 previousTickPosition) {
+
+    public final Vec3 getPreviousPosition(float pPartialTicks, Vec3 previousTickPosition) {
         double d0 = Mth.lerp(pPartialTicks, previousTickPosition.x, this.xo);
         double d1 = Mth.lerp(pPartialTicks, previousTickPosition.y, this.yo);
         double d2 = Mth.lerp(pPartialTicks, previousTickPosition.z, this.zo);
         return new Vec3(d0, d1, d2);
     }
-    public final Vec3 getCurrentlyPosition(float pPartialTicks,Vec3 position) {
+
+    public final Vec3 getCurrentlyPosition(float pPartialTicks, Vec3 position) {
         double d0 = Mth.lerp(pPartialTicks, this.xo, position.x);
         double d1 = Mth.lerp(pPartialTicks, this.yo, position.y);
         double d2 = Mth.lerp(pPartialTicks, this.zo, position.z);

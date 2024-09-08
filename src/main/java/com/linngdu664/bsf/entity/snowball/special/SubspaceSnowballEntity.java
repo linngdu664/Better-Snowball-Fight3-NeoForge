@@ -8,7 +8,9 @@ import com.linngdu664.bsf.network.to_client.SubspaceSnowballReleaseTraceParticle
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntitySelector;
@@ -27,11 +29,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
-    private final ArrayList<ItemStack> itemStackArrayList = new ArrayList<>();
+//    private final ArrayList<ItemStack> itemStackArrayList = new ArrayList<>();
+    private final HashMap<Item, Integer> snowballCount = new HashMap<>();
     private boolean release = true;
     private int timer = 0;
 //    private float damage = Float.MIN_NORMAL;
@@ -59,6 +61,11 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
 //        pCompound.putFloat("Damage", damage);
 //        pCompound.putFloat("BlazeDamage", blazeDamage);
         pCompound.putBoolean("Release", release);
+        CompoundTag tag = new CompoundTag();
+        for (Map.Entry<Item, Integer> entry : snowballCount.entrySet()) {
+            tag.putInt(BuiltInRegistries.ITEM.getKey(entry.getKey()).toString(), entry.getValue());
+        }
+        pCompound.put("Snowballs", tag);
     }
 
     @Override
@@ -67,7 +74,12 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         timer = pCompound.getInt("Timer");
 //        damage = pCompound.getFloat("Damage");
 //        blazeDamage = pCompound.getFloat("BlazeDamage");
-        release=pCompound.getBoolean("Release");
+        release = pCompound.getBoolean("Release");
+        CompoundTag tag = pCompound.getCompound("Snowballs");
+        Set<String> keys = tag.getAllKeys();
+        for (String key : keys) {
+            snowballCount.put(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(key)), tag.getInt(key));
+        }
     }
 
 
@@ -80,7 +92,9 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             level.getEntities(this, aabb, p -> p instanceof Absorbable).forEach(p -> {
                 Absorbable absorbable = (Absorbable) p;
                 if (release) {
-                    itemStackArrayList.add(absorbable.getSnowballItem());
+//                    itemStackArrayList.add(absorbable.getSnowballItem());
+                    Item item = absorbable.getSnowballItem().getItem();
+                    snowballCount.put(item, snowballCount.getOrDefault(item, 0) + 1);
                 }
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, p.getX(), p.getY(), p.getZ(), 8, 0, 0, 0, 0.05);
                 p.discard();
@@ -101,7 +115,9 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             });
             level.getEntitiesOfClass(Snowball.class, aabb, p -> true).forEach(p -> {
                 if (release) {
-                    itemStackArrayList.add(p.getItem());
+//                    itemStackArrayList.add(p.getItem());
+                    Item item = p.getItem().getItem();
+                    snowballCount.put(item, snowballCount.getOrDefault(item, 0) + 1);
                 }
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, p.getX(), p.getY(), p.getZ(), 8, 0, 0, 0, 0.05);
                 p.discard();
@@ -116,18 +132,19 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                 }
             });
             if (timer == 150) {
-                for (ItemStack itemStack : itemStackArrayList) {
-                    ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), itemStack);
-                    itemEntity.setDefaultPickUpDelay();
-                    level.addFreshEntity(itemEntity);
-                }
+//                for (ItemStack itemStack : itemStackArrayList) {
+//                    ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), itemStack);
+//                    itemEntity.setDefaultPickUpDelay();
+//                    level.addFreshEntity(itemEntity);
+//                }
+                generateItemEntities();
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 16, 0, 0, 0, 0.05);
                 this.discard();
             }
             timer++;
         }
     }
-    protected void generateParticles(Vec3 vec3) {
+    protected void generateVelIndependentTraceParticles(Vec3 vec3) {
         // Spawn trace particles
         Level level = level();
         if (!level.isClientSide) {
@@ -144,14 +161,15 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHitBlock(@NotNull BlockHitResult pResult) {
         super.onHitBlock(pResult);
         Vec3 location = pResult.getLocation();
-        callTrackParticlesEnd(location);
+        callTraceParticlesEnd(location);
         Level level = level();
         if (!level.isClientSide) {
-            for (ItemStack itemStack : itemStackArrayList) {
-                ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), itemStack);
-                itemEntity.setDefaultPickUpDelay();
-                level.addFreshEntity(itemEntity);
-            }
+//            for (ItemStack itemStack : itemStackArrayList) {
+//                ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), itemStack);
+//                itemEntity.setDefaultPickUpDelay();
+//                level.addFreshEntity(itemEntity);
+//            }
+            generateItemEntities();
             if(!release){
                 subspaceRangeDamage(location);
 //                float damage = getDamage();
@@ -169,7 +187,7 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
         Vec3 location = BSFCommonUtil.getRealEntityHitPosOnMoveVecWithHitResult(this,pResult);
-        callTrackParticlesEnd(location);
+        callTraceParticlesEnd(location);
         Level level = level();
         if (!level.isClientSide){
             if (!release) {
@@ -198,6 +216,23 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             }
         }
         PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
+    }
+
+    private void generateItemEntities() {
+        Level level = level();
+        for (Map.Entry<Item, Integer> entry : snowballCount.entrySet()) {
+            Item item = entry.getKey();
+            int count = entry.getValue();
+            int maxStackSize = item.getDefaultMaxStackSize();
+            for (int i = 0; i < count / maxStackSize; i++) {
+                ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), new ItemStack(item, maxStackSize));
+                itemEntity.setDefaultPickUpDelay();
+                level.addFreshEntity(itemEntity);
+            }
+            ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), new ItemStack(item, count % maxStackSize));
+            itemEntity.setDefaultPickUpDelay();
+            level.addFreshEntity(itemEntity);
+        }
     }
 
 

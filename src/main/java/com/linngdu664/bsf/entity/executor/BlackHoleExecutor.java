@@ -164,7 +164,7 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
                             merge(blackHoleExecutor);
                         } else if (p instanceof FallingBlockEntity) {
                             p.discard();
-                        } else {
+                        } else if (!p.isInvulnerable()) {
                             p.hurt(level.damageSources().fellOutOfWorld(), damage);
                         }
                     });

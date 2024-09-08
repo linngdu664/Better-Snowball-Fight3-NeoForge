@@ -164,7 +164,7 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     }
 
     @Override
-    protected void generateParticles(Vec3 vec3) {
+    protected void generateVelIndependentTraceParticles(Vec3 vec3) {
         if (!inBlockDuration) {
             Level level = level();
             if (level.isClientSide) {
