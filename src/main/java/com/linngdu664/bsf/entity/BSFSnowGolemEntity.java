@@ -171,8 +171,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         setPotionSickness(pCompound.getInt("PotionSickness"));
         setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
         dropEquipment = pCompound.getBoolean("DropEquipment");
-        if (pCompound.contains("TargetUUID")) {
-            setTarget((LivingEntity) ((ServerLevel) level()).getEntity(pCompound.getUUID("TargetUUID")));
+        if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
+            setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
         }
     }
 
