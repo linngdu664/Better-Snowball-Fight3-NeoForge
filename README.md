@@ -1,25 +1,24 @@
+![head](README/b.png)
 
-Installation information
-=======
+简介 Summary
+==
+---
+Better Snowball Fight Ⅲ
+更好的打雪仗3
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+~~打雪仗×~~ 黑帮火拼√
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+这是一个非常适合多人游戏的mod，添加了各种各样的雪球，工具，装备和武器。既可以互相无伤害拿雪球互喷，也可以互相竞技pvp，还可以造雪人跟雪人干仗或者让雪人去攻击其他生物
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+作者：Linngdu664，zx1316
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+![](README/a.png)
+
+目前版本 Version
+==
+---
+* mod version: 3.1.0
+* minecraft version: 1.21.1
+* neoforge version: ≥21.1.0
+* compatibility level: JAVA_21
