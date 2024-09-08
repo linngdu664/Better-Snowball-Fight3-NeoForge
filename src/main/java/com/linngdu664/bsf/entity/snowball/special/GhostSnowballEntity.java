@@ -18,6 +18,7 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
@@ -74,9 +75,9 @@ public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
     }
 
     @Override
-    protected void spawnBasicParticles(Level level) {
+    protected void spawnBasicParticles(Level level, Vec3 location) {
         if (!level.isClientSide) {
-            ((ServerLevel) level).sendParticles(ParticleTypes.SOUL, this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0);
+            ((ServerLevel) level).sendParticles(ParticleTypes.SOUL, location.x, location.y, location.z, 8, 0, 0, 0, 0);
         }
     }
 
