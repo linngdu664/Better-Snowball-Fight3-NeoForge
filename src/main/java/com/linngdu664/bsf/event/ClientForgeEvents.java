@@ -4,23 +4,27 @@ import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.resources.sounds.MovingSoundInstance;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
+import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
 import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
+import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
 import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;
 import com.linngdu664.bsf.network.to_server.SwitchTweakerStatusModePayload;
 import com.linngdu664.bsf.network.to_server.SwitchTweakerTargetModePayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -29,14 +33,22 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
+import oshi.util.tuples.Pair;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static com.linngdu664.bsf.event.BSFGui.*;
 
 
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
@@ -127,46 +139,117 @@ public class ClientForgeEvents {
 
     @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Post event) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui) {
+        Minecraft instance = Minecraft.getInstance();
+        if (instance.options.hideGui) {
             return;
         }
-        Player player = mc.player;
+        Player player = instance.player;
         AbstractBSFWeaponItem weaponItem = null;
         ItemStack mainHandItem = player.getMainHandItem();
         ItemStack offHandItem = player.getOffhandItem();
+        ItemStack selectItem = null;
         if (mainHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
             weaponItem = item;
+            selectItem = mainHandItem;
         } else if (offHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
             weaponItem = item;
+            selectItem = offHandItem;
         }
         GuiGraphics guiGraphics = event.getGuiGraphics();
-        Window window = mc.getWindow();
+        Window window = instance.getWindow();
         if (weaponItem != null) {
             ItemStack current = weaponItem.getCurrentAmmoItemStack();
             ItemStack prev = weaponItem.getPrevAmmoItemStack();
             ItemStack next = weaponItem.getNextAmmoItemStack();
-            BSFGui.V2I v2I = BSFGui.SNOWBALL_GUI.renderCenterVertically(guiGraphics, window, 0);
+            BSFGui.V2I v2I = SNOWBALL_SLOT_FRAME_GUI.renderCenterVertically(guiGraphics, window, 0);
             int startPos = v2I.y;
             guiGraphics.renderItem(prev, 3, startPos + 3);
             guiGraphics.renderItem(current, 3, startPos + 23);
             guiGraphics.renderItem(next, 3, startPos + 43);
-            guiGraphics.drawString(mc.font, String.valueOf(prev.getCount()), 24, startPos + 7, 0xffffffff);
-            guiGraphics.drawString(mc.font, String.valueOf(current.getCount()), 24, startPos + 27, 0xffffffff);
-            guiGraphics.drawString(mc.font, String.valueOf(next.getCount()), 24, startPos + 47, 0xffffffff);
+            guiGraphics.drawString(instance.font, String.valueOf(prev.getCount()), 24, startPos + 7, 0xffffffff);
+            guiGraphics.drawString(instance.font, String.valueOf(current.getCount()), 24, startPos + 27, 0xffffffff);
+            guiGraphics.drawString(instance.font, String.valueOf(next.getCount()), 24, startPos + 47, 0xffffffff);
+            if (weaponItem.getTypeFlag()== SnowballMachineGunItem.TYPE_FLAG){
+                V2I barFrame = new V2I(100, 10);
+                int padding = 2;
+                V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.7));
+                int timer = selectItem.getOrDefault(DataComponentRegister.MACHINE_GUN_TIMER,0);
+                boolean isCoolDown = selectItem.getOrDefault(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN,false);
+                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, isCoolDown?0xfffc3d49:0xffffffff, (float) timer /360);
+            }
         }
-        HitResult pick = mc.hitResult;
+        HitResult pick = instance.hitResult;
         BSFGui.V2I locateV2I = null,statusV2I = null;
+        String sLocatorStr = "";
+        String sStatusStr = "";
         if (pick.getType() == HitResult.Type.ENTITY && ((EntityHitResult) pick).getEntity() instanceof BSFSnowGolemEntity entity && player.equals(entity.getOwner())) {
+            //显示装备
+            float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
+            List<Pair<Vec3, Consumer<Vec2>>> list = new ArrayList<>();
+            Vec3 entityPosition = entity.getPosition(partialTick);
+            Vec3 viewVector0Y = entity.getMiddleModelForward(partialTick,0);
+            ItemStack equip = entity.getWeapon();
+            if (equip != ItemStack.EMPTY) {
+                ItemStack finalEquip = equip;
+                list.add(new Pair<>(entityPosition.add(entity.getMiddleModelForward(partialTick,4).scale(0.7).add(0, 1.3, 0)), v2 -> {
+                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, finalEquip,instance.font, BSFCommonUtil.getTransStr("gui_text_weapon"));
+                    float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) /finalEquip.getMaxDamage();
+                    renderProgressBar(guiGraphics,new V2I(v2IRatio.x-4,v2IRatio.y+23),new V2I(30,6),2,0xffffffff,percent>0.3?0xff85e900:0xfffc3d49,percent);
+                }));
+            }
+            equip = entity.getAmmo();
+            if (equip != ItemStack.EMPTY) {
+                ItemStack finalEquip = equip;
+                list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(-0.3).add(0, 1.2, 0)), v2 -> {
+                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.5);
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.07), 0xffffffff, finalEquip,instance.font,BSFCommonUtil.getTransStr("gui_text_snowball"));
+                    float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) /finalEquip.getMaxDamage();
+                    renderProgressBar(guiGraphics,new V2I(v2IRatio.x-4,v2IRatio.y+23),new V2I(30,6),2,0xffffffff,percent>0.3?0xff85e900:0xfffc3d49,percent);
+                }));
+            }
+            equip = entity.getCore();
+            if (equip != ItemStack.EMPTY) {
+                ItemStack finalEquip = equip;
+                list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(0.3).add(0, 1.05, 0)), v2 -> {
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.7).getVec2(), widthWinRatio(window, 0.12), 0xffffffff, finalEquip,instance.font,BSFCommonUtil.getTransStr("gui_text_core"));
+                }));
+            }
+            calcScreenPosFromWorldPos(list, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, partialTick);
+            //显示模式
             byte locator = entity.getLocator();
+            sLocatorStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator));
             byte status = entity.getStatus();
-            locateV2I = BSFGui.GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
-            locateV2I.set(locateV2I.x-1,locateV2I.y-1+locator*20);
-            BSFGui.GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
-            statusV2I = BSFGui.GOLEM_STATUS_GUI.renderRatio(guiGraphics,window,0.7,0.5,60,0);
-            statusV2I.set(statusV2I.x-1,statusV2I.y-1+status*20);
-            BSFGui.GOLEM_SELECTOR_GUI.render(guiGraphics, statusV2I.x, statusV2I.y);
-//                BSFGui.renderLineTool(guiGraphics,50,50,100,100,0xffffffff);
+            sStatusStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.statusMap(status));
+            locateV2I = GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
+            locateV2I.set(locateV2I.x - 1, locateV2I.y - 1 + locator * 20);
+            GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
+            statusV2I = GOLEM_STATUS_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 60, 0);
+            statusV2I.set(statusV2I.x - 1, statusV2I.y - 1 + status * 20);
+            GOLEM_SELECTOR_GUI.render(guiGraphics, statusV2I.x, statusV2I.y);
+            if (entity.getEnhance()) {
+                ADVANCE_MODE_GUI.renderRatio(guiGraphics, window, 0.5, 0.8);
+            }
+
+            //显示血条/cd
+            V2I barFrame = new V2I(100, 10);
+            int padding = 2;
+            V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
+            renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffe82f27, entity.getHealth() / entity.getMaxHealth());
+            if (entity.getCore().getItem() instanceof SnowGolemCoreItem item && entity.getCoreCoolDown() > 0) {
+                barPos.y += 15;
+                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff26a7ff, (float) entity.getCoreCoolDown() / item.getCoolDown());
+            }
+            if (entity.getPotionSickness() > 0) {
+                barPos.y += 15;
+                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff62df86, (float) entity.getPotionSickness() / 100);
+            }
+
+            //显示当前目标
+            String targetName = entity.getTargetName();
+            V2I v2I = v2IRatio(window, 0.4, 0.75);
+            String transStr = BSFCommonUtil.getTransStr("tweaker_target_now.tip", targetName.isEmpty() ? BSFCommonUtil.getTransStr("snow_golem_target_null.tip"):targetName);
+            guiGraphics.drawString(instance.font, transStr, v2I.x-instance.font.width(transStr), v2I.y, 0xffffffff);
         }
         ItemStack tweaker = null;
         if (mainHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
@@ -174,21 +257,33 @@ public class ClientForgeEvents {
         } else if (offHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
             tweaker = offHandItem;
         }
+        String tLocatorStr = "";
+        String tStatusStr = "";
         if (tweaker != null) {
+
+            byte locator = tweaker.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
+            tLocatorStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator));
             byte status = tweaker.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0);
-            byte target = tweaker.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
-            BSFGui.V2I locateV2IT = BSFGui.TWEAKER_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5,30,0);
-            locateV2IT.set(locateV2IT.x-1, locateV2IT.y-1+target*20);
-            BSFGui.TWEAKER_SELECTOR_GUI.render(guiGraphics, locateV2IT.x, locateV2IT.y);
-            BSFGui.V2I statusV2IT = BSFGui.TWEAKER_STATUS_GUI.renderRatio(guiGraphics,window,0.7,0.5,90,0);
-            statusV2IT.set(statusV2IT.x-1, statusV2IT.y-1+status*20);
-            BSFGui.TWEAKER_SELECTOR_GUI.render(guiGraphics, statusV2IT.x, statusV2IT.y);
-            if (locateV2I!=null &&  locateV2I.y!=locateV2IT.y){
-                BSFGui.SETTER_ARROW.render(guiGraphics, locateV2I.x+23, locateV2IT.y+2);
+            tStatusStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.statusMap(status));
+            V2I locateV2IT = TWEAKER_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 30, 0);
+            locateV2IT.set(locateV2IT.x - 1, locateV2IT.y - 1 + locator * 20);
+            TWEAKER_SELECTOR_GUI.render(guiGraphics, locateV2IT.x, locateV2IT.y);
+            V2I statusV2IT = TWEAKER_STATUS_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 90, 0);
+            statusV2IT.set(statusV2IT.x - 1, statusV2IT.y - 1 + status * 20);
+            TWEAKER_SELECTOR_GUI.render(guiGraphics, statusV2IT.x, statusV2IT.y);
+            if (locateV2I != null && locateV2I.y != locateV2IT.y) {
+                SETTER_ARROW_GUI.render(guiGraphics, locateV2I.x + 23, locateV2IT.y + 2);
             }
-            if (statusV2I!=null &&  statusV2I.y!=statusV2IT.y){
-                BSFGui.SETTER_ARROW.render(guiGraphics, statusV2I.x+23, statusV2IT.y+2);
+            if (statusV2I != null && statusV2I.y != statusV2IT.y) {
+                SETTER_ARROW_GUI.render(guiGraphics, statusV2I.x + 23, statusV2IT.y + 2);
             }
+        }
+        if (!(sLocatorStr.isEmpty() && tLocatorStr.isEmpty())) {
+            String lStr = BSFCommonUtil.getTransStr("tweaker_target.tip", sLocatorStr.isEmpty() ? tLocatorStr : tLocatorStr.isEmpty() || sLocatorStr.equals(tLocatorStr) ? sLocatorStr : sLocatorStr + " << " + tLocatorStr);
+            String sStr = BSFCommonUtil.getTransStr("tweaker_status.tip", sStatusStr.isEmpty() ? tStatusStr : tStatusStr.isEmpty() || sStatusStr.equals(tStatusStr) ? sStatusStr : sStatusStr + " << " + tStatusStr);
+            V2I v2I = v2IRatio(window, 0.6, 0.75);
+            guiGraphics.drawString(instance.font, lStr, v2I.x, v2I.y, 0xffffffff);
+            guiGraphics.drawString(instance.font, sStr, v2I.x, v2I.y+10, 0xffffffff);
         }
     }
 
