@@ -16,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -82,6 +83,16 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         properties.launchFrom = LaunchFrom.values()[pCompound.getInt("LaunchFrom")];
         particleGenerationStepSize = pCompound.getFloat("ParticleGenerationStepSize");
         particleGeneratePointOffset = pCompound.getFloat("ParticleGenerationPointOffset");
+    }
+
+    @Override
+    public void shootFromRotation(Entity shooter, float x, float y, float z, float velocity, float inaccuracy) {
+        float f = -Mth.sin(y * 0.017453292F) * Mth.cos(x * 0.017453292F);
+        float f1 = -Mth.sin((x + z) * 0.017453292F);
+        float f2 = Mth.cos(y * 0.017453292F) * Mth.cos(x * 0.017453292F);
+        this.shoot(f, f1, f2, velocity, inaccuracy);
+        Vec3 vec3 = ServerConfig.SHOOTING_INERTIA.getConfigValue()?shooter.getKnownMovement():shooter.getDeltaMovement();
+        this.setDeltaMovement(this.getDeltaMovement().add(vec3.x, shooter.onGround() ? 0.0 : vec3.y, vec3.z));
     }
 
     @Override

@@ -32,6 +32,9 @@ public class ServerConfig extends BSFConfig {
     public static ConfigValueHolder<Boolean> ENABLE_FRIENDLY_FIRE = new ConfigValueHolder(Main.MODID, "server/enableFriendlyFire", (builder) ->
             builder.comment("Default value: false.")
                     .define("enableFriendlyFire", false));
+    public static ConfigValueHolder<Boolean> SHOOTING_INERTIA = new ConfigValueHolder(Main.MODID, "server/shootingInertia", (builder) ->
+            builder.comment("Default value: false.")
+                    .define("shootingInertia", false));
 
     public static final ServerConfig INSTANCE;
     public static final ModConfigSpec SPEC;
