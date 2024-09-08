@@ -35,26 +35,26 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile implements Absorbable {
     protected float particleGenerationStepSize = 0.5F;
     protected float particleGeneratePointOffset;
-    protected Vec3 previousTickPosition;
+    protected Vec3 previousTickPosition = new Vec3(Double.NaN, Double.NaN, Double.NaN);
     protected boolean isCaught = false;
     private final BSFSnowballEntityProperties properties;
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pLevel);
         this.properties = pProperties;
-        previousTickPosition = position();
+//        previousTickPosition = position();
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, double pX, double pY, double pZ, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pX, pY, pZ, pLevel);
         this.properties = pProperties;
-        previousTickPosition = position();
+//        previousTickPosition = position();
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pShooter, pLevel);
         this.properties = pProperties;
-        previousTickPosition = position();
+//        previousTickPosition = position();
     }
 
     @Override
@@ -149,21 +149,29 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
      */
     @Override
     public void tick() {
-        if (!firstTick) {
-            callTraceParticles();
-        }
+//        if (level().isClientSide) {
+//            System.out.println("client prev pos: " + previousTickPosition);
+//        } else {
+//            System.out.println("server prev pos: " + previousTickPosition);
+//        }
+//        if (!firstTick) {
+//            callTraceParticles();
+//        }
         super.tick();
+        callTraceParticles();
     }
 
     protected void callTraceParticles() {
-        float v = (float) this.getDeltaMovement().length();
-        int n = (int) (v / particleGenerationStepSize);
-        int num = 0;
-        for (int i = 0; i <= n && particleGeneratePointOffset + i * particleGenerationStepSize < v; i++) {
-            generateVelIndependentTraceParticles(this.getPreviousPosition((particleGeneratePointOffset + i * particleGenerationStepSize) / v, previousTickPosition));
-            num++;
+        if (!Double.isNaN(previousTickPosition.x)) {
+            float v = (float) this.getDeltaMovement().length();
+            int n = (int) (v / particleGenerationStepSize);
+            int num = 0;
+            for (int i = 0; i <= n && particleGeneratePointOffset + i * particleGenerationStepSize < v; i++) {
+                generateVelIndependentTraceParticles(this.getPreviousPosition((particleGeneratePointOffset + i * particleGenerationStepSize) / v, previousTickPosition));
+                num++;
+            }
+            particleGeneratePointOffset = num * particleGenerationStepSize + particleGeneratePointOffset - v;
         }
-        particleGeneratePointOffset = num * particleGenerationStepSize + particleGeneratePointOffset - v;
         previousTickPosition = this.getPosition(0);
     }
 
