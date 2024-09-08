@@ -39,7 +39,7 @@ public class ParticleRegister {
         ParticleEngine particleEngine = Minecraft.getInstance().particleEngine;
         particleEngine.register(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), ShortTimeSnowflake.Provider::new);
         particleEngine.register(ParticleRegister.BIG_LONG_TIME_SNOWFLAKE.get(), BigLongTimeSnowflake.Provider::new);
-        particleEngine.register(ParticleRegister.IMPULSE.get(), SonicBoomParticle.Provider::new);
+        particleEngine.register(ParticleRegister.IMPULSE.get(), ImpulseParticle.Provider::new);
         particleEngine.register(ParticleRegister.GENERATOR_FIX.get(), GeneratorFix.Provider::new);
         particleEngine.register(ParticleRegister.GENERATOR_PUSH.get(), GeneratorPush.Provider::new);
         particleEngine.register(ParticleRegister.MONSTER_GRAVITY_EXECUTOR_ASH.get(), MonsterGravityExecutorAsh.Provider::new);
