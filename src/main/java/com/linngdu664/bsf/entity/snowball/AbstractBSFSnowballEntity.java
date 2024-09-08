@@ -7,6 +7,7 @@ import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
 import com.linngdu664.bsf.item.tool.GloveItem;
 import com.linngdu664.bsf.registry.ParticleRegister;
+import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -130,7 +131,9 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
                 owner.setLastHurtMob(entity);
             }
         }
-        spawnBasicParticles(level);
+        Vec3 location = BSFCommonUtil.getRealEntityHitPosOnMoveVecWithHitResult(this,pResult);
+        spawnBasicParticles(level,location);
+        callTraceParticlesEnd(location);
     }
 
     /**
@@ -141,7 +144,9 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     @Override
     protected void onHitBlock(@NotNull BlockHitResult p_37258_) {
         super.onHitBlock(p_37258_);
-        spawnBasicParticles(level());
+        Vec3 location = p_37258_.getLocation();
+        spawnBasicParticles(level(), location);
+        callTraceParticlesEnd(location);
     }
 
     /**
@@ -255,10 +260,10 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
 
     }
 
-    protected void spawnBasicParticles(Level level) {
+    protected void spawnBasicParticles(Level level,Vec3 location) {
         if (!level.isClientSide) {
-            ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0);
-            ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0.04);
+            ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, location.x, location.y, location.z, 8, 0, 0, 0, 0);
+            ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, location.x, location.y, location.z, 8, 0, 0, 0, 0.04);
         }
     }
 

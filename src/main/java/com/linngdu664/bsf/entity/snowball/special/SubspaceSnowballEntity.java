@@ -161,7 +161,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHitBlock(@NotNull BlockHitResult pResult) {
         super.onHitBlock(pResult);
         Vec3 location = pResult.getLocation();
-        callTraceParticlesEnd(location);
         Level level = level();
         if (!level.isClientSide) {
 //            for (ItemStack itemStack : itemStackArrayList) {
@@ -187,7 +186,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
         Vec3 location = BSFCommonUtil.getRealEntityHitPosOnMoveVecWithHitResult(this,pResult);
-        callTraceParticlesEnd(location);
         Level level = level();
         if (!level.isClientSide){
             if (!release) {
