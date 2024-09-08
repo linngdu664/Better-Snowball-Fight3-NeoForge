@@ -25,6 +25,7 @@ import com.linngdu664.bsf.util.BSFTiers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -68,15 +69,14 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.world.entity.monster.Skeleton;
-
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 // I call this "shit mountain".
 public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob {
-    private static final int STYLE_NUM = 9;
+    public static final int STYLE_NUM = 9;
     private static final EntityDataAccessor<ItemStack> WEAPON = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<ItemStack> AMMO = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<ItemStack> CORE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
@@ -85,9 +85,10 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private static final EntityDataAccessor<Byte> STATUS_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Byte> LOCATOR_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> POTION_SICKNESS = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CORE_COOL_DOWN = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<String> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Optional<Component>> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
+
     private float launchVelocity;
     private float launchAccuracy;
     private double shootX;
@@ -104,7 +105,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
      locator flag:
      0: monster
      1: target locator
-     2: enemy player
+     2: enemy player & enemy ownable
      3: all
      */
 
@@ -127,13 +128,13 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         builder.define(AMMO, ItemStack.EMPTY);
         builder.define(CORE, ItemStack.EMPTY);
         builder.define(WEAPON_ANG, 0);
-        builder.define(STYLE, (byte) (getRandom().nextInt(0, STYLE_NUM)));
+        builder.define(STYLE, (byte) 0);
         builder.define(STATUS_FLAG, (byte)0);
         builder.define(LOCATOR_FLAG, (byte)0);
         builder.define(POTION_SICKNESS, 0);
         builder.define(ENHANCE, false);
         builder.define(CORE_COOL_DOWN, 0);
-        builder.define(TARGET_NAME, "");
+        builder.define(TARGET_NAME, Optional.empty());
     }
 
     @Override
@@ -149,7 +150,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         pCompound.putInt("PotionSickness", getPotionSickness());
         pCompound.putInt("CoreCoolDown", getCoreCoolDown());
         pCompound.putBoolean("DropEquipment", dropEquipment);
-        pCompound.putString("TargetName", getTargetName());
         if (getTarget() != null) {
             pCompound.putUUID("TargetUUID", getTarget().getUUID());
         } else {
@@ -171,7 +171,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         setPotionSickness(pCompound.getInt("PotionSickness"));
         setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
         dropEquipment = pCompound.getBoolean("DropEquipment");
-        setTargetName(pCompound.getString("TargetName"));
         if (pCompound.contains("TargetUUID")) {
             setTarget((LivingEntity) ((ServerLevel) level()).getEntity(pCompound.getUUID("TargetUUID")));
         }
@@ -185,6 +184,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     public byte getStatus() {
         return entityData.get(STATUS_FLAG);
     }
+
     public void setStatus(byte status){
         entityData.set(STATUS_FLAG,status);
     }
@@ -192,14 +192,13 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     public byte getLocator() {
         return entityData.get(LOCATOR_FLAG);
     }
+
     public void setLocator(byte locator){
         entityData.set(LOCATOR_FLAG,locator);
     }
-    public String getTargetName(){
+
+    public Optional<Component> getTargetName(){
         return entityData.get(TARGET_NAME);
-    }
-    public void setTargetName(String targetName){
-        entityData.set(TARGET_NAME,targetName);
     }
 
     public ItemStack getWeapon() {
@@ -265,18 +264,23 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     public int getCoreCoolDown() {
         return entityData.get(CORE_COOL_DOWN);
     }
+
     public void setCoreCoolDown(int coolDown) {
         entityData.set(CORE_COOL_DOWN,coolDown);
     }
+
     public int getPotionSickness() {
         return entityData.get(POTION_SICKNESS);
     }
+
     public void setPotionSickness(int sickness) {
         entityData.set(POTION_SICKNESS,sickness);
     }
+
     public boolean getEnhance() {
         return entityData.get(ENHANCE);
     }
+
     public void setEnhance(boolean enhance0) {
         entityData.set(ENHANCE,enhance0);
     }
@@ -289,7 +293,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     protected void registerGoals() {
         goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         goalSelector.addGoal(2, new BSFGolemTargetNearGoal(this));
-        goalSelector.addGoal(3, new BSFGolemFollowOwnerGoal(this, 1.0, 8.0F, 4.0F, 20.0F, 8.0F));
+        goalSelector.addGoal(3, new BSFGolemFollowOwnerGoal(this, 1.0, 8.0F, 3.0F, 20.0F));
         goalSelector.addGoal(4, new BSFGolemRangedAttackGoal(this, 1.0, 30, 50.0F));
         goalSelector.addGoal(5, new BSFGolemRandomStrollGoal(this, 0.8, 1E-5F));
         goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -517,9 +521,9 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
             }
             LivingEntity target = getTarget();
             if (target == null) {
-                setTargetName("");
-            }else {
-                setTargetName(target.getName().getString());
+                entityData.set(TARGET_NAME, Optional.empty());
+            } else {
+                entityData.set(TARGET_NAME, Optional.of(target.getName()));
             }
         }
         super.tick();

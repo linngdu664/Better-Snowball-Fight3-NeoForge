@@ -15,9 +15,8 @@ import javax.annotation.Nullable;
 import java.util.EnumSet;
 
 public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
-    private static final int DEFAULT_RANDOM_INTERVAL = 10;
+    private static final int DEFAULT_RANDOM_INTERVAL = 4;
     private static final int SEARCH_DISTANCE = 50;
-    protected final int randomInterval;
     @Nullable
     protected LivingEntity target;
     private final BSFSnowGolemEntity snowGolem;
@@ -25,18 +24,16 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
 
     public BSFGolemNearsetAttackableTargetGoal(BSFSnowGolemEntity snowGolem) {
         super(snowGolem, true, false);
-        this.randomInterval = reducedTickDelay(DEFAULT_RANDOM_INTERVAL);
         this.snowGolem = snowGolem;
         this.setFlags(EnumSet.of(Flag.TARGET));
     }
 
     public boolean canUse() {
-        if (this.randomInterval > 0 && this.mob.getRandom().nextInt(this.randomInterval) != 0) {
+        if (this.mob.getRandom().nextInt(DEFAULT_RANDOM_INTERVAL) != 0) {
             return false;
-        } else {
-            this.findTarget();
-            return target != null;
         }
+        this.findTarget();
+        return target != null;
     }
 
     protected AABB getTargetSearchArea() {

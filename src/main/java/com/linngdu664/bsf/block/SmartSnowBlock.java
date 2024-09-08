@@ -78,6 +78,7 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
             snowGolem.setOwnerUUID(player.getUUID());
             snowGolem.setOrderedToSit(true);
             snowGolem.setDropEquipment(true);
+            snowGolem.setStyle((byte) (level.getRandom().nextInt(0, BSFSnowGolemEntity.STYLE_NUM)));
             BlockPos blockPos = blockPatternMatch.getBlock(0, 2, 0).getPos();
             snowGolem.moveTo(blockPos.getX() + 0.5D, blockPos.getY() + 0.05D, blockPos.getZ() + 0.5D, 0.0F, 0.0F);
             level.addFreshEntity(snowGolem);

@@ -25,6 +25,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -46,6 +47,7 @@ import oshi.util.tuples.Pair;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.BSFGui.*;
@@ -246,9 +248,9 @@ public class ClientForgeEvents {
             }
 
             //显示当前目标
-            String targetName = entity.getTargetName();
+            Optional<Component> targetName = entity.getTargetName();
             V2I v2I = v2IRatio(window, 0.4, 0.75);
-            String transStr = BSFCommonUtil.getTransStr("tweaker_target_now.tip", targetName.isEmpty() ? BSFCommonUtil.getTransStr("snow_golem_target_null.tip"):targetName);
+            String transStr = BSFCommonUtil.getTransStr("tweaker_target_now.tip", targetName.isEmpty() ? BSFCommonUtil.getTransStr("snow_golem_target_null.tip") : targetName.get());
             guiGraphics.drawString(instance.font, transStr, v2I.x-instance.font.width(transStr), v2I.y, 0xffffffff);
         }
         ItemStack tweaker = null;

@@ -21,19 +21,17 @@ public class BSFGolemFollowOwnerGoal extends Goal {
     private final PathNavigation navigation;
     private final double stopDisSqr;
     private final double startDisSqr;
-    private final double hasTargetStartDisSqr;
     private final double hasTargetStopDisSqr;
     private LivingEntity owner;
     private int timeToRecalcPath;
 
-    public BSFGolemFollowOwnerGoal(BSFSnowGolemEntity golem, double pSpeedModifier, double pStartDistance, double pStopDistance, double hasTargetStartDistance, double hasTargetStopDistance) {
+    public BSFGolemFollowOwnerGoal(BSFSnowGolemEntity golem, double pSpeedModifier, double pStartDistance, double pStopDistance, double hasTargetStopDistance) {
         this.golem = golem;
         this.level = golem.level();
         this.speedModifier = pSpeedModifier;
         this.navigation = golem.getNavigation();
         this.startDisSqr = pStartDistance * pStartDistance;
         this.stopDisSqr = pStopDistance * pStopDistance;
-        this.hasTargetStartDisSqr = hasTargetStartDistance * hasTargetStartDistance;
         this.hasTargetStopDisSqr = hasTargetStopDistance * hasTargetStopDistance;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
     }
@@ -46,8 +44,7 @@ public class BSFGolemFollowOwnerGoal extends Goal {
             return false;
         }
         double ownerDisSqr = golem.distanceToSqr(livingentity);
-        if (status == 1 && ownerDisSqr < startDisSqr || status == 2 && (
-                golem.getTarget() == null && ownerDisSqr < startDisSqr || golem.getTarget() != null && ownerDisSqr < hasTargetStartDisSqr)) {
+        if (status == 1 && ownerDisSqr < startDisSqr || status == 2 && (ownerDisSqr < startDisSqr || golem.getTarget() != null)) {
             return false;
         }
         owner = livingentity;

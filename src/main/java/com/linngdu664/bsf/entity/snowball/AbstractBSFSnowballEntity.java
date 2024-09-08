@@ -154,14 +154,6 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
      */
     @Override
     public void tick() {
-//        if (level().isClientSide) {
-//            System.out.println("client prev pos: " + previousTickPosition);
-//        } else {
-//            System.out.println("server prev pos: " + previousTickPosition);
-//        }
-//        if (!firstTick) {
-//            callTraceParticles();
-//        }
         super.tick();
         callTraceParticles();
     }
