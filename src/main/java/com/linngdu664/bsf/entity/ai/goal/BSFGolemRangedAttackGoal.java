@@ -145,7 +145,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
                 golem.setTarget(entity);
             }
         } else if (golem.getLocator() == 2) {
-            if (golem.canAttackInAttackEnemyTeamMode(entity)) {
+            if (golem.canPassiveAttackInAttackEnemyTeamMode(entity)) {
                 golem.setTarget(entity);
             }
         } else if (golem.getLocator() == 3 && owner != null) {

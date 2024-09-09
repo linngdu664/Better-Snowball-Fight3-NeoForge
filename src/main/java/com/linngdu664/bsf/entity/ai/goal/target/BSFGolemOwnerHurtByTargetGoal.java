@@ -41,7 +41,7 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
             case 1:
                 return false;
             case 2:
-                if (!snowGolem.canAttackInAttackEnemyTeamMode(ownerLastHurtBy)) {
+                if (!snowGolem.canPassiveAttackInAttackEnemyTeamMode(ownerLastHurtBy)) {
                     return false;
                 }
                 break;

@@ -30,7 +30,7 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
                 yield false;
             }
             case 2 -> {
-                if (snowGolem.canAttackInAttackEnemyTeamMode(lastHurtByMob)) {
+                if (snowGolem.canPassiveAttackInAttackEnemyTeamMode(lastHurtByMob)) {
                     yield super.canUse();
                 }
                 yield false;

@@ -130,6 +130,19 @@ public class BSFCommonUtil {
         return new Vector3f(x, y, z);
     }
 
+    public static void putVec3d(CompoundTag compoundTag, String key, Vec3 vec3) {
+        compoundTag.putDouble(key + "X", vec3.x);
+        compoundTag.putDouble(key + "Y", vec3.y);
+        compoundTag.putDouble(key + "Z", vec3.z);
+    }
+
+    public static Vec3 getVec3d(CompoundTag compoundTag, String name) {
+        double x = compoundTag.getDouble(name + "X");
+        double y = compoundTag.getDouble(name + "Y");
+        double z = compoundTag.getDouble(name + "Z");
+        return new Vec3(x, y, z);
+    }
+
     /**
      * 自定义二次函数
      * @param x x值

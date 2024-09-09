@@ -24,7 +24,7 @@ public class BSFGolemOwnerHurtEnemyTeamGoal extends TargetGoal {
             return false;
         }
         ownerLastHurt = owner.getLastHurtMob();
-        if (snowGolem.getLocator() != 2 || !snowGolem.canAttackInAttackEnemyTeamMode(ownerLastHurt)) {
+        if (snowGolem.getLocator() != 2 || !snowGolem.canPassiveAttackInAttackEnemyTeamMode(ownerLastHurt)) {
             return false;
         }
         int $$1 = owner.getLastHurtMobTimestamp();

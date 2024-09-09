@@ -90,12 +90,16 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private static final EntityDataAccessor<Integer> CORE_COOL_DOWN = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Optional<Component>> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
-
+    private static final EntityDataAccessor<Byte> FIXED_TEAM_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);     // 当此属性不为-1时，为固定队伍，owner无效
+    // server only
     private float launchVelocity;
     private float launchAccuracy;
     private double shootX;
     private double shootY;
     private double shootZ;
+    private int rank;                    // 等级，配合积分器使用
+    private boolean dropEquipment;
+    private AABB aliveRange;
     /*
      status flag:
      0: standby
@@ -110,13 +114,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
      2: enemy player & enemy ownable
      3: all
      */
-
-//    private byte statusFlag;
-//    private byte locatorFlag;
-//    private boolean enhance;
-//    private int potionSickness;
-//    private int coreCoolDown;
-    private boolean dropEquipment;
 
     public BSFSnowGolemEntity(EntityType<? extends TamableAnimal> p_21803_, Level p_21804_) {
         super(p_21803_, p_21804_);
@@ -137,6 +134,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         builder.define(ENHANCE, false);
         builder.define(CORE_COOL_DOWN, 0);
         builder.define(TARGET_NAME, Optional.empty());
+        builder.define(FIXED_TEAM_ID, (byte) -1);
     }
 
     @Override
@@ -152,10 +150,14 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         pCompound.putInt("PotionSickness", getPotionSickness());
         pCompound.putInt("CoreCoolDown", getCoreCoolDown());
         pCompound.putBoolean("DropEquipment", dropEquipment);
+        pCompound.putByte("FixedTeamId", getFixedTeamId());
+        pCompound.putInt("Rank", rank);
+        if (aliveRange != null) {
+            BSFCommonUtil.putVec3d(pCompound, "AliveMin", aliveRange.getMinPosition());
+            BSFCommonUtil.putVec3d(pCompound, "AliveMax", aliveRange.getMaxPosition());
+        }
         if (getTarget() != null) {
             pCompound.putUUID("TargetUUID", getTarget().getUUID());
-        } else {
-            pCompound.remove("TargetUUID");
         }
     }
 
@@ -173,6 +175,11 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         setPotionSickness(pCompound.getInt("PotionSickness"));
         setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
         dropEquipment = pCompound.getBoolean("DropEquipment");
+        setFixedTeamId(pCompound.getByte("FixedTeamId"));
+        rank = pCompound.getInt("Rank");
+        if (pCompound.contains("AliveMin") && pCompound.contains("AliveMax")) {
+            aliveRange = new AABB(BSFCommonUtil.getVec3d(pCompound, "AliveMin"), BSFCommonUtil.getVec3d(pCompound, "AliveMax"));
+        }
         if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
             setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
         }
@@ -289,6 +296,22 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
 
     public void setDropEquipment(boolean b) {
         this.dropEquipment = b;
+    }
+
+    public void setFixedTeamId(byte teamId) {
+        entityData.set(FIXED_TEAM_ID, teamId);
+    }
+
+    public byte getFixedTeamId() {
+        return entityData.get(FIXED_TEAM_ID);
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setAliveRange(Vec3 vec31, Vec3 vec32) {
+        aliveRange = new AABB(vec31, vec32);
     }
 
     @Override
@@ -492,6 +515,9 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     public void tick() {
         Level level = level();
         if (!level.isClientSide) {
+            if (aliveRange != null && !aliveRange.contains(position())) {
+                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
+            }
             setTicksFrozen(0);
             if (getEnhance()) {
                 heal(1);
@@ -692,24 +718,57 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         return !(pTarget instanceof OwnableEntity ownableEntity && pOwner.equals(ownableEntity.getOwner()));
     }
 
-    public boolean canAttackInAttackEnemyTeamMode(Entity entity) {
+    public boolean canPassiveAttackInAttackEnemyTeamMode(Entity entity) {
         if (entity == null) {
             return false;
         }
-        if (getOwnerUUID() == null) {
-            return true;
-        }
         BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-        if (entity.getType().equals(EntityType.PLAYER)) {
-            return !savedData.isSameTeam(getOwner(), entity);
-        } else if (entity instanceof OwnableEntity ownableEntity) {
+        int fixedTeamId = getFixedTeamId();
+        if (fixedTeamId >= 0) {
+            // 确定一点：只有玩家的UUID会出现在队伍存档数据中
+            if (entity instanceof BSFSnowGolemEntity snowGolem) {
+                if (snowGolem.getFixedTeamId() >= 0) {
+                    return fixedTeamId != snowGolem.getFixedTeamId();
+                }
+                return fixedTeamId != savedData.getTeam(snowGolem.getOwnerUUID());
+            }
+            if (entity instanceof OwnableEntity ownableEntity) {
+                return fixedTeamId != savedData.getTeam(ownableEntity.getOwnerUUID());
+            }
+            if (entity.getType().equals(EntityType.PLAYER)) {
+                return fixedTeamId != savedData.getTeam(entity.getUUID());
+            }
+            return false;
+        }
+        if (entity instanceof BSFSnowGolemEntity snowGolem) {
+            if (savedData.getTeam(getOwnerUUID()) < 0) {
+                return !Objects.equals(getOwner(), snowGolem.getOwner());
+            }
+            if (snowGolem.getFixedTeamId() >= 0) {
+                return savedData.getTeam(getOwnerUUID()) != snowGolem.getFixedTeamId();
+            }
+            return !savedData.isSameTeam(getOwner(), snowGolem.getOwner());
+        }
+        if (entity instanceof OwnableEntity ownableEntity) {
             if (savedData.getTeam(getOwnerUUID()) < 0) {
                 return !Objects.equals(getOwner(), ownableEntity.getOwner());
             }
             return !savedData.isSameTeam(getOwner(), ownableEntity.getOwner());
-        } else {
-            return false;
         }
+        if (entity.getType().equals(EntityType.PLAYER)) {
+            return !savedData.isSameTeam(getOwner(), entity);
+        }
+        return false;
+//        if (entity.getType().equals(EntityType.PLAYER)) {
+//            return !savedData.isSameTeam(getOwner(), entity);
+//        } else if (entity instanceof OwnableEntity ownableEntity) {
+//            if (savedData.getTeam(getOwnerUUID()) < 0) {
+//                return !Objects.equals(getOwner(), ownableEntity.getOwner());
+//            }
+//            return !savedData.isSameTeam(getOwner(), ownableEntity.getOwner());
+//        } else {
+//            return false;
+//        }
     }
 
     public void resetCoreCoolDown() {
