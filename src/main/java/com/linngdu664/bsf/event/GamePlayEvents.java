@@ -10,7 +10,7 @@ import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
-import com.linngdu664.bsf.util.BSFTeamSavedData;
+import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;

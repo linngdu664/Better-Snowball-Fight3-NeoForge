@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.util;
+package com.linngdu664.bsf.misc;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;

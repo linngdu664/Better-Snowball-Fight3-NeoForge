@@ -1,7 +1,7 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.util.BSFTiers;
+import com.linngdu664.bsf.misc.BSFTiers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 

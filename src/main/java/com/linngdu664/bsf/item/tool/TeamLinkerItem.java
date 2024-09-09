@@ -1,7 +1,7 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
-import com.linngdu664.bsf.util.BSFTeamSavedData;
+import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;

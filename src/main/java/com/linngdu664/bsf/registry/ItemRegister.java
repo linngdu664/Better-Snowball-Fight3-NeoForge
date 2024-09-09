@@ -15,7 +15,7 @@ import com.linngdu664.bsf.item.tank.LargeSnowballTankItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.item.tool.*;
 import com.linngdu664.bsf.item.weapon.*;
-import com.linngdu664.bsf.util.BSFTiers;
+import com.linngdu664.bsf.misc.BSFTiers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;

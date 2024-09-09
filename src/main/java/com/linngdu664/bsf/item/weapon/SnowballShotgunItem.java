@@ -16,6 +16,7 @@ import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -32,10 +33,12 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_NEXT;
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_PREV;
@@ -121,9 +124,6 @@ public class SnowballShotgunItem extends AbstractBSFWeaponItem {
         // finally push player
         Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
         if (level.isClientSide) {
-//            if (!player.isShiftKeyDown()) {
-//                pushRank = 0.24;
-//            }
             player.push(-pushRank * cameraVec.x, -pushRank * cameraVec.y, -pushRank * cameraVec.z);
             ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(3)).setIntensity(0.8f).setEasing(Easing.ELASTIC_IN));
         } else {
@@ -138,8 +138,6 @@ public class SnowballShotgunItem extends AbstractBSFWeaponItem {
         stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
         player.getCooldowns().addCooldown(this, player.isShiftKeyDown() ? 30 : 20);
         player.awardStat(Stats.ITEM_USED.get(this));
-
-
 //            Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
 //            if (!player.isShiftKeyDown()) {
 //                if (level.isClientSide) {
@@ -173,5 +171,15 @@ public class SnowballShotgunItem extends AbstractBSFWeaponItem {
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_shotgun3.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            @Override
+            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
+                return HumanoidModel.ArmPose.valueOf("BSF_WEAPON");
+            }
+        });
     }
 }

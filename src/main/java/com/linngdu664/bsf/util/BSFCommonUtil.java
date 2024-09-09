@@ -246,26 +246,27 @@ public class BSFCommonUtil {
     public static double vec3GetPitch(Vec3 vec) {
         return Math.atan2(vec.y, Math.sqrt(vec.x * vec.x + vec.z * vec.z));
     }
-    public static MutableComponent getTransMc(String transKey, Object... args){
-        return MutableComponent.create(new TranslatableContents(transKey, null, args));
+
+    public static String getTransStr(String transKey, Object... args) {
+        return Component.translatable(transKey, args).getString();
     }
-    public static String getTransStr(String transKey, Object... args){
-        return getTransMc(transKey,args).getString();
+
+    public static Component getTransCp(String transKey, ChatFormatting format, Object... args) {
+        return Component.translatable(transKey, args).withStyle(format);
     }
-    public static Component getTransCp(String transKey, ChatFormatting format, Object... args){
-        return getTransMc(transKey,args).withStyle(format);
+
+    public static void addTrans(List<Component> pTooltipComponents, String transKey, ChatFormatting format, Object... args) {
+        pTooltipComponents.add(getTransCp(transKey, format, args));
     }
-    public static void addTrans(List<Component> pTooltipComponents,String transKey, ChatFormatting format, Object... args){
-        pTooltipComponents.add(getTransCp(transKey,format,args));
-    }
+
     public static class TipBuilder{
         public List<Component> tooltipComponents;
 
         public TipBuilder(List<Component> tooltipComponents) {
             this.tooltipComponents = tooltipComponents;
         }
-        public TipBuilder add(String transKey, ChatFormatting format, Object... args){
-            BSFCommonUtil.addTrans(this.tooltipComponents,transKey,format,args);
+        public TipBuilder add(String transKey, ChatFormatting format, Object... args) {
+            BSFCommonUtil.addTrans(this.tooltipComponents, transKey, format, args);
             return this;
         }
     }

@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.util;
+package com.linngdu664.bsf.misc;
 
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Items;
