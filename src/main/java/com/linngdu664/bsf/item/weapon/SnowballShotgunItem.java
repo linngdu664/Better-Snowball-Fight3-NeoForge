@@ -37,6 +37,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -45,6 +46,8 @@ import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_PREV;
 
 public class SnowballShotgunItem extends AbstractBSFWeaponItem {
     public static final int TYPE_FLAG = 8;
+    private boolean isShiftHold = false;
+    private boolean isChangeToThrust = false;
 
     public SnowballShotgunItem() {
         super(1145, Rarity.EPIC, TYPE_FLAG);
@@ -162,6 +165,34 @@ public class SnowballShotgunItem extends AbstractBSFWeaponItem {
 //                ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(3)).setIntensity(0.8f).setEasing(Easing.ELASTIC_IN));
 //            }
         return InteractionResultHolder.pass(stack);
+    }
+
+    @Override
+    protected void modifyOrder(Player player, LinkedHashSet<Item> launchOrder) {
+        if (player.isShiftKeyDown()) {
+            if (isShiftHold) {
+                return;
+            }
+            // try switching to thrust
+            if (launchOrder.contains(ItemRegister.THRUST_SNOWBALL.get()) && !launchOrder.getFirst().equals(ItemRegister.THRUST_SNOWBALL.get())) {
+                launchOrder.remove(ItemRegister.THRUST_SNOWBALL.get());
+                launchOrder.addFirst(ItemRegister.THRUST_SNOWBALL.get());
+                isChangeToThrust = true;
+            } else {
+                isChangeToThrust = false;
+            }
+            isShiftHold = true;
+        } else {
+            if (!isShiftHold) {
+                return;
+            }
+            // try recovering
+            if (isChangeToThrust && launchOrder.getFirst().equals(ItemRegister.THRUST_SNOWBALL.get())) {
+                launchOrder.removeFirst();
+                launchOrder.addLast(ItemRegister.THRUST_SNOWBALL.get());
+            }
+            isShiftHold = false;
+        }
     }
 
     @Override

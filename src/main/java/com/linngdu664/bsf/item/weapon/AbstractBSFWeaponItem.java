@@ -20,12 +20,11 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 
 public abstract class AbstractBSFWeaponItem extends Item {
     private final int typeFlag;
-    private LinkedList<Item> launchOrder;                                      // client only
+    private final LinkedHashSet<Item> launchOrder = new LinkedHashSet<>();   // client only
     private ItemStack prevAmmoItemStack = Items.AIR.getDefaultInstance();      // client only
     private ItemStack currentAmmoItemStack = Items.AIR.getDefaultInstance();   // client only
     private ItemStack nextAmmoItemStack = Items.AIR.getDefaultInstance();      // client only
@@ -87,95 +86,49 @@ public abstract class AbstractBSFWeaponItem extends Item {
     @Override
     public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
         if (pLevel.isClientSide && pEntity instanceof Player player && (this.equals(player.getMainHandItem().getItem()) || this.equals(player.getOffhandItem().getItem()))) {
-            ArrayList<Item> arrayList = new ArrayList<>();
             Inventory inventory = player.getInventory();
             int k = inventory.getContainerSize();
+            HashMap<Item, Integer> hashMap = new HashMap<>();
             for (int i = 0; i < k; i++) {
                 ItemStack itemStack = inventory.getItem(i);
                 Item item = itemStack.getItem();
                 if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.AMMO_ITEM)) {
                     AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
-                    if (!arrayList.contains(snowball) && (typeFlag & snowball.getTypeFlag()) != 0) {
-                        arrayList.add(snowball);
+                    if ((typeFlag & snowball.getTypeFlag()) != 0) {
+                        hashMap.put(snowball, hashMap.getOrDefault(snowball, 0) + itemStack.getMaxDamage() - itemStack.getDamageValue());
                     }
-                } else if (isAllowBulkedSnowball() && item instanceof AbstractBSFSnowballItem snowball && !arrayList.contains(snowball) && (typeFlag & snowball.getTypeFlag()) != 0) {
-                    arrayList.add(snowball);
+                } else if (isAllowBulkedSnowball() && item instanceof AbstractBSFSnowballItem snowball && (typeFlag & snowball.getTypeFlag()) != 0) {
+                    hashMap.put(snowball, hashMap.getOrDefault(snowball, 0) + itemStack.getCount());
                 }
             }
-            if (launchOrder == null) {
-                launchOrder = new LinkedList<>(arrayList);
-            } else {
-                int j = launchOrder.size();
-                int i = 0;
-                while (i < arrayList.size()) {
-                    Item item = arrayList.get(i);
-                    if (!launchOrder.contains(item)) {
-                        launchOrder.addLast(item);
-                        arrayList.remove(i);
-                    } else {
-                        i++;
-                    }
-                }
-                i = 0;
-                while (i < j) {
-                    Item item = launchOrder.get(i);
-                    if (!arrayList.contains(item)) {
-                        launchOrder.remove(i);
-                        j--;
-                    } else {
-                        i++;
-                    }
-                }
-            }
+            launchOrder.addAll(hashMap.keySet());
+            launchOrder.removeIf(item -> !hashMap.containsKey(item));
+            modifyOrder(player, launchOrder);
             if (launchOrder.isEmpty()) {
                 prevAmmoItemStack = Items.AIR.getDefaultInstance();
-                currentAmmoItemStack = prevAmmoItemStack;
-                nextAmmoItemStack = prevAmmoItemStack;
+                currentAmmoItemStack = Items.AIR.getDefaultInstance();
+                nextAmmoItemStack = Items.AIR.getDefaultInstance();
+            } else if (launchOrder.size() == 1) {
+                prevAmmoItemStack = Items.AIR.getDefaultInstance();
+                currentAmmoItemStack = new ItemStack(launchOrder.getFirst(), hashMap.get(launchOrder.getFirst()));
+                nextAmmoItemStack = Items.AIR.getDefaultInstance();
             } else {
-                Item item1, item3;
-                if (launchOrder.size() == 1) {
-                    item1 = Items.AIR;
-                    item3 = Items.AIR;
-                } else {
-                    item1 = launchOrder.getLast();
-                    item3 = launchOrder.get(1);
-                }
-                Item item2 = launchOrder.getFirst();
-                int i1 = 0, i2 = 0, i3 = 0;
-                for (int i = 0; i < k; i++) {
-                    ItemStack itemStack = inventory.getItem(i);
-                    Item item = itemStack.getItem();
-                    if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.AMMO_ITEM)) {
-                        AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
-                        if (snowball.equals(item1)) {
-                            i1 += itemStack.getMaxDamage() - itemStack.getDamageValue();
-                        } else if (snowball.equals(item2)) {
-                            i2 += itemStack.getMaxDamage() - itemStack.getDamageValue();
-                        } else if (snowball.equals(item3)) {
-                            i3 += itemStack.getMaxDamage() - itemStack.getDamageValue();
-                        }
-                    } else if (item instanceof AbstractBSFSnowballItem snowball && isAllowBulkedSnowball()) {
-                        if (snowball.equals(item1)) {
-                            i1 += itemStack.getCount();
-                        } else if (snowball.equals(item2)) {
-                            i2 += itemStack.getCount();
-                        } else if (snowball.equals(item3)) {
-                            i3 += itemStack.getCount();
-                        }
-                    }
-                }
-                if (item3.equals(item1)) {
-                    i3 = i1;
-                }
-                prevAmmoItemStack = new ItemStack(item1, i1);
-                currentAmmoItemStack = new ItemStack(item2, i2);
-                nextAmmoItemStack = new ItemStack(item3, i3);
+                prevAmmoItemStack = new ItemStack(launchOrder.getLast(), hashMap.get(launchOrder.getLast()));
+                currentAmmoItemStack = new ItemStack(launchOrder.getFirst(), hashMap.get(launchOrder.getFirst()));
+                Iterator<Item> iterator = launchOrder.iterator();
+                iterator.next();
+                Item nextItem = iterator.next();
+                nextAmmoItemStack = new ItemStack(nextItem, hashMap.get(nextItem));
             }
             Item newItem = currentAmmoItemStack.getItem();
             if (!newItem.equals(pStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item())) {
                 PacketDistributor.sendToServer(new AmmoTypePayload(newItem, pSlotId));
             }
         }
+    }
+
+    protected void modifyOrder(Player player, LinkedHashSet<Item> launchOrder) {
+
     }
 
     public ItemStack getAmmo(Player player, ItemStack weaponItemStack) {
@@ -206,7 +159,7 @@ public abstract class AbstractBSFWeaponItem extends Item {
         return null;
     }
 
-    public LinkedList<Item> getLaunchOrder() {
+    public LinkedHashSet<Item> getLaunchOrder() {
         return launchOrder;
     }
 

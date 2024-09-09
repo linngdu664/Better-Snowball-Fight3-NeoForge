@@ -29,6 +29,7 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 
@@ -66,7 +67,7 @@ public class ClientForgeEvents {
                 weaponItem = item;
             }
             if (weaponItem != null) {
-                LinkedList<Item> launchOrder = weaponItem.getLaunchOrder();
+                LinkedHashSet<Item> launchOrder = weaponItem.getLaunchOrder();
                 if (!launchOrder.isEmpty()) {
                     if (key == ClientModEvents.CYCLE_MOVE_AMMO_NEXT.getKey().getValue()) {
                         Item item = launchOrder.getFirst();
