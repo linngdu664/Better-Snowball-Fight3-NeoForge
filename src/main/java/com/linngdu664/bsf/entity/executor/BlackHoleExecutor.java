@@ -48,7 +48,6 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
         super(pEntityType, pX, pY, pZ, pLevel, maxTime);
         setRank(pLevel.random.nextInt(30, 50));
         setDeltaMovement(vel);
-        setGlowingTag(true);
 
         // initialized shaft for client
         Vector3f forward = vel.toVector3f().normalize();
