@@ -1,10 +1,8 @@
 package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.client.renderer.entity.BSFSnowGolemRenderer;
-import com.linngdu664.bsf.client.renderer.entity.BlackHoleExecutorCRenderer;
-import com.linngdu664.bsf.client.renderer.entity.FixedForceExecutorLayerType;
-import com.linngdu664.bsf.client.renderer.entity.FixedForceExecutorRenderer;
+import com.linngdu664.bsf.client.renderer.entity.*;
+import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.executor.*;
 import com.linngdu664.bsf.entity.snowball.force.MonsterGravitySnowballEntity;
@@ -17,10 +15,7 @@ import com.linngdu664.bsf.entity.snowball.tracking.*;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.api.distmarker.Dist;
@@ -37,6 +32,9 @@ public class EntityRegister {
             ENTITY_TYPES.register("bsf_snow_golem", () -> EntityType.Builder.of(BSFSnowGolemEntity::new, MobCategory.MISC)
                     .sized(0.7F, 1.9F).clientTrackingRange(8).immuneTo(Blocks.POWDER_SNOW)
                     .build(Main.makeResLoc("bsf_snow_golem").toString()));
+    public static final DeferredHolder<EntityType<?>, EntityType<BSFDummyEntity>> BSF_DUMMY =
+            ENTITY_TYPES.register("bsf_dummy", () -> EntityType.Builder.of(BSFDummyEntity::new, MobCategory.MISC)
+                    .sized(0.7F, 1.9F).clientTrackingRange(8).build(Main.makeResLoc("bsf_dummy").toString()));
     public static final DeferredHolder<EntityType<?>, EntityType<AbstractFixedForceExecutor>> MONSTER_GRAVITY_EXECUTOR = executorRegister(MonsterGravityExecutor::new, "monster_gravity_executor", 0.25F);
     public static final DeferredHolder<EntityType<?>, EntityType<AbstractFixedForceExecutor>> MONSTER_REPULSION_EXECUTOR = executorRegister(MonsterRepulsionExecutor::new, "monster_repulsion_executor", 0.25F);
     public static final DeferredHolder<EntityType<?>, EntityType<AbstractFixedForceExecutor>> PROJECTILE_GRAVITY_EXECUTOR = executorRegister(ProjectileGravityExecutor::new, "projectile_gravity_executor", 0.25F);
@@ -97,6 +95,7 @@ public class EntityRegister {
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(BSF_SNOW_GOLEM.get(), BSFSnowGolemRenderer::new);
+            event.registerEntityRenderer(BSF_DUMMY.get(), BSFDummyRenderer::new);
             event.registerEntityRenderer(MONSTER_GRAVITY_EXECUTOR.get(), pContext -> new FixedForceExecutorRenderer(pContext, FixedForceExecutorLayerType.MONSTER_GRAVITY));
             event.registerEntityRenderer(MONSTER_REPULSION_EXECUTOR.get(), pContext -> new FixedForceExecutorRenderer(pContext, FixedForceExecutorLayerType.MONSTER_REPULSION));
             event.registerEntityRenderer(PROJECTILE_GRAVITY_EXECUTOR.get(), pContext -> new FixedForceExecutorRenderer(pContext, FixedForceExecutorLayerType.PROJECTILE_GRAVITY));
@@ -146,6 +145,7 @@ public class EntityRegister {
         @SubscribeEvent
         public static void onCreateEntityAttribute(EntityAttributeCreationEvent event) {
             event.put(BSF_SNOW_GOLEM.get(), TamableAnimal.createLivingAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.FOLLOW_RANGE, 100.0).add(Attributes.MOVEMENT_SPEED, 0.3).build());
+            event.put(BSF_DUMMY.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH, Float.MAX_VALUE).add(Attributes.FOLLOW_RANGE, 100.0).add(Attributes.MOVEMENT_SPEED, 0).add(Attributes.KNOCKBACK_RESISTANCE, Double.MAX_VALUE).build());
         }
     }
 }

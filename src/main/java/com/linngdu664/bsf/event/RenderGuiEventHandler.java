@@ -1,17 +1,20 @@
 package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
@@ -80,74 +83,83 @@ public class RenderGuiEventHandler {
         BSFGui.V2I locateV2I = null,statusV2I = null;
         String sLocatorStr = "";
         String sStatusStr = "";
-        if (pick.getType() == HitResult.Type.ENTITY && ((EntityHitResult) pick).getEntity() instanceof BSFSnowGolemEntity entity && player.equals(entity.getOwner())) {
-            //显示装备
-            float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
-            List<Pair<Vec3, Consumer<Vec2>>> list = new ArrayList<>();
-            Vec3 entityPosition = entity.getPosition(partialTick);
-            Vec3 viewVector0Y = entity.getMiddleModelForward(partialTick,0);
-            ItemStack equip = entity.getWeapon();
-            if (equip != ItemStack.EMPTY) {
-                ItemStack finalEquip = equip;
-                list.add(new Pair<>(entityPosition.add(entity.getMiddleModelForward(partialTick,4).scale(0.7).add(0, 1.3, 0)), v2 -> {
-                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, finalEquip,instance.font, BSFCommonUtil.getTransStr("gui_text_weapon"));
-                    float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) /finalEquip.getMaxDamage();
-                    renderProgressBar(guiGraphics,new V2I(v2IRatio.x-4,v2IRatio.y+23),new V2I(30,6),2,0xffffffff,percent>0.3?0xff85e900:0xfffc3d49,percent);
-                }));
-            }
-            equip = entity.getAmmo();
-            if (equip != ItemStack.EMPTY) {
-                ItemStack finalEquip = equip;
-                list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(-0.3).add(0, 1.2, 0)), v2 -> {
-                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.5);
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.07), 0xffffffff, finalEquip,instance.font,BSFCommonUtil.getTransStr("gui_text_snowball"));
-                    float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) /finalEquip.getMaxDamage();
-                    renderProgressBar(guiGraphics,new V2I(v2IRatio.x-4,v2IRatio.y+23),new V2I(30,6),2,0xffffffff,percent>0.3?0xff85e900:0xfffc3d49,percent);
-                }));
-            }
-            equip = entity.getCore();
-            if (equip != ItemStack.EMPTY) {
-                ItemStack finalEquip = equip;
-                list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(0.3).add(0, 1.05, 0)), v2 -> {
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.7).getVec2(), widthWinRatio(window, 0.12), 0xffffffff, finalEquip,instance.font,BSFCommonUtil.getTransStr("gui_text_core"));
-                }));
-            }
-            calcScreenPosFromWorldPos(list, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, partialTick);
-            //显示模式
-            byte locator = entity.getLocator();
-            byte status = entity.getStatus();
-            sLocatorStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator));
-            sStatusStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.statusMap(status));
-            locateV2I = GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
-            locateV2I.set(locateV2I.x - 1, locateV2I.y - 1 + locator * 20);
-            GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
-            statusV2I = GOLEM_STATUS_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 60, 0);
-            statusV2I.set(statusV2I.x - 1, statusV2I.y - 1 + status * 20);
-            GOLEM_SELECTOR_GUI.render(guiGraphics, statusV2I.x, statusV2I.y);
-            if (entity.getEnhance()) {
-                ADVANCE_MODE_GUI.renderRatio(guiGraphics, window, 0.5, 0.8);
-            }
+        if (pick.getType() == HitResult.Type.ENTITY) {
+            Entity entity1 = ((EntityHitResult) pick).getEntity();
+            if (entity1.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()) && player.equals(((BSFSnowGolemEntity) entity1).getOwner())) {
+                BSFSnowGolemEntity entity = (BSFSnowGolemEntity) entity1;
+                //显示装备
+                float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
+                List<Pair<Vec3, Consumer<Vec2>>> list = new ArrayList<>();
+                Vec3 entityPosition = entity.getPosition(partialTick);
+                Vec3 viewVector0Y = entity.getMiddleModelForward(partialTick, 0);
+                ItemStack equip = entity.getWeapon();
+                if (equip != ItemStack.EMPTY) {
+                    ItemStack finalEquip = equip;
+                    list.add(new Pair<>(entityPosition.add(entity.getMiddleModelForward(partialTick, 4).scale(0.7).add(0, 1.3, 0)), v2 -> {
+                        V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
+                        renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_weapon"));
+                        float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) / finalEquip.getMaxDamage();
+                        renderProgressBar(guiGraphics, new V2I(v2IRatio.x - 4, v2IRatio.y + 23), new V2I(30, 6), 2, 0xffffffff, percent > 0.3 ? 0xff85e900 : 0xfffc3d49, percent);
+                    }));
+                }
+                equip = entity.getAmmo();
+                if (equip != ItemStack.EMPTY) {
+                    ItemStack finalEquip = equip;
+                    list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(-0.3).add(0, 1.2, 0)), v2 -> {
+                        V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.5);
+                        renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.07), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_snowball"));
+                        float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) / finalEquip.getMaxDamage();
+                        renderProgressBar(guiGraphics, new V2I(v2IRatio.x - 4, v2IRatio.y + 23), new V2I(30, 6), 2, 0xffffffff, percent > 0.3 ? 0xff85e900 : 0xfffc3d49, percent);
+                    }));
+                }
+                equip = entity.getCore();
+                if (equip != ItemStack.EMPTY) {
+                    ItemStack finalEquip = equip;
+                    list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(0.3).add(0, 1.05, 0)), v2 -> {
+                        renderEquipIntroduced(guiGraphics, v2, v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.7).getVec2(), widthWinRatio(window, 0.12), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_core"));
+                    }));
+                }
+                calcScreenPosFromWorldPos(list, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, partialTick);
+                //显示模式
+                byte locator = entity.getLocator();
+                byte status = entity.getStatus();
+                sLocatorStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator));
+                sStatusStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.statusMap(status));
+                locateV2I = GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
+                locateV2I.set(locateV2I.x - 1, locateV2I.y - 1 + locator * 20);
+                GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
+                statusV2I = GOLEM_STATUS_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 60, 0);
+                statusV2I.set(statusV2I.x - 1, statusV2I.y - 1 + status * 20);
+                GOLEM_SELECTOR_GUI.render(guiGraphics, statusV2I.x, statusV2I.y);
+                if (entity.getEnhance()) {
+                    ADVANCE_MODE_GUI.renderRatio(guiGraphics, window, 0.5, 0.8);
+                }
 
-            //显示血条/cd
-            V2I barFrame = new V2I(100, 10);
-            int padding = 2;
-            V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
-            renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffe82f27, entity.getHealth() / entity.getMaxHealth());
-            if (entity.getCore().getItem() instanceof SnowGolemCoreItem item && entity.getCoreCoolDown() > 0) {
-                barPos.y += 15;
-                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff26a7ff, (float) entity.getCoreCoolDown() / item.getCoolDown());
-            }
-            if (entity.getPotionSickness() > 0) {
-                barPos.y += 15;
-                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff62df86, (float) entity.getPotionSickness() / 100);
-            }
+                //显示血条/cd
+                V2I barFrame = new V2I(100, 10);
+                int padding = 2;
+                V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
+                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffe82f27, entity.getHealth() / entity.getMaxHealth());
+                if (entity.getCore().getItem() instanceof SnowGolemCoreItem item && entity.getCoreCoolDown() > 0) {
+                    barPos.y += 15;
+                    renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff26a7ff, (float) entity.getCoreCoolDown() / item.getCoolDown());
+                }
+                if (entity.getPotionSickness() > 0) {
+                    barPos.y += 15;
+                    renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff62df86, (float) entity.getPotionSickness() / 100);
+                }
 
-            //显示当前目标
-            Optional<Component> targetName = entity.getTargetName();
-            V2I v2I = v2IRatio(window, 0.4, 0.75);
-            Component transComp = Component.translatable("tweaker_target_now.tip", targetName.orElseGet(() -> Component.translatable("snow_golem_target_null.tip")));
-            guiGraphics.drawString(instance.font, transComp, v2I.x-instance.font.width(transComp), v2I.y, 0xffffffff);
+                //显示当前目标
+                Optional<Component> targetName = entity.getTargetName();
+                V2I v2I = v2IRatio(window, 0.4, 0.75);
+                Component transComp = Component.translatable("tweaker_target_now.tip", targetName.orElseGet(() -> Component.translatable("snow_golem_target_null.tip")));
+                guiGraphics.drawString(instance.font, transComp, v2I.x - instance.font.width(transComp), v2I.y, 0xffffffff);
+            } else if (entity1.getType().equals(EntityRegister.BSF_DUMMY.get())) {
+                BSFDummyEntity dummy = (BSFDummyEntity) entity1;
+                V2I v2I = v2IRatio(window, 0.4, 0.5);
+                String dpsStr = String.format(dummy.getDPS() < 10 ? "DPS: %.2f" : "DPS: %.3g", dummy.getDPS());
+                guiGraphics.drawString(instance.font, dpsStr, v2I.x - instance.font.width(dpsStr), v2I.y - 5, 0xffffffff);
+            }
         }
         ItemStack tweaker = null;
         if (mainHandItem.getItem() instanceof SnowGolemModeTweakerItem) {

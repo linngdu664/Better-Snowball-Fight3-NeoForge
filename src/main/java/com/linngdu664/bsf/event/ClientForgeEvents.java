@@ -1,13 +1,11 @@
 package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.client.resources.sounds.MovingSoundInstance;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
 import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
-import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
 import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;
 import com.linngdu664.bsf.network.to_server.SwitchTweakerStatusModePayload;
 import com.linngdu664.bsf.network.to_server.SwitchTweakerTargetModePayload;
@@ -15,10 +13,8 @@ import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +26,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 
 
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
@@ -129,33 +124,5 @@ public class ClientForgeEvents {
         Camera camera = minecraft.gameRenderer.getMainCamera();
         ScreenshakeHandler.clientTick(camera, null);
         ScreenshakeHandler.clientTick(camera, BSF_RANDOM_SOURCE);
-    }
-
-    @SubscribeEvent
-    public static void onClientTickPre(ClientTickEvent.Pre event) {
-        Minecraft minecraft = Minecraft.getInstance();
-        ClientLevel level = minecraft.level;
-        if (level == null) {
-            return;
-        }
-        for (ToggleMovingSoundPayload payload : ToggleMovingSoundPayload.SOUND_PAYLOADS) {
-            Entity entity = level.getEntity(payload.entityId());
-            if (entity != null) {
-                SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-                if (payload.flag() == ToggleMovingSoundPayload.PLAY_LOOP) {
-                    MovingSoundInstance soundInstance = new MovingSoundInstance(entity, payload.soundEvent(), true);
-                    if (!soundManager.isActive(soundInstance)) {
-                        soundManager.queueTickingSound(soundInstance);
-                    }
-                } else if (payload.flag() == ToggleMovingSoundPayload.STOP_LOOP) {
-                    MovingSoundInstance soundInstance = new MovingSoundInstance(entity, payload.soundEvent(), true);
-                    soundManager.stop(soundInstance);
-                } else {
-                    MovingSoundInstance soundInstance = new MovingSoundInstance(entity, payload.soundEvent(), false);
-                    soundManager.queueTickingSound(soundInstance);
-                }
-            }
-        }
-        ToggleMovingSoundPayload.SOUND_PAYLOADS.clear();
     }
 }

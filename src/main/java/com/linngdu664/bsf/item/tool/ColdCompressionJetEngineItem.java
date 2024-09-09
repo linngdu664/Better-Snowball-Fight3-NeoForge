@@ -103,7 +103,7 @@ public class ColdCompressionJetEngineItem extends Item {
                     if (entity.getTicksFrozen() < 100) {
                         entity.setTicksFrozen(100);
                     }
-                    entity.hurt(pLevel.damageSources().playerAttack((Player) pLivingEntity), Float.MIN_VALUE);
+                    entity.hurt(pLevel.damageSources().playerAttack((Player) pLivingEntity), Float.MIN_NORMAL);
                 }
                 if (vec3.y > 0) {
                     pLivingEntity.resetFallDistance();
@@ -148,7 +148,7 @@ public class ColdCompressionJetEngineItem extends Item {
                     entity.setTicksFrozen(100);
                 }
                 if (pLivingEntity instanceof Player player) {
-                    entity.hurt(pLevel.damageSources().playerAttack(player), Float.MIN_VALUE);
+                    entity.hurt(pLevel.damageSources().playerAttack(player), Float.MIN_NORMAL);
                 }
             }
             if (vec3.y > 0) {

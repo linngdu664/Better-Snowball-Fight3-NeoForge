@@ -9,11 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-
-
 public record ToggleMovingSoundPayload(int entityId, SoundEvent soundEvent, byte flag) implements CustomPacketPayload {
-    public static final ArrayList<ToggleMovingSoundPayload> SOUND_PAYLOADS = new ArrayList<>();
     public static final byte PLAY_ONCE = 0;
     public static final byte PLAY_LOOP = 1;
     public static final byte STOP_LOOP = 2;
@@ -26,7 +22,7 @@ public record ToggleMovingSoundPayload(int entityId, SoundEvent soundEvent, byte
     );
 
     public static void handleDataInClient(ToggleMovingSoundPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> SOUND_PAYLOADS.add(payload));     // handle the payload in client tick event to prevent class loading
+        context.enqueueWork(() -> ToggleMovingSoundClientHandler.handlePayload(payload));     // to prevent class loading
     }
 
     @Override
