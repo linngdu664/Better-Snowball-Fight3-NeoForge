@@ -2,10 +2,7 @@ package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.network.to_client.*;
-import com.linngdu664.bsf.network.to_server.AmmoTypePayload;
-import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;
-import com.linngdu664.bsf.network.to_server.SwitchTweakerStatusModePayload;
-import com.linngdu664.bsf.network.to_server.SwitchTweakerTargetModePayload;
+import com.linngdu664.bsf.network.to_server.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -31,5 +28,6 @@ public class NetworkRegister {
         registrar.playToServer(SculkSnowballLauncherSwitchSoundPayload.TYPE, SculkSnowballLauncherSwitchSoundPayload.STREAM_CODEC, SculkSnowballLauncherSwitchSoundPayload::handleDataInServer);
         registrar.playToServer(SwitchTweakerStatusModePayload.TYPE, SwitchTweakerStatusModePayload.STREAM_CODEC, SwitchTweakerStatusModePayload::handleDataInServer);
         registrar.playToServer(SwitchTweakerTargetModePayload.TYPE, SwitchTweakerTargetModePayload.STREAM_CODEC, SwitchTweakerTargetModePayload::handleDataInServer);
+        registrar.playToServer(ValueAdjustmentToolPayload.TYPE, ValueAdjustmentToolPayload.STREAM_CODEC, ValueAdjustmentToolPayload::handleDataInServer);
     }
 }
