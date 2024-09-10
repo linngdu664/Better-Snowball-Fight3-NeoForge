@@ -6,29 +6,20 @@ import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -98,11 +89,13 @@ public class ScoringDevice extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        RegionData regine = itemStack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
-        if (!regine.inRegion(pPlayer.getPosition(1)) && !BSFCommonUtil.findInventoryItemStacks(pPlayer, (item) -> item != ItemRegister.SCORING_DEVICE.get()).isEmpty() || BSFCommonUtil.findInventoryItemStacks(pPlayer, (item) -> item == ItemRegister.SCORING_DEVICE.get()).size()>1){
-            if (!pLevel.isClientSide())pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed"), false);
+        RegionData region = itemStack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+        if (!region.inRegion(pPlayer.getPosition(1)) && !BSFCommonUtil.findInventoryItemStacks(pPlayer, (item) -> item != ItemRegister.SCORING_DEVICE.get()).isEmpty() || BSFCommonUtil.findInventoryItemStacks(pPlayer, (item) -> item == ItemRegister.SCORING_DEVICE.get()).size() > 1) {
+            if (!pLevel.isClientSide()) {
+                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed.tip"), false);
+            }
             return InteractionResultHolder.fail(itemStack);
-        }else {
+        } else {
             pPlayer.startUsingItem(pUsedHand);
             return InteractionResultHolder.consume(itemStack);
         }
@@ -119,6 +112,7 @@ public class ScoringDevice extends Item {
     public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
         return 40;
     }
+
     public @NotNull UseAnim getUseAnimation(@NotNull ItemStack stack) {
         return UseAnim.BOW;
     }

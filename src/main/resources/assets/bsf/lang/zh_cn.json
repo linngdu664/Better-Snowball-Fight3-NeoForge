@@ -444,6 +444,7 @@
   "scoring_device_cannot_sell.tip": "这台售货机不能回收物品",
   "scoring_device_kill_bonus.tip": "金钱 +%1$s",
   "scoring_device_death_punishment.tip": "金钱 -%1$s",
+  "scoring_device_tp_failed.tip": "进入区域内不能携带积分器以外的物品，且积分器只能携带一个",
 
   "block.bsf.smart_snow_block": "智慧雪块",
   "block.bsf.loose_snow_block": "松散雪块",
@@ -458,7 +459,5 @@
 
   "gui_text_weapon": "武器",
   "gui_text_snowball": "雪球",
-  "gui_text_core": "核心",
-
-  "scoring_device_tp_failed": "进入区域内不能携带积分器以外的物品，且积分器只能携带一个"
+  "gui_text_core": "核心"
 }

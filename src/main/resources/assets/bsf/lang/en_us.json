@@ -444,6 +444,7 @@
   "scoring_device_cannot_sell.tip": "This machine can't recycle items.",
   "scoring_device_kill_bonus.tip": "Money +%1$s",
   "scoring_device_death_punishment.tip": "Money -%1$s",
+  "scoring_device_tp_failed.tip": "Items other than Scoring Device cannot be brought into the area, and the Scoring Device can only carry one.",
 
   "block.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.loose_snow_block": "Loose Snow Block",
@@ -458,7 +459,5 @@
 
   "gui_text_weapon": "Weapon",
   "gui_text_snowball": "Snowball",
-  "gui_text_core": "Core",
-
-  "scoring_device_tp_failed": "Items other than Scoring Device cannot be brought into the area, and the Scoring Device can only carry one"
+  "gui_text_core": "Core"
 }
