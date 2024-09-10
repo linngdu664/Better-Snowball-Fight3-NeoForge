@@ -6,12 +6,14 @@ import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -60,20 +62,24 @@ public class ZoneController extends Block implements EntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof ZoneControllerEntity zoneControllerEntity) {
-            if (stack.has(DataComponentRegister.REGION)) {
+            if (stack.has(DataComponentRegister.REGION) && player.getAbilities().instabuild) {
                 if (!level.isClientSide()) {
                     RegionData regionData = stack.get(DataComponentRegister.REGION);
                     if (regionData.start().getY() < regionData.end().getY()) {
-                        zoneControllerEntity.setSnowGolemList(player, regionData.start(), regionData.end());
+                        zoneControllerEntity.setSnowGolemList(regionData.start(), regionData.end());
+                        player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSnowGolemCount() + " golems"), false);
                     } else {
-                        zoneControllerEntity.setRegionAndSummon(player, regionData.start(), regionData.end());
+                        zoneControllerEntity.setRegionAndSummon(regionData.start(), regionData.end());
+                        player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSummonPosList().size() + " spawn points"), false);
                     }
                 }
                 return ItemInteractionResult.SUCCESS;
             }
             if (stack.getItem() instanceof TeamLinkerItem teamLinkerItem && player.getAbilities().instabuild) {
                 if (!level.isClientSide()) {
-                    zoneControllerEntity.setTeamId(player, teamLinkerItem.getTeamId());
+                    byte teamId = teamLinkerItem.getTeamId();
+                    zoneControllerEntity.setTeamId(teamId);
+                    player.displayClientMessage(Component.literal("Set controller team " + DyeColor.byId(teamId).getName()), false);
                 }
                 return ItemInteractionResult.SUCCESS;
             }

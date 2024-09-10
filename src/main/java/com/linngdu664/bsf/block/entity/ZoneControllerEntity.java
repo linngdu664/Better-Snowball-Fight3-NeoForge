@@ -6,9 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -107,12 +104,12 @@ public class ZoneControllerEntity extends BlockEntity {
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
         // in client these fields are valid
+        super.handleUpdateTag(tag, lookupProvider);
         teamId = tag.getByte("TeamId");
         currentRank = tag.getInt("CurrentRank");
-        super.handleUpdateTag(tag, lookupProvider);
     }
 
-    public void setRegionAndSummon(Player player, BlockPos regionStart, BlockPos regionEnd) {
+    public void setRegionAndSummon(BlockPos regionStart, BlockPos regionEnd) {
         this.regionStart = regionStart;
         this.regionEnd = regionEnd;
         summonPosList = new ArrayList<>();
@@ -123,10 +120,9 @@ public class ZoneControllerEntity extends BlockEntity {
                     }
                 });
         setChanged();
-        player.displayClientMessage(Component.literal("Add " + summonPosList.size() + " spawn points"), false);
     }
 
-    public void setSnowGolemList(Player player, BlockPos regionStart, BlockPos regionEnd) {
+    public void setSnowGolemList(BlockPos regionStart, BlockPos regionEnd) {
         AABB aabb = new AABB(new Vec3(regionStart.getX(), regionStart.getY(), regionStart.getZ()), new Vec3(regionEnd.getX(), regionEnd.getY(), regionEnd.getZ()));
         List<BSFSnowGolemEntity> golemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, aabb, p -> true);
         snowGolemList = new ArrayList<>();
@@ -136,16 +132,26 @@ public class ZoneControllerEntity extends BlockEntity {
             snowGolemList.add(compoundTag);
         }
         setChanged();
-        player.displayClientMessage(Component.literal("Add " + snowGolemList.size() + " golems"), false);
     }
 
-    public void setTeamId(Player player, byte teamId) {
+    public void setTeamId(byte teamId) {
         this.teamId = teamId;
         setChanged();
-        player.displayClientMessage(Component.literal("Set controller team " + DyeColor.byId(teamId).getName()), false);
     }
 
     public ArrayList<BlockPos> getSummonPosList() {
         return summonPosList;
+    }
+
+    public int getSnowGolemCount() {
+        return snowGolemList.size();
+    }
+
+    public int getCurrentRank() {
+        return currentRank;
+    }
+
+    public byte getTeamId() {
+        return teamId;
     }
 }
