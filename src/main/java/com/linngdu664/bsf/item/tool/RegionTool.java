@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 
 public class RegionTool extends Item {
     public RegionTool(Properties properties) {
-        super(properties.component(DataComponentRegister.REGION, RegionData.EMPTY));
+        super(properties.stacksTo(1).component(DataComponentRegister.REGION, RegionData.EMPTY));
     }
 
     @Override

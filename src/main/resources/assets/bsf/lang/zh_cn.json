@@ -353,6 +353,8 @@
   "vector_inversion_anchor.tooltip": "逆转周围内所有实体的速度",
   "team_linker.tooltip": "<%1$s> 加入/退出队伍",
   "team_linker1.tooltip": "<%1$s+%2$s> 开/关显示队友位置",
+  "scoring_device_rank.tooltip": "等级：%1$s",
+  "scoring_device_money.tooltip": "金钱：%1$s",
 
 
 
@@ -434,6 +436,14 @@
   "random_sound.tip": "随机音效",
   "sound_id.tip": "音效%1$s",
   "show_detail.tip": "<%1$s> 查看详细信息",
+  "scoring_device_rank_low.tip": "等级不足，无法购买",
+  "scoring_device_no_money.tip": "金钱不足，无法购买",
+  "scoring_device_buy_success.tip": "谢谢惠顾",
+  "scoring_device_sell_success.tip": "所有相关物品已被回收，回收价为%1$s",
+  "scoring_device_no_item_to_sell.tip": "没有能被回收的相关物品",
+  "scoring_device_cannot_sell.tip": "这台售货机不能回收物品",
+  "scoring_device_kill_bonus.tip": "金钱 +%1$s",
+  "scoring_device_death_punishment.tip": "金钱 -%1$s",
 
   "block.bsf.smart_snow_block": "智慧雪块",
   "block.bsf.loose_snow_block": "松散雪块",

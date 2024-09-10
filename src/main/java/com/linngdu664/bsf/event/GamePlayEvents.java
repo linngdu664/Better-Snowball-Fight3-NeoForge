@@ -16,6 +16,7 @@ import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.ResourceLocation;
@@ -79,11 +80,11 @@ public class GamePlayEvents {
                         int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                         int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                         device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                        deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -" + getPoints)), false);
+                        deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
                         int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                         device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
                         device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
-                        killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +" + getPoints)), false);
+                        killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
                     }
                 } else if (deathEntity instanceof BSFSnowGolemEntity deathGolem) {
                     ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, ItemRegister.SCORING_DEVICE.get());
@@ -92,7 +93,7 @@ public class GamePlayEvents {
                         int getPoints = deathGolem.getRank();
                         device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
                         device.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
-                        killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +" + getPoints)), false);
+                        killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
                     }
                 }
             } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof Player deathPlayer) {
@@ -101,7 +102,7 @@ public class GamePlayEvents {
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                     int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                     device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                    deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -" + getPoints)), false);
+                    deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
                 }
             }
         }

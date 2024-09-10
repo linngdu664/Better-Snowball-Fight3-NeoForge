@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 
 public class ValueAdjustmentTool extends Item {
     public ValueAdjustmentTool(Properties properties) {
-        super(properties.component(DataComponentRegister.GENERIC_INT_VALUE.get(), 0));
+        super(properties.stacksTo(1).component(DataComponentRegister.GENERIC_INT_VALUE.get(), 0));
     }
 
     @Override
