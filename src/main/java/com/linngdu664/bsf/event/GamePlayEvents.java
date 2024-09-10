@@ -8,12 +8,16 @@ import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +26,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -48,6 +53,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -55,8 +61,56 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.List;
+
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
+    public static final int CAPTURE_POINTS=10;
+    @SubscribeEvent
+    public static void onLivingDeath(LivingDeathEvent event){
+        DamageSource source = event.getSource();
+        Entity killerEntity = source.getEntity();
+        LivingEntity deathEntity = event.getEntity();
+        if (killerEntity instanceof Player killerPlayer){
+            if (!killerEntity.level().isClientSide && deathEntity instanceof Player deathPlayer){
+                List<ItemStack> deathItemStacks = BSFCommonUtil.findInventoryItemStacks(deathPlayer, ItemRegister.SCORING_DEVICE.get());
+                List<ItemStack> killerItemStacks = BSFCommonUtil.findInventoryItemStacks(killerPlayer, ItemRegister.SCORING_DEVICE.get());
+                if (!deathItemStacks.isEmpty() && !killerItemStacks.isEmpty()){
+                    ItemStack device = deathItemStacks.getFirst();
+                    int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                    int getPoints = deathPlayerPoint - CAPTURE_POINTS>0?CAPTURE_POINTS:deathPlayerPoint;
+                    device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint-getPoints);
+                    deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -"+ getPoints)), false);
+
+                    device = killerItemStacks.getFirst();
+                    int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                    device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint+getPoints);
+                    device.set(DataComponentRegister.RANK.get(),killerPlayerPoint+getPoints);
+                    killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +"+ getPoints)), false);
+                }
+            }else if (deathEntity instanceof BSFSnowGolemEntity deathGolem){
+                List<ItemStack> killerItemStacks = BSFCommonUtil.findInventoryItemStacks(killerPlayer, ItemRegister.SCORING_DEVICE.get());
+                if (!killerItemStacks.isEmpty()){
+                    ItemStack device = killerItemStacks.getFirst();
+                    int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                    int getPoints = deathGolem.getRank();
+                    device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint+getPoints);
+                    device.set(DataComponentRegister.RANK.get(),killerPlayerPoint+getPoints);
+                    killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +"+ getPoints)), false);
+                }
+            }
+        } else if (killerEntity instanceof BSFSnowGolemEntity && !killerEntity.level().isClientSide && deathEntity instanceof Player deathPlayer) {
+            List<ItemStack> deathItemStacks = BSFCommonUtil.findInventoryItemStacks(deathPlayer, ItemRegister.SCORING_DEVICE.get());
+            if (!deathItemStacks.isEmpty()){
+                ItemStack device = deathItemStacks.getFirst();
+                int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                int getPoints = deathPlayerPoint - CAPTURE_POINTS>0?CAPTURE_POINTS:deathPlayerPoint;
+                device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint-getPoints);
+                deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -"+ getPoints)), false);
+            }
+        }
+
+    }
     @SubscribeEvent
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
         if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {

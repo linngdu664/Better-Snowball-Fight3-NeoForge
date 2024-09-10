@@ -16,7 +16,11 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 import org.joml.Matrix3f;
@@ -282,5 +286,17 @@ public class BSFCommonUtil {
             BSFCommonUtil.addTrans(this.tooltipComponents, transKey, format, args);
             return this;
         }
+    }
+    public static List<ItemStack> findInventoryItemStacks(Player player, Item item){
+        Inventory inventory = player.getInventory();
+        int k = inventory.getContainerSize();
+        List<ItemStack> outItemStacks=new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            ItemStack itemStack = inventory.getItem(i);
+            if (itemStack.getItem().equals(item)){
+                outItemStacks.add(itemStack);
+            }
+        }
+        return outItemStacks;
     }
 }
