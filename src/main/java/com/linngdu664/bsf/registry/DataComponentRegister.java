@@ -2,22 +2,20 @@ package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.item.component.ItemData;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
+import com.linngdu664.bsf.network.CustomStreamCodecs;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class DataComponentRegister {
     public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Main.MODID);
 
-//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemData>> SNOWBALL_TANK_TYPE =
-//            DATA_COMPONENTS.registerComponentType(
-//                    "snowball_tank_type",
-//                    builder -> builder.persistent(ItemData.CODEC).networkSynchronized(ItemData.STREAM_CODEC)
-//            );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemData>> AMMO_ITEM =
             DATA_COMPONENTS.registerComponentType(
                     "ammo_item",
@@ -62,5 +60,30 @@ public class DataComponentRegister {
             DATA_COMPONENTS.registerComponentType(
                     "machine_gun_is_cool_down",
                     builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GENERIC_INT_VALUE =
+            DATA_COMPONENTS.registerComponentType(
+                    "generic_int_value",
+                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RegionData>> REGION =
+            DATA_COMPONENTS.registerComponentType(
+                    "region",
+                    builder -> builder.persistent(RegionData.CODEC).networkSynchronized(RegionData.STREAM_CODEC)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> TP_POINT =
+            DATA_COMPONENTS.registerComponentType(
+                    "tp_point",
+                    builder -> builder.persistent(Vec3.CODEC).networkSynchronized(CustomStreamCodecs.VEC3_STREAM_CODEC)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> RANK =
+            DATA_COMPONENTS.registerComponentType(
+                    "rank",
+                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MONEY =
+            DATA_COMPONENTS.registerComponentType(
+                    "money",
+                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
             );
 }
