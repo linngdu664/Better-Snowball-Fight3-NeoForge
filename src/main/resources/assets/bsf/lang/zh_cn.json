@@ -458,5 +458,7 @@
 
   "gui_text_weapon": "武器",
   "gui_text_snowball": "雪球",
-  "gui_text_core": "核心"
+  "gui_text_core": "核心",
+
+  "scoring_device_tp_failed": "进入区域内不能携带积分器以外的物品，且积分器只能携带一个"
 }

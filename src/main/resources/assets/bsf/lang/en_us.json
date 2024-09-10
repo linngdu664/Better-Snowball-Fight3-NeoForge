@@ -218,6 +218,7 @@
   "entity.bsf.bsf_dummy": "Dummy",
 
 
+
   "stone_snowball.tooltip": "Embedded a stone",
   "duck_snowball.tooltip": "Quack！",
   "cherry_blossom_snowball.tooltip": "Embedded a few cherry blossom petals",
@@ -457,5 +458,7 @@
 
   "gui_text_weapon": "Weapon",
   "gui_text_snowball": "Snowball",
-  "gui_text_core": "Core"
+  "gui_text_core": "Core",
+
+  "scoring_device_tp_failed": "Items other than Scoring Device cannot be brought into the area, and the Scoring Device can only carry one"
 }

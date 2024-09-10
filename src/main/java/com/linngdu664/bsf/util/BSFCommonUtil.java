@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class BSFCommonUtil {
@@ -288,13 +290,13 @@ public class BSFCommonUtil {
         }
     }
 
-    public static List<ItemStack> findInventoryItemStacks(Player player, Item item) {
+    public static List<ItemStack> findInventoryItemStacks(Player player, Predicate<Item> filter) {
         Inventory inventory = player.getInventory();
         int k = inventory.getContainerSize();
         List<ItemStack> outItemStacks=new ArrayList<>();
         for (int i = 0; i < k; i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (itemStack.getItem().equals(item)){
+            if (filter.test(itemStack.getItem())){
                 outItemStacks.add(itemStack);
             }
         }
