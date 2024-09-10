@@ -13,7 +13,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +29,6 @@ public record ValueAdjustmentToolPayload(boolean isIncrease, boolean speedUp) im
             Player sender = context.player();
             ItemStack itemStack = sender.getItemInHand(InteractionHand.MAIN_HAND);
             if (itemStack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
-                Level level = sender.level();
                 int value = itemStack.getOrDefault(DataComponentRegister.GENERIC_INT_VALUE.get(), 0);
                 if (payload.isIncrease) {
                     value += payload.speedUp ? 10 : 1;
@@ -38,7 +36,7 @@ public record ValueAdjustmentToolPayload(boolean isIncrease, boolean speedUp) im
                     value -= payload.speedUp ? 10 : 1;
                 }
                 itemStack.set(DataComponentRegister.GENERIC_INT_VALUE.get(), value);
-                itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("value:" + value)));
+                itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("value: " + value)));
             }
         });
     }
