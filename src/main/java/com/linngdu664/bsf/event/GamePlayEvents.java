@@ -61,56 +61,52 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.List;
-
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
-    public static final int CAPTURE_POINTS=10;
+    public static final int CAPTURE_POINTS = 10;
     @SubscribeEvent
-    public static void onLivingDeath(LivingDeathEvent event){
+    public static void onLivingDeath(LivingDeathEvent event) {
         DamageSource source = event.getSource();
         Entity killerEntity = source.getEntity();
         LivingEntity deathEntity = event.getEntity();
-        if (killerEntity instanceof Player killerPlayer){
-            if (!killerEntity.level().isClientSide && deathEntity instanceof Player deathPlayer){
-                List<ItemStack> deathItemStacks = BSFCommonUtil.findInventoryItemStacks(deathPlayer, ItemRegister.SCORING_DEVICE.get());
-                List<ItemStack> killerItemStacks = BSFCommonUtil.findInventoryItemStacks(killerPlayer, ItemRegister.SCORING_DEVICE.get());
-                if (!deathItemStacks.isEmpty() && !killerItemStacks.isEmpty()){
-                    ItemStack device = deathItemStacks.getFirst();
+        if (!deathEntity.level().isClientSide) {
+            BSFTeamSavedData savedData = deathEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+            if (killerEntity instanceof Player killerPlayer) {
+                if (deathEntity instanceof Player deathPlayer) {
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, ItemRegister.SCORING_DEVICE.get());
+                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerPlayer, ItemRegister.SCORING_DEVICE.get());
+                    if (device != null && device1 != null && !savedData.isSameTeam(killerPlayer, deathEntity)) {
+                        int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                        int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
+                        device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                        deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -" + getPoints)), false);
+                        int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                        device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
+                        device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
+                        killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +" + getPoints)), false);
+                    }
+                } else if (deathEntity instanceof BSFSnowGolemEntity deathGolem) {
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, ItemRegister.SCORING_DEVICE.get());
+                    if (device != null && (deathGolem.getFixedTeamId() >= 0 && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) || deathGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerPlayer, deathGolem.getOwner()))) {
+                        int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                        int getPoints = deathGolem.getRank();
+                        device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
+                        device.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
+                        killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +" + getPoints)), false);
+                    }
+                }
+            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof Player deathPlayer) {
+                ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, ItemRegister.SCORING_DEVICE.get());
+                if (device != null && (killerGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) || killerGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerGolem.getOwner(), deathPlayer))) {
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                    int getPoints = deathPlayerPoint - CAPTURE_POINTS>0?CAPTURE_POINTS:deathPlayerPoint;
-                    device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint-getPoints);
-                    deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -"+ getPoints)), false);
-
-                    device = killerItemStacks.getFirst();
-                    int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                    device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint+getPoints);
-                    device.set(DataComponentRegister.RANK.get(),killerPlayerPoint+getPoints);
-                    killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +"+ getPoints)), false);
+                    int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
+                    device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                    deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -" + getPoints)), false);
                 }
-            }else if (deathEntity instanceof BSFSnowGolemEntity deathGolem){
-                List<ItemStack> killerItemStacks = BSFCommonUtil.findInventoryItemStacks(killerPlayer, ItemRegister.SCORING_DEVICE.get());
-                if (!killerItemStacks.isEmpty()){
-                    ItemStack device = killerItemStacks.getFirst();
-                    int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                    int getPoints = deathGolem.getRank();
-                    device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint+getPoints);
-                    device.set(DataComponentRegister.RANK.get(),killerPlayerPoint+getPoints);
-                    killerPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money +"+ getPoints)), false);
-                }
-            }
-        } else if (killerEntity instanceof BSFSnowGolemEntity && !killerEntity.level().isClientSide && deathEntity instanceof Player deathPlayer) {
-            List<ItemStack> deathItemStacks = BSFCommonUtil.findInventoryItemStacks(deathPlayer, ItemRegister.SCORING_DEVICE.get());
-            if (!deathItemStacks.isEmpty()){
-                ItemStack device = deathItemStacks.getFirst();
-                int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                int getPoints = deathPlayerPoint - CAPTURE_POINTS>0?CAPTURE_POINTS:deathPlayerPoint;
-                device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint-getPoints);
-                deathPlayer.displayClientMessage(MutableComponent.create(new PlainTextContents.LiteralContents("Money -"+ getPoints)), false);
             }
         }
-
     }
+
     @SubscribeEvent
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
         if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {

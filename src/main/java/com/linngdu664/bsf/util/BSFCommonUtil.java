@@ -287,7 +287,8 @@ public class BSFCommonUtil {
             return this;
         }
     }
-    public static List<ItemStack> findInventoryItemStacks(Player player, Item item){
+
+    public static List<ItemStack> findInventoryItemStacks(Player player, Item item) {
         Inventory inventory = player.getInventory();
         int k = inventory.getContainerSize();
         List<ItemStack> outItemStacks=new ArrayList<>();
@@ -298,5 +299,17 @@ public class BSFCommonUtil {
             }
         }
         return outItemStacks;
+    }
+
+    public static ItemStack findInventoryItemStack(Player player, Item item) {
+        Inventory inventory = player.getInventory();
+        int k = inventory.getContainerSize();
+        for (int i = 0; i < k; i++) {
+            ItemStack itemStack = inventory.getItem(i);
+            if (itemStack.getItem().equals(item)){
+                return itemStack;
+            }
+        }
+        return null;
     }
 }
