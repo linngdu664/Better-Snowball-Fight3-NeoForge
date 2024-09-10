@@ -18,4 +18,12 @@ public record RegionData(Vec3 start, Vec3 end) {
             CustomStreamCodecs.VEC3_STREAM_CODEC, RegionData::end,
             RegionData::new
     );
+
+    @Override
+    public String toString() {
+        return "RegionData{" +
+                "start=" + start +
+                ", end=" + end +
+                '}';
+    }
 }
