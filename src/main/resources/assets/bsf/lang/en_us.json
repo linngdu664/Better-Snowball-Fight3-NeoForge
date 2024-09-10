@@ -215,6 +215,7 @@
   "entity.bsf.icicle_snowball": "Icicle Snowball",
   "entity.bsf.impulse_snowball": "Impulse Snowball",
   "entity.bsf.ghost_snowball": "Ghost Snowball",
+  "entity.bsf.bsf_dummy": "Dummy",
 
 
   "stone_snowball.tooltip": "Embedded a stone",

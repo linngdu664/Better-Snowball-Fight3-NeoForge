@@ -473,6 +473,9 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 pPlayer.getInventory().placeItemBackInInventory(getCore(), true);
                 setCore(ItemStack.EMPTY);
+            } else if (item.equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
+                rank = itemStack.getOrDefault(DataComponentRegister.GENERIC_INT_VALUE, 0);
+                pPlayer.displayClientMessage(Component.literal("Set rank to " + rank), false);
             }
         }
         return InteractionResult.SUCCESS;

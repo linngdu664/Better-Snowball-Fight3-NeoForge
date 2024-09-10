@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -84,7 +85,8 @@ public class ZoneController extends Block implements EntityBlock {
         List<BlockPos> blockPosList = entity.getSummonPosList();
         if (!blockPosList.isEmpty()) {
             BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));
-            player.teleportTo(blockPos.getX(), blockPos.getY() + 1, blockPos.getZ());
+            Vec3 pos = blockPos.above().getBottomCenter();
+            player.teleportTo(pos.x, pos.y, pos.z);
             ((ServerPlayer) player).connection.send(new ClientboundSetEntityMotionPacket(player));
         }
     }

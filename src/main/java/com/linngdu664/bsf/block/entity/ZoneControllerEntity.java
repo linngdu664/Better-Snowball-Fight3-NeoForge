@@ -26,14 +26,13 @@ public class ZoneControllerEntity extends BlockEntity {
     private int currentRank;        // 同步到客户端
     private byte teamId;            // 同步到客户端
 
-
     public ZoneControllerEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityRegister.ZONE_CONTROLLER_ENTITY.get(), pos, blockState);
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (!level.isClientSide) {
-
+        if (!level.isClientSide && level.hasNeighborSignal(pos)) {
+            // 启动！
         }
     }
 
