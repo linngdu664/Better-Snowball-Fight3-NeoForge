@@ -2,6 +2,8 @@ package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.item.block.SmartSnowBlockItem;
+import com.linngdu664.bsf.item.block.VendingMachineItem;
+import com.linngdu664.bsf.item.block.ZoneControllerItem;
 import com.linngdu664.bsf.item.misc.*;
 import com.linngdu664.bsf.item.snowball.CompactedSnowballSetItem;
 import com.linngdu664.bsf.item.snowball.force.MonsterGravitySnowballItem;
@@ -148,4 +150,11 @@ public class ItemRegister {
     public static final DeferredItem<Item> GREEN_TEAM_LINKER = ITEMS.register("green_team_linker", () -> new TeamLinkerItem(13));
     public static final DeferredItem<Item> RED_TEAM_LINKER = ITEMS.register("red_team_linker", () -> new TeamLinkerItem(14));
     public static final DeferredItem<Item> BLACK_TEAM_LINKER = ITEMS.register("black_team_linker", () -> new TeamLinkerItem(15));
+
+    public static final DeferredItem<Item> REGION_TOOL = ITEMS.register("region_tool", () -> new RegionTool(new Item.Properties()));
+    public static final DeferredItem<Item> SCORING_DEVICE = ITEMS.register("scoring_device", () -> new ScoringDevice(new Item.Properties()));
+    public static final DeferredItem<Item> VALUE_ADJUSTMENT_TOOL = ITEMS.register("value_adjustment_tool", () -> new ValueAdjustmentTool(new Item.Properties()));
+    public static final DeferredItem<Item> VENDING_MACHINE = ITEMS.register("vending_machine", VendingMachineItem::new);
+    public static final DeferredItem<Item> ZONE_CONTROLLER = ITEMS.register("zone_controller", ZoneControllerItem::new);
+
 }
