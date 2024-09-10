@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.item.tool;
 
+import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.ChatFormatting;
@@ -61,12 +62,13 @@ public class TeamLinkerItem extends Item {
                     .forEach(p -> p.displayClientMessage(MutableComponent.create(new TranslatableContents("leave_bsf_team.tip", null, oldNameParam)), false));
             if (oldId == teamId) {
                 // 退队
-                savedData.exitTeam(uuid);
+                savedData.exitTeam(uuid);       // 此时oldMembers已经不含自己了
                 oldMembers.stream()
                         .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))
                         .filter(Objects::nonNull)
                         .forEach(p -> PacketDistributor.sendToPlayer(p, new TeamMembersPayload(oldMembers)));
                 PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new TeamMembersPayload(new HashSet<>()));
+                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new CurrentTeamPayload((byte) -1));
             } else {
                 // 退队后进队
                 savedData.joinTeam(uuid, teamId);
@@ -82,6 +84,7 @@ public class TeamLinkerItem extends Item {
                             p.displayClientMessage(MutableComponent.create(new TranslatableContents("join_bsf_team.tip", null, newNameParam)), false);
                             PacketDistributor.sendToPlayer(p, new TeamMembersPayload(newMembers));
                         });
+                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new CurrentTeamPayload((byte) teamId));
             }
             savedData.setDirty();
         }

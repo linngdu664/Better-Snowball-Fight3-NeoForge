@@ -6,6 +6,7 @@ import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
+import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
@@ -72,6 +73,7 @@ public class GamePlayEvents {
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
         BSFTeamSavedData savedData = player.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        PacketDistributor.sendToPlayer(player, new CurrentTeamPayload((byte) savedData.getTeam(player.getUUID())));
         PacketDistributor.sendToPlayer(player, new TeamMembersPayload(savedData.getMembers(savedData.getTeam(player.getUUID()))));
     }
 

@@ -1,6 +1,8 @@
 package com.linngdu664.bsf.mixin;
 
+import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
+import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.mojang.blaze3d.platform.WindowEventHandler;
@@ -22,8 +24,16 @@ public abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnabl
 
     @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
     private void shouldEntityAppearGlowing(Entity pEntity, CallbackInfoReturnable<Boolean> cir) {
-        if (TeamLinkerItem.shouldShowHighlight && (TeamMembersPayload.staticMembers.contains(pEntity.getUUID()) || pEntity instanceof OwnableEntity ownable && TeamMembersPayload.staticMembers.contains(ownable.getOwnerUUID()))) {
-            cir.setReturnValue(true);
+        if (TeamLinkerItem.shouldShowHighlight) {
+            if (TeamMembersPayload.staticMembers.contains(pEntity.getUUID())) {
+                cir.setReturnValue(true);
+            }
+            if (pEntity instanceof BSFSnowGolemEntity snowGolem && snowGolem.getFixedTeamId() >= 0 && snowGolem.getFixedTeamId() == CurrentTeamPayload.currentTeam) {
+                cir.setReturnValue(true);
+            }
+            if (pEntity instanceof OwnableEntity ownable && TeamMembersPayload.staticMembers.contains(ownable.getOwnerUUID())) {
+                cir.setReturnValue(true);
+            }
         }
         if (pEntity.getType().equals(EntityRegister.BLACK_HOLE_EXECUTOR.get())) {
             cir.setReturnValue(true);       // some TeaCon mod screwed up glowing and thus force our black hole glowing here

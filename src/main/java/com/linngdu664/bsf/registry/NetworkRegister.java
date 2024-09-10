@@ -16,6 +16,7 @@ public class NetworkRegister {
     @SubscribeEvent
     public static void registerPayloadHandlers(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(CurrentTeamPayload.TYPE, CurrentTeamPayload.STREAM_CODEC, CurrentTeamPayload::handleDataInClient);
         registrar.playToClient(ForwardConeParticlesPayload.TYPE, ForwardConeParticlesPayload.STREAM_CODEC, ForwardConeParticlesPayload::handleDataInClient);
         registrar.playToClient(ForwardRaysParticlesPayload.TYPE, ForwardRaysParticlesPayload.STREAM_CODEC, ForwardRaysParticlesPayload::handleDataInClient);
         registrar.playToClient(ImplosionSnowballCannonParticlesPayload.TYPE, ImplosionSnowballCannonParticlesPayload.STREAM_CODEC, ImplosionSnowballCannonParticlesPayload::handleDataInClient);
