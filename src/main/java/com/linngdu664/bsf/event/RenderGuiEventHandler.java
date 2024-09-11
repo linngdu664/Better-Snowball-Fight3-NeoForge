@@ -6,12 +6,14 @@ import com.linngdu664.bsf.block.entity.ZoneControllerEntity;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
+import com.linngdu664.bsf.item.tool.ScoringDevice;
 import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
+import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
@@ -166,9 +168,23 @@ public class RenderGuiEventHandler {
             BlockEntity blockEntity = player.level().getBlockEntity(((BlockHitResult) pick).getBlockPos());
             if (blockEntity instanceof VendingMachineEntity vendingMachine){
                 calcScreenPosFromWorldPos(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2->{
-                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, "["+BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", vendingMachine.getMinRank())+"]["+BSFCommonUtil.getTransStr("scoring_device_money.tooltip", vendingMachine.getPrice()));
+                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.4);
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, "["+ BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", vendingMachine.getMinRank()) +"] ["+BSFCommonUtil.getTransStr("scoring_device_money.tooltip", vendingMachine.getPrice())+"]");
                 }),guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, event.getPartialTick().getGameTimeDeltaPartialTick(true));
+                if (mainHandItem.getItem() instanceof ScoringDevice){
+                    V2I barFrame = new V2I(100, 10);
+                    int padding = 2;
+                    V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
+                    int deviceMoney = mainHandItem.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                    renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffe82f27,  (float) deviceMoney / vendingMachine.getPrice());
+                    String moneyTransStr = BSFCommonUtil.getTransStr("scoring_device_money.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
+                    guiGraphics.drawString(instance.font, moneyTransStr,barPos.x+(barFrame.x-instance.font.width(moneyTransStr)/2),barPos.y+10,0xffffffff);
+                    barPos.y+=25;
+                    int deviceRank = mainHandItem.getOrDefault(DataComponentRegister.RANK.get(), 0);
+                    renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffe82f27,  (float) deviceRank / vendingMachine.getMinRank());
+                    String rankTransStr = BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
+                    guiGraphics.drawString(instance.font, rankTransStr,barPos.x+(barFrame.x-instance.font.width(rankTransStr)/2),barPos.y+10,0xffffffff);
+                }
             }else if(blockEntity instanceof ZoneControllerEntity zoneController){
                 calcScreenPosFromWorldPos(new Pair<>(zoneController.getBlockPos().getCenter(), v2->{
                     V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
