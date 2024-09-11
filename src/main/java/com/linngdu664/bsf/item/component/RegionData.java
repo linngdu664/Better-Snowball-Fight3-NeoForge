@@ -36,9 +36,9 @@ public record RegionData(BlockPos start, BlockPos end) {
         int minX = Math.min(start.getX(), end.getX());
         int minY = Math.min(start.getY(), end.getY());
         int minZ = Math.min(start.getZ(), end.getZ());
-        int maxX = Math.max(start.getX(), end.getX()) + 1;
-        int maxY = Math.max(start.getY(), end.getY()) + 1;
-        int maxZ = Math.max(start.getZ(), end.getZ()) + 1;
+        int maxX = Math.max(start.getX(), end.getX());
+        int maxY = Math.max(start.getY(), end.getY());
+        int maxZ = Math.max(start.getZ(), end.getZ());
         return pos.getX() >= minX && pos.getX() <= maxX && pos.getY() >= minY && pos.getY() <= maxY && pos.getZ() >= minZ && pos.getZ() <= maxZ;
     }
 

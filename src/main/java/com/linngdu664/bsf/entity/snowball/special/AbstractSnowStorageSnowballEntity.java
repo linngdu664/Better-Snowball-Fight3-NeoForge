@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstructSnowballEntity {
     protected int snowStock = 0;
+    private RegionData aliveRange = null;
 
     public AbstractSnowStorageSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel, int duration) {
         super(pEntityType, pLevel, duration, new BSFSnowballEntityProperties().canBeCaught(false));
@@ -23,6 +24,10 @@ public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstruc
         super(pEntityType, pShooter, pLevel, duration, new BSFSnowballEntityProperties().canBeCaught(false).applyAdjustment(launchAdjustment), region);
         this.snowStock = snowStock;
     }
+    public RegionData getAliveRange() {
+        return aliveRange;
+    }
+
 
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
@@ -40,7 +45,7 @@ public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstruc
     protected void placeAndRecordBlock(Level level, BlockPos blockPos) {
 
 
-        if (level instanceof ServerLevel) {
+        if (level instanceof ServerLevel && getAliveRange().inRegion(blockPos)) {
             if (level.getBlockState(blockPos).canBeReplaced()) {
                 level.setBlock(blockPos, BlockRegister.LOOSE_SNOW_BLOCK.get().defaultBlockState(), 3);
                 snowStock--;
