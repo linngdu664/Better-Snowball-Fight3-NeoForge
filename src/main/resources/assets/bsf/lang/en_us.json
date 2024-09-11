@@ -357,6 +357,7 @@
   "scoring_device_money.tooltip": "Money: %1$s",
 
   "void.tooltip": "",
+  "region_limit.tooltip": "This item can only be used within region (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
 
   "lunch_yes_hand.tooltip": "Hand √",
   "lunch_yes_cannon.tooltip": "Cannon √",
