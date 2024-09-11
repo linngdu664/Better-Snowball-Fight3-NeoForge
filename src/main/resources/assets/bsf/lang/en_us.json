@@ -171,6 +171,7 @@
   "item.bsf.green_team_linker": "Team Linker: Green",
   "item.bsf.red_team_linker": "Team Linker: Red",
   "item.bsf.black_team_linker": "Team Linker: Black",
+  "item.bsf.scoring_device": "Scoring Device",
 
   "entity.bsf.bsf_snow_golem": "Advanced Snow Golem",
   "entity.bsf.monster_gravity_executor": "Monster Gravity Field Generator",
@@ -355,6 +356,7 @@
   "team_linker1.tooltip": "<%1$s+%2$s> Enable/disable teammate position visibility",
   "scoring_device_rank.tooltip": "Rank: %1$s",
   "scoring_device_money.tooltip": "Money: %1$s",
+  "scoring_device_region.tooltip": "Binding region: (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
 
   "void.tooltip": "",
   "region_limit.tooltip": "This item can only be used within region (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
@@ -445,7 +447,8 @@
   "scoring_device_cannot_sell.tip": "This machine can't recycle items.",
   "scoring_device_kill_bonus.tip": "Money +%1$s",
   "scoring_device_death_punishment.tip": "Money -%1$s",
-  "scoring_device_tp_failed.tip": "Items other than Scoring Device cannot be brought into the area, and the Scoring Device can only carry one.",
+  "scoring_device_tp_failed1.tip": "Items with region different from the device cannot be brought into the region, and you must join a team.",
+  "scoring_device_tp_failed2.tip": "You can only teleport within the region.",
 
   "block.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.loose_snow_block": "Loose Snow Block",

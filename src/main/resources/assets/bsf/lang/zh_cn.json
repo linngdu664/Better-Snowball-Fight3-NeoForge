@@ -171,6 +171,7 @@
   "item.bsf.green_team_linker": "组队器：绿",
   "item.bsf.red_team_linker": "组队器：红",
   "item.bsf.black_team_linker": "组队器：黑",
+  "item.bsf.scoring_device": "积分器",
 
   "entity.bsf.bsf_snow_golem": "高级雪傀儡",
   "entity.bsf.monster_gravity_executor": "怪物引力场发生器",
@@ -355,6 +356,7 @@
   "team_linker1.tooltip": "<%1$s+%2$s> 开/关显示队友位置",
   "scoring_device_rank.tooltip": "等级：%1$s",
   "scoring_device_money.tooltip": "金钱：%1$s",
+  "scoring_device_region.tooltip": "绑定区域：(%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
 
   "region_limit.tooltip": "此物品仅可在区域 (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s) 内使用",
 
@@ -444,7 +446,8 @@
   "scoring_device_cannot_sell.tip": "这台售货机不能回收物品",
   "scoring_device_kill_bonus.tip": "金钱 +%1$s",
   "scoring_device_death_punishment.tip": "金钱 -%1$s",
-  "scoring_device_tp_failed.tip": "进入区域内不能携带积分器以外的物品，且积分器只能携带一个",
+  "scoring_device_tp_failed1.tip": "区域内不能携带区域限制与积分器不同的物品，且必须加入一个队伍",
+  "scoring_device_tp_failed2.tip": "只有在区域内才能传送",
 
   "block.bsf.smart_snow_block": "智慧雪块",
   "block.bsf.loose_snow_block": "松散雪块",

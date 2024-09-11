@@ -290,25 +290,25 @@ public class BSFCommonUtil {
         }
     }
 
-    public static List<ItemStack> findInventoryItemStacks(Player player, Predicate<Item> filter) {
+    public static List<ItemStack> findInventoryItemStacks(Player player, Predicate<ItemStack> filter) {
         Inventory inventory = player.getInventory();
         int k = inventory.getContainerSize();
         List<ItemStack> outItemStacks=new ArrayList<>();
         for (int i = 0; i < k; i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (filter.test(itemStack.getItem())){
+            if (filter.test(itemStack)){
                 outItemStacks.add(itemStack);
             }
         }
         return outItemStacks;
     }
 
-    public static ItemStack findInventoryItemStack(Player player, Item item) {
+    public static ItemStack findInventoryItemStack(Player player, Predicate<ItemStack> filter) {
         Inventory inventory = player.getInventory();
         int k = inventory.getContainerSize();
         for (int i = 0; i < k; i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (itemStack.getItem().equals(item)){
+            if (filter.test(itemStack)) {
                 return itemStack;
             }
         }

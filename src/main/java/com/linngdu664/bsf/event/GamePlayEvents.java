@@ -69,28 +69,32 @@ public class GamePlayEvents {
     public static final int CAPTURE_POINTS = 10;
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
-        DamageSource source = event.getSource();
-        Entity killerEntity = source.getEntity();
         LivingEntity deathEntity = event.getEntity();
         if (!deathEntity.level().isClientSide) {
+            DamageSource source = event.getSource();
+            Entity killerEntity = source.getEntity();
             BSFTeamSavedData savedData = deathEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             if (killerEntity instanceof Player killerPlayer) {
                 if (deathEntity instanceof Player deathPlayer) {
-                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, ItemRegister.SCORING_DEVICE.get());
-                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerPlayer, ItemRegister.SCORING_DEVICE.get());
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                     if (device != null && device1 != null && !savedData.isSameTeam(killerPlayer, deathEntity)) {
-                        int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                        int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
-                        device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                        deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
-                        int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                        device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
-                        device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
-                        killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
+                        RegionData region = device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+                        RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+                        if (region1.equals(region) && region.inRegion(killerPlayer.position()) && region.inRegion(deathPlayer.position())) {
+                            int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                            int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
+                            device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                            deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
+                            int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                            device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
+                            device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
+                            killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
+                        }
                     }
                 } else if (deathEntity instanceof BSFSnowGolemEntity deathGolem) {
-                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, ItemRegister.SCORING_DEVICE.get());
-                    if (device != null && (deathGolem.getFixedTeamId() >= 0 && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) || deathGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerPlayer, deathGolem.getOwner()))) {
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    if (device != null && (deathGolem.getFixedTeamId() >= 0 && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) || deathGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerPlayer, deathGolem.getOwner())) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(killerPlayer.position())) {
                         int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                         int getPoints = deathGolem.getRank();
                         device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
@@ -99,8 +103,8 @@ public class GamePlayEvents {
                     }
                 }
             } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof Player deathPlayer) {
-                ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, ItemRegister.SCORING_DEVICE.get());
-                if (device != null && (killerGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) || killerGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerGolem.getOwner(), deathPlayer))) {
+                ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                if (device != null && (killerGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) || killerGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerGolem.getOwner(), deathPlayer)) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(deathPlayer.position())) {
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                     int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                     device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
@@ -175,7 +179,7 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack itemStack = event.getItemStack();
-        if (!itemStack.getItem().equals(ItemRegister.REGION_TOOL.get()) && itemStack.has(DataComponentRegister.REGION.get())) {
+        if (!itemStack.getItem().equals(ItemRegister.REGION_TOOL.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && itemStack.has(DataComponentRegister.REGION.get())) {
             RegionData region = event.getItemStack().get(DataComponentRegister.REGION.get());
             event.getToolTip().add(Component.translatable(
                     "region_limit.tooltip",

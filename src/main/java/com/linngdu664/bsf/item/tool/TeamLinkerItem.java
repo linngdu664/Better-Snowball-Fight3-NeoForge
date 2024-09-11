@@ -106,7 +106,7 @@ public class TeamLinkerItem extends Item {
         return (byte) teamId;
     }
 
-    public static ItemStack getItemStackById(byte id){
+    public static ItemStack getItemStackById(byte id) {
         return switch (id) {
             case 0 -> ItemRegister.WHITE_TEAM_LINKER.toStack();
             case 1 -> ItemRegister.ORANGE_TEAM_LINKER.toStack();
