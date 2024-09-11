@@ -8,7 +8,23 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
-public record RegionData(BlockPos start, BlockPos end) {
+import java.util.Objects;
+
+public class RegionData {
+    private final BlockPos start, end;
+    private final int minX, minY, minZ, maxX, maxY, maxZ;       // prevent replication computation
+
+    public RegionData(BlockPos start, BlockPos end) {
+        this.start = start;
+        this.end = end;
+        this.minX = Math.min(start.getX(), end.getX());
+        this.minY = Math.min(start.getY(), end.getY());
+        this.minZ = Math.min(start.getZ(), end.getZ());
+        this.maxX = Math.max(start.getX(), end.getX());
+        this.maxY = Math.max(start.getY(), end.getY());
+        this.maxZ = Math.max(start.getZ(), end.getZ());
+    }
+
     public static final Codec<RegionData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     BlockPos.CODEC.fieldOf("start").forGetter(RegionData::start),
@@ -22,23 +38,31 @@ public record RegionData(BlockPos start, BlockPos end) {
 
     public static final RegionData EMPTY = new RegionData(BlockPos.ZERO, BlockPos.ZERO);
 
+    public BlockPos start() {
+        return start;
+    }
+
+    public BlockPos end() {
+        return end;
+    }
+
     public boolean inRegion(Vec3 vec3) {
-        int minX = Math.min(start.getX(), end.getX());
-        int minY = Math.min(start.getY(), end.getY());
-        int minZ = Math.min(start.getZ(), end.getZ());
-        int maxX = Math.max(start.getX(), end.getX()) + 1;
-        int maxY = Math.max(start.getY(), end.getY()) + 1;
-        int maxZ = Math.max(start.getZ(), end.getZ()) + 1;
-        return vec3.x > minX && vec3.x < maxX && vec3.y > minY && vec3.y < maxY && vec3.z > minZ && vec3.z < maxZ;
+//        int minX = Math.min(start.getX(), end.getX());
+//        int minY = Math.min(start.getY(), end.getY());
+//        int minZ = Math.min(start.getZ(), end.getZ());
+//        int maxX = Math.max(start.getX(), end.getX()) + 1;
+//        int maxY = Math.max(start.getY(), end.getY()) + 1;
+//        int maxZ = Math.max(start.getZ(), end.getZ()) + 1;
+        return vec3.x > minX && vec3.x < maxX + 1 && vec3.y > minY && vec3.y < maxY + 1 && vec3.z > minZ && vec3.z < maxZ + 1;
     }
 
     public boolean inRegion(BlockPos pos) {
-        int minX = Math.min(start.getX(), end.getX());
-        int minY = Math.min(start.getY(), end.getY());
-        int minZ = Math.min(start.getZ(), end.getZ());
-        int maxX = Math.max(start.getX(), end.getX());
-        int maxY = Math.max(start.getY(), end.getY());
-        int maxZ = Math.max(start.getZ(), end.getZ());
+//        int minX = Math.min(start.getX(), end.getX());
+//        int minY = Math.min(start.getY(), end.getY());
+//        int minZ = Math.min(start.getZ(), end.getZ());
+//        int maxX = Math.max(start.getX(), end.getX());
+//        int maxY = Math.max(start.getY(), end.getY());
+//        int maxZ = Math.max(start.getZ(), end.getZ());
         return pos.getX() >= minX && pos.getX() <= maxX && pos.getY() >= minY && pos.getY() <= maxY && pos.getZ() >= minZ && pos.getZ() <= maxZ;
     }
 
@@ -64,5 +88,18 @@ public record RegionData(BlockPos start, BlockPos end) {
             return new RegionData(start, end);
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RegionData that = (RegionData) o;
+        return Objects.equals(start, that.start) && Objects.equals(end, that.end);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(start, end);
     }
 }

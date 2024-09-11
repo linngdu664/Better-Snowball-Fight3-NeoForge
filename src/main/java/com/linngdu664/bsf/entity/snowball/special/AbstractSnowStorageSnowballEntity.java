@@ -5,7 +5,6 @@ import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -39,9 +38,8 @@ public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstruc
 
     @Override
     protected void placeAndRecordBlock(Level level, BlockPos blockPos) {
+        if (!level.isClientSide && (getRegion() == null || getRegion().inRegion(blockPos))) {
 
-
-        if (level instanceof ServerLevel && getRegion().inRegion(blockPos)) {
             if (level.getBlockState(blockPos).canBeReplaced()) {
                 level.setBlock(blockPos, BlockRegister.LOOSE_SNOW_BLOCK.get().defaultBlockState(), 3);
                 snowStock--;

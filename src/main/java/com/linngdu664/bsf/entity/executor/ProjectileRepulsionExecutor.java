@@ -32,8 +32,10 @@ public class ProjectileRepulsionExecutor extends AbstractFixedForceExecutor {
 
     @Override
     public List<? extends Entity> getTargetList() {
-        double r2 = range * range;
-        return level().getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(range), p -> distanceToSqr(p) < r2 && getAliveRange().inRegion(p.position()));
+        if (getAliveRange() != null) {
+            return level().getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(range), p -> distanceToSqr(p) < range2 && getAliveRange().inRegion(p.position()));
+        }
+        return level().getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(range), p -> distanceToSqr(p) < range2);
     }
 
     @Override

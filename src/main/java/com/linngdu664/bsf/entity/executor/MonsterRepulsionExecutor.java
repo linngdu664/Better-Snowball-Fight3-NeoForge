@@ -32,8 +32,10 @@ public class MonsterRepulsionExecutor extends AbstractFixedForceExecutor {
 
     @Override
     public List<? extends Entity> getTargetList() {
-        double r2 = range * range;
-        return level().getEntities(this, getBoundingBox().inflate(range), p -> p instanceof Enemy && distanceToSqr(p) < r2 && getAliveRange().inRegion(p.position()));
+        if (getAliveRange() != null) {
+            return level().getEntities(this, getBoundingBox().inflate(range), p -> p instanceof Enemy && distanceToSqr(p) < range2 && getAliveRange().inRegion(p.position()));
+        }
+        return level().getEntities(this, getBoundingBox().inflate(range), p -> p instanceof Enemy && distanceToSqr(p) < range2);
     }
 
     @Override

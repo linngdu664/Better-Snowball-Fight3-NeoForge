@@ -17,6 +17,7 @@ public abstract class AbstractForceExecutor extends AbstractExecutor {
     protected double GM;
     protected double boundaryR2;
     protected double range;
+    protected double range2;
     protected List<? extends Entity> targetList;
 
     public AbstractForceExecutor(EntityType<?> pEntityType, Level pLevel) {
@@ -31,6 +32,7 @@ public abstract class AbstractForceExecutor extends AbstractExecutor {
     public AbstractForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, double GM, double boundaryR2, double range, int maxTime, RegionData region) {
         this(pEntityType, pX, pY, pZ, pLevel, maxTime, region);
         this.range = range;
+        this.range2 = range * range;
         this.boundaryR2 = boundaryR2;
         this.GM = GM;
     }
@@ -41,6 +43,7 @@ public abstract class AbstractForceExecutor extends AbstractExecutor {
         GM = pCompound.getDouble("GM");
         boundaryR2 = pCompound.getDouble("BoundaryR2");
         range = pCompound.getDouble("Range");
+        range2 = range * range;
     }
 
     @Override

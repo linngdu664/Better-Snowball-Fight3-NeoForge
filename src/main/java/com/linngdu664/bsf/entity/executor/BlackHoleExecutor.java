@@ -224,6 +224,9 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
 
     @Override
     public List<? extends Entity> getTargetList() {
-        return level().getEntities(this, getBoundingBox().inflate(range), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> getAliveRange().inRegion(p.position())));
+        if (getAliveRange() != null) {
+            return level().getEntities(this, getBoundingBox().inflate(range), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> getAliveRange().inRegion(p.position())));
+        }
+        return level().getEntities(this, getBoundingBox().inflate(range), EntitySelector.NO_CREATIVE_OR_SPECTATOR);
     }
 }
