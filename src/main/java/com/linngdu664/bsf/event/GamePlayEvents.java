@@ -15,6 +15,7 @@ import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -49,8 +50,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.BinomialDistributionGenerator;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -59,6 +58,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -164,11 +164,28 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.has(DataComponentRegister.REGION.get())) {
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.REGION_TOOL.get())) {
             RegionData region = itemStack.get(DataComponentRegister.REGION.get());
             if (!region.inRegion(event.getHitVec().getLocation())) {
                 event.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onItemTooltip(ItemTooltipEvent event) {
+        ItemStack itemStack = event.getItemStack();
+        if (!itemStack.getItem().equals(ItemRegister.REGION_TOOL.get()) && itemStack.has(DataComponentRegister.REGION.get())) {
+            RegionData region = event.getItemStack().get(DataComponentRegister.REGION.get());
+            event.getToolTip().add(Component.translatable(
+                    "region_limit.tooltip",
+                    String.valueOf(region.start().getX()),
+                    String.valueOf(region.start().getY()),
+                    String.valueOf(region.start().getZ()),
+                    String.valueOf(region.end().getX()),
+                    String.valueOf(region.end().getY()),
+                    String.valueOf(region.end().getZ())
+            ).withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 

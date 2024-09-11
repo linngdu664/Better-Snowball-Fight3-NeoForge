@@ -9,11 +9,11 @@ public class ServerConfig extends BSFConfig {
             builder.comment("Whether explosive snowballs can destroy blocks. Default value: true")
                     .define("explosiveDestroy", true));
     public static ConfigValueHolder<Boolean> BLACK_HOLE_DESTROY = new ConfigValueHolder(Main.MODID, "server/blackHoleDestroy", (builder) ->
-            builder.comment("Whether black hole snowballs can destroy blocks. Default value: true")
-                    .define("blackHoleDestroy", true));
+            builder.comment("Whether black hole snowballs can destroy blocks. Default value: false")
+                    .define("blackHoleDestroy", false));
     public static ConfigValueHolder<Boolean> BLACK_HOLE_DROP = new ConfigValueHolder(Main.MODID, "server/blackHoleDrop", (builder) ->
-            builder.comment("Whether to drop when black hole snowballs destroy blocks. Set to false to improve performance. Default value: true")
-                    .define("blackHoleDrop", true));
+            builder.comment("Whether to drop when black hole snowballs destroy blocks. Set to false to improve performance. Default value: false")
+                    .define("blackHoleDrop", false));
     public static ConfigValueHolder<Integer> RECONSTRUCT_SNOWBALL_CAPACITY = new ConfigValueHolder(Main.MODID, "server/reconstructSnowballCapacity", (builder) ->
             builder.comment("The capacity of reconstruct snowball. Default value: 500.")
                     .defineInRange("reconstructSnowballCapacity", 500, 0, 1100));

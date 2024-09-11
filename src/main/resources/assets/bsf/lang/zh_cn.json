@@ -356,7 +356,7 @@
   "scoring_device_rank.tooltip": "等级：%1$s",
   "scoring_device_money.tooltip": "金钱：%1$s",
 
-
+  "region_limit.tooltip": "此物品仅可在区域 (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s) 内使用",
 
   "lunch_yes_hand.tooltip": "投掷√",
   "lunch_yes_cannon.tooltip": "炮击√",
