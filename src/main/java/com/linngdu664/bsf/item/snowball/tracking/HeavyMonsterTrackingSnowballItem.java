@@ -3,6 +3,7 @@ package com.linngdu664.bsf.item.snowball.tracking;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.tracking.HeavyMonsterTrackingSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
@@ -48,8 +49,8 @@ public class HeavyMonsterTrackingSnowballItem extends AbstractBSFSnowballItem {
         return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
     }
 
-    public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment) {
-        return new HeavyMonsterTrackingSnowballEntity(livingEntity, level, launchAdjustment);
+    public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment, RegionData region) {
+        return new HeavyMonsterTrackingSnowballEntity(livingEntity, level, launchAdjustment, region);
     }
 
 //    @Override

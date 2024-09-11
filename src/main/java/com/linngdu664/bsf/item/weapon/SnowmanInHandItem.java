@@ -6,6 +6,7 @@ import com.linngdu664.bsf.client.screenshake.ScreenshakeInstance;
 import com.linngdu664.bsf.entity.snowball.nomal.SmoothSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import net.minecraft.ChatFormatting;
@@ -95,7 +96,7 @@ public class SnowmanInHandItem extends Item {
                 ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(1)).setIntensity(0.5f).setEasing(Easing.ELASTIC_IN));
             } else {
                 for (int i = 0; i < 3; i++) {
-                    SmoothSnowballEntity snowballEntity = new SmoothSnowballEntity(pLivingEntity, pLevel, LAUNCH_ADJUSTMENT);
+                    SmoothSnowballEntity snowballEntity = new SmoothSnowballEntity(pLivingEntity, pLevel, LAUNCH_ADJUSTMENT, pStack.get(DataComponentRegister.REGION.get()));     // harmless
                     if (pLivingEntity.isShiftKeyDown()) {
                         snowballEntity.shootFromRotation(pLivingEntity, pLivingEntity.getXRot(), pLivingEntity.getYRot(), 0, 1, 10.0F);
                     } else {

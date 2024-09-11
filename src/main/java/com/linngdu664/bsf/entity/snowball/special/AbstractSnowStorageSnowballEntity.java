@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -18,8 +19,8 @@ public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstruc
         super(pEntityType, pLevel, duration, new BSFSnowballEntityProperties().canBeCaught(false));
     }
 
-    public AbstractSnowStorageSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, int snowStock, int duration) {
-        super(pEntityType, pShooter, pLevel, duration, new BSFSnowballEntityProperties().canBeCaught(false).applyAdjustment(launchAdjustment));
+    public AbstractSnowStorageSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, int snowStock, int duration, RegionData region) {
+        super(pEntityType, pShooter, pLevel, duration, new BSFSnowballEntityProperties().canBeCaught(false).applyAdjustment(launchAdjustment), region);
         this.snowStock = snowStock;
     }
 

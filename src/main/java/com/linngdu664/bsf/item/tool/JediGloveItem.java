@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -33,7 +34,11 @@ public class JediGloveItem extends GloveItem {
             List<AbstractBSFSnowballEntity> list = pLevel.getEntitiesOfClass(AbstractBSFSnowballEntity.class, aabb, p -> !player.equals(p.getOwner()) && p.canBeCaught());
             List<Snowball> list1 = pLevel.getEntitiesOfClass(Snowball.class, aabb, p -> !player.equals(p.getOwner()));
             for (AbstractBSFSnowballEntity snowball : list) {
-                player.getInventory().placeItemBackInInventory(snowball.getItem(), true);
+                ItemStack itemStack = snowball.getItem();
+                if (snowball.getRegion() != null) {
+                    itemStack.set(DataComponentRegister.REGION.get(), snowball.getRegion());
+                }
+                player.getInventory().placeItemBackInInventory(itemStack, true);
                 ((ServerLevel) pLevel).sendParticles(ParticleTypes.DRAGON_BREATH, snowball.getX(), snowball.getY(), snowball.getZ(), 8, 0, 0, 0, 0.05);
                 snowball.discard();
             }

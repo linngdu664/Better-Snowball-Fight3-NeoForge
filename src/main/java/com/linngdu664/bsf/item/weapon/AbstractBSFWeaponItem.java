@@ -3,6 +3,7 @@ package com.linngdu664.bsf.item.weapon;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.ItemData;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.network.to_server.AmmoTypePayload;
@@ -64,11 +65,12 @@ public abstract class AbstractBSFWeaponItem extends Item {
 
     protected AbstractBSFSnowballEntity ItemToEntity(ItemStack itemStack, Player player, Level level, ILaunchAdjustment launchAdjustment) {
         Item item = itemStack.getItem();
+        RegionData region = itemStack.get(DataComponentRegister.REGION.get());
         if (item instanceof SnowballTankItem) {
             item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         }
         if (item instanceof AbstractBSFSnowballItem snowball) {
-            return snowball.getCorrespondingEntity(level, player, launchAdjustment);
+            return snowball.getCorrespondingEntity(level, player, launchAdjustment, region);
         }
         return null;
     }

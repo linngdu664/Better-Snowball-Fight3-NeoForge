@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
@@ -25,8 +26,8 @@ public class ExpansionSnowballEntity extends AbstractConstructSnowballEntity {
         super(pEntityType, pLevel, ServerConfig.EXPANSION_SNOWBALL_DURATION.getConfigValue(), new BSFSnowballEntityProperties());
     }
 
-    public ExpansionSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment) {
-        super(EntityRegister.EXPANSION_SNOWBALL.get(), pShooter, pLevel, ServerConfig.EXPANSION_SNOWBALL_DURATION.getConfigValue(), new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment));
+    public ExpansionSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
+        super(EntityRegister.EXPANSION_SNOWBALL.get(), pShooter, pLevel, ServerConfig.EXPANSION_SNOWBALL_DURATION.getConfigValue(), new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment), region);
     }
 
     @Override

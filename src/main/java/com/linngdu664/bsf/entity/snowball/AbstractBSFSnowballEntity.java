@@ -5,9 +5,12 @@ import com.linngdu664.bsf.entity.Absorbable;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.tool.GloveItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -38,24 +41,23 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     protected float particleGeneratePointOffset;
     protected Vec3 previousTickPosition = new Vec3(Double.NaN, Double.NaN, Double.NaN);
     protected boolean isCaught = false;
+    private RegionData aliveRange = null;
     private final BSFSnowballEntityProperties properties;
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pLevel);
         this.properties = pProperties;
-//        previousTickPosition = position();
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, double pX, double pY, double pZ, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pX, pY, pZ, pLevel);
         this.properties = pProperties;
-//        previousTickPosition = position();
     }
 
-    public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties) {
+    public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties, RegionData region) {
         super(pEntityType, pShooter, pLevel);
         this.properties = pProperties;
-//        previousTickPosition = position();
+        aliveRange = region;
     }
 
     @Override
@@ -70,6 +72,9 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         pCompound.putInt("LaunchFrom", properties.launchFrom.ordinal());
         pCompound.putFloat("ParticleGenerationStepSize", particleGenerationStepSize);
         pCompound.putFloat("ParticleGenerationPointOffset", particleGeneratePointOffset);
+        if (aliveRange != null) {
+            aliveRange.saveToCompoundTag("AliveRange", pCompound);
+        }
     }
 
     @Override
@@ -84,6 +89,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         properties.launchFrom = LaunchFrom.values()[pCompound.getInt("LaunchFrom")];
         particleGenerationStepSize = pCompound.getFloat("ParticleGenerationStepSize");
         particleGeneratePointOffset = pCompound.getFloat("ParticleGenerationPointOffset");
+        aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
     }
 
     @Override
@@ -155,6 +161,9 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     @Override
     public void tick() {
         super.tick();
+        if (!level().isClientSide && aliveRange != null && !aliveRange.inRegion(position())) {
+            discard();
+        }
         callTraceParticles();
     }
 
@@ -215,7 +224,11 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
             if ((offHand.getItem() instanceof GloveItem && player.getUsedItemHand() == InteractionHand.OFF_HAND ||
                     mainHand.getItem() instanceof GloveItem && player.getUsedItemHand() == InteractionHand.MAIN_HAND) &&
                     player.isUsingItem() && isHeadingToSnowball(player) && canBeCaught()) {
-                player.getInventory().placeItemBackInInventory(new ItemStack(getDefaultItem()));
+                ItemStack stack = new ItemStack(getDefaultItem());
+                if (aliveRange != null) {
+                    stack.set(DataComponentRegister.REGION.get(), aliveRange);
+                }
+                player.getInventory().placeItemBackInInventory(stack);
                 if (mainHand.getItem() instanceof GloveItem glove) {
                     mainHand.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                     glove.releaseUsing(mainHand, level, player, 1);
@@ -257,6 +270,10 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
             ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, location.x, location.y, location.z, 8, 0, 0, 0, 0);
             ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, location.x, location.y, location.z, 8, 0, 0, 0, 0.04);
         }
+    }
+
+    public final RegionData getRegion() {
+        return aliveRange;
     }
 
     public final boolean canBeCaught() {

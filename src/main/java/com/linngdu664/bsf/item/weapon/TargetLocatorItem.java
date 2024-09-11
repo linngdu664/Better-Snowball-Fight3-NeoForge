@@ -54,7 +54,7 @@ public class TargetLocatorItem extends AbstractBSFWeaponItem {
                 ItemStack stack = getAmmo(pPlayer, itemStack);
                 if (stack != null || pPlayer.isCreative()) {
                     pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.SNOWBALL_CANNON_SHOOT.get(), SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
-                    GPSSnowballEntity snowballEntity = new GPSSnowballEntity(pPlayer, pLevel, itemStack);
+                    GPSSnowballEntity snowballEntity = new GPSSnowballEntity(pPlayer, pLevel, itemStack, itemStack.get(DataComponentRegister.REGION.get()));
                     snowballEntity.shootFromRotation(pPlayer, pPlayer.getXRot(), pPlayer.getYRot(), 0.0F, 2.0F, 1.0F);
                     pLevel.addFreshEntity(snowballEntity);
                     itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));

@@ -4,6 +4,7 @@ import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.entity.executor.BlackHoleExecutor;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.network.to_client.ScreenshakePayload;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
@@ -36,8 +37,8 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
         this.setNoGravity(true);
     }
 
-    public BlackHoleSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment) {
-        super(EntityRegister.BLACK_HOLE_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6).canBeCaught(false).applyAdjustment(launchAdjustment));
+    public BlackHoleSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
+        super(EntityRegister.BLACK_HOLE_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6).canBeCaught(false).applyAdjustment(launchAdjustment), region);
         this.setNoGravity(true);
     }
 
@@ -109,7 +110,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
         playSound(SoundRegister.BLACK_HOLE_START.get(), 3.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         playSound(SoundRegister.BLACK_HOLE_AMBIENCE.get(), 12.0F, 1.0F);
 //        Vector3f shaft = vec3.cross(new Vec3(0, 1, 0)).normalize().add(0,BSFMthUtil.SQRT_3,0).normalize().toVector3f();
-        level.addFreshEntity(new BlackHoleExecutor(EntityRegister.BLACK_HOLE_EXECUTOR.get(), getX(), getY(), getZ(), level(), getDeltaMovement(), endTime - startTime));
+        level.addFreshEntity(new BlackHoleExecutor(EntityRegister.BLACK_HOLE_EXECUTOR.get(), getX(), getY(), getZ(), level(), getDeltaMovement(), endTime - startTime, getRegion()));
     }
 
 //    @Override

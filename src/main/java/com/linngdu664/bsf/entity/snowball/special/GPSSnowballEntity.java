@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
@@ -29,8 +30,8 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
         this.setItem(new ItemStack(ItemRegister.GPS_SNOWBALL.get()));
     }
 
-    public GPSSnowballEntity(LivingEntity pShooter, Level pLevel, ItemStack targetLocator) {
-        super(EntityRegister.GPS_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicPunch(1));
+    public GPSSnowballEntity(LivingEntity pShooter, Level pLevel, ItemStack targetLocator, RegionData region) {
+        super(EntityRegister.GPS_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicPunch(1), region);
         this.targetLocator = targetLocator;
         this.setItem(new ItemStack(ItemRegister.GPS_SNOWBALL.get()));
     }

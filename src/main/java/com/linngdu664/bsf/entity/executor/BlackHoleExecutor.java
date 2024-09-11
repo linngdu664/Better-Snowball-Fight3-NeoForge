@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.executor;
 
 import com.linngdu664.bsf.config.ServerConfig;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.particle.util.ParticleUtil;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
@@ -44,8 +45,8 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
         super(pEntityType, pLevel);
     }
 
-    public BlackHoleExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, Vec3 vel, int maxTime) {
-        super(pEntityType, pX, pY, pZ, pLevel, maxTime);
+    public BlackHoleExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, Vec3 vel, int maxTime, RegionData region) {
+        super(pEntityType, pX, pY, pZ, pLevel, maxTime, region);
         setRank(pLevel.random.nextInt(30, 50));
         setDeltaMovement(vel);
 
@@ -223,6 +224,6 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
 
     @Override
     public List<? extends Entity> getTargetList() {
-        return level().getEntities(this, getBoundingBox().inflate(range), EntitySelector.NO_CREATIVE_OR_SPECTATOR);
+        return level().getEntities(this, getBoundingBox().inflate(range), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> getAliveRange().inRegion(p.position())));
     }
 }

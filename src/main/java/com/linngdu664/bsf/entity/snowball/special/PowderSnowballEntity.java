@@ -3,6 +3,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 import com.linngdu664.bsf.entity.executor.PowderExecutor;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
@@ -30,8 +31,8 @@ public class PowderSnowballEntity extends AbstractBSFSnowballEntity {
         super(EntityRegister.POWDER_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties());
     }
 
-    public PowderSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment) {
-        super(EntityRegister.POWDER_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment));
+    public PowderSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
+        super(EntityRegister.POWDER_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment), region);
     }
 
 //    @Override
@@ -55,7 +56,7 @@ public class PowderSnowballEntity extends AbstractBSFSnowballEntity {
         if (!level.isClientSide()) {
             ((ServerLevel) level).sendParticles(ParticleRegister.BIG_LONG_TIME_SNOWFLAKE.get(), this.getX(), this.getY(), this.getZ(), 25, 0, 0, 0, 0.4);
             level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegister.POWDER_SNOWBALL.get(), SoundSource.PLAYERS, 0.3F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-            level.addFreshEntity(new PowderExecutor(EntityRegister.POWDER_EXECUTOR.get(), getX(), getY(), getZ(), level()));
+            level.addFreshEntity(new PowderExecutor(EntityRegister.POWDER_EXECUTOR.get(), getX(), getY(), getZ(), level(), getRegion()));
         }
         discard();
 //        isStart = true;

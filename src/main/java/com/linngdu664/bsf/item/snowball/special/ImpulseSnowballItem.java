@@ -3,6 +3,7 @@ package com.linngdu664.bsf.item.snowball.special;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.special.ImpulseSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import net.minecraft.ChatFormatting;
@@ -31,8 +32,8 @@ public class ImpulseSnowballItem extends AbstractBSFSnowballItem {
     }
 
     @Override
-    public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment) {
-        return new ImpulseSnowballEntity(livingEntity, level, launchAdjustment);
+    public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment, RegionData region) {
+        return new ImpulseSnowballEntity(livingEntity, level, launchAdjustment, region);
     }
 
 //    @Override

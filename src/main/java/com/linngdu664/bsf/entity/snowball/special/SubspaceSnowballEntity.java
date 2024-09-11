@@ -3,6 +3,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 import com.linngdu664.bsf.entity.Absorbable;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.network.to_client.SubspaceSnowballParticlesPayload;
 import com.linngdu664.bsf.network.to_client.SubspaceSnowballReleaseTraceParticlesPayload;
 import com.linngdu664.bsf.registry.*;
@@ -36,8 +37,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     private final HashMap<Item, Integer> snowballCount = new HashMap<>();
     private boolean release = true;
     private int timer = 0;
-//    private float damage = Float.MIN_NORMAL;
-//    private float blazeDamage = 3F;
 
     public SubspaceSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().canBeCaught(false));
@@ -45,8 +44,8 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         this.particleGenerationStepSize=0.1f;
     }
 
-    public SubspaceSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, boolean release) {
-        super(EntityRegister.SUBSPACE_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().canBeCaught(false).applyAdjustment(launchAdjustment));
+    public SubspaceSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, boolean release, RegionData region) {
+        super(EntityRegister.SUBSPACE_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().canBeCaught(false).applyAdjustment(launchAdjustment), region);
         this.release = release;
         this.setNoGravity(true);
         if (!release){
@@ -58,8 +57,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt("Timer", timer);
-//        pCompound.putFloat("Damage", damage);
-//        pCompound.putFloat("BlazeDamage", blazeDamage);
         pCompound.putBoolean("Release", release);
         CompoundTag tag = new CompoundTag();
         for (Map.Entry<Item, Integer> entry : snowballCount.entrySet()) {
@@ -72,8 +69,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         timer = pCompound.getInt("Timer");
-//        damage = pCompound.getFloat("Damage");
-//        blazeDamage = pCompound.getFloat("BlazeDamage");
         release = pCompound.getBoolean("Release");
         CompoundTag tag = pCompound.getCompound("Snowballs");
         Set<String> keys = tag.getAllKeys();
@@ -106,8 +101,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                     float damage = getDamage();
                     setDamage(damage + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
                     setBlazeDamage(getBlazeDamage() + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
-//                    damage += damage<15?absorbable.getSubspacePower():15*absorbable.getSubspacePower()/damage;
-//                    blazeDamage += damage<15?absorbable.getSubspacePower():15*absorbable.getSubspacePower()/damage;
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);
                     this.push(vec3.x, vec3.y, vec3.z);
                 }
@@ -125,8 +118,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                     float damage = getDamage();
                     setDamage(damage + (damage < 15 ? 1 : 15 / damage));
                     setBlazeDamage(getBlazeDamage() + (damage < 15 ? 1 : 15 / damage));
-//                    damage += damage<15?1:15/damage;
-//                    blazeDamage += damage<15?1:15/damage;
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);
                     this.push(vec3.x, vec3.y, vec3.z);
                 }
@@ -223,11 +214,19 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             int count = entry.getValue();
             int maxStackSize = item.getDefaultMaxStackSize();
             for (int i = 0; i < count / maxStackSize; i++) {
-                ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), new ItemStack(item, maxStackSize));
+                ItemStack stack = new ItemStack(item, maxStackSize);
+                if (getRegion() != null) {
+                    stack.set(DataComponentRegister.REGION.get(), getRegion());
+                }
+                ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), stack);
                 itemEntity.setDefaultPickUpDelay();
                 level.addFreshEntity(itemEntity);
             }
-            ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), new ItemStack(item, count % maxStackSize));
+            ItemStack stack = new ItemStack(item, count % maxStackSize);
+            if (getRegion() != null) {
+                stack.set(DataComponentRegister.REGION.get(), getRegion());
+            }
+            ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), stack);
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }

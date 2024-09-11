@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.tracking;
 
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.world.entity.EntityType;
@@ -15,8 +16,8 @@ public class LightMonsterTrackingSnowballEntity extends AbstractMonsterTrackingS
         super(pEntityType, pLevel, new BSFSnowballEntityProperties(), false);
     }
 
-    public LightMonsterTrackingSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment) {
-        super(EntityRegister.LIGHT_MONSTER_TRACKING_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment), false);
+    public LightMonsterTrackingSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
+        super(EntityRegister.LIGHT_MONSTER_TRACKING_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment), false, region);
     }
 
 //    @Override

@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.tracking;
 
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -22,8 +23,8 @@ public abstract class AbstractTrackingSnowballEntity extends AbstractBSFSnowball
         this.isLockFeet = isLockFeet;
     }
 
-    public AbstractTrackingSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties, boolean isLockFeet) {
-        super(pEntityType, pShooter, pLevel, pProperties);
+    public AbstractTrackingSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties, boolean isLockFeet, RegionData region) {
+        super(pEntityType, pShooter, pLevel, pProperties, region);
         this.isLockFeet = isLockFeet;
     }
 

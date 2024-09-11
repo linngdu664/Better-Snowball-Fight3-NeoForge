@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.item.tool;
 
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.misc.BSFTiers;
 import net.minecraft.ChatFormatting;
@@ -37,11 +38,16 @@ public class SnowballClampItem extends TieredItem {
         Block block = level.getBlockState(pContext.getClickedPos()).getBlock();
         if ((block == Blocks.SNOW_BLOCK || block == Blocks.SNOW || block == Blocks.POWDER_SNOW) && player != null) {
             if (player.getMainHandItem().isEmpty() || player.getOffhandItem().isEmpty()) {
+                ItemStack stack;
                 if (getTier().equals(BSFTiers.EMERALD)) {
-                    player.getInventory().placeItemBackInInventory(ItemRegister.DUCK_SNOWBALL.get().getDefaultInstance(), true);
+                    stack = ItemRegister.DUCK_SNOWBALL.get().getDefaultInstance();
                 } else {
-                    player.getInventory().placeItemBackInInventory(ItemRegister.SMOOTH_SNOWBALL.get().getDefaultInstance(), true);
+                    stack = ItemRegister.SMOOTH_SNOWBALL.get().getDefaultInstance();
                 }
+                if (itemStack.has(DataComponentRegister.REGION.get())) {
+                    stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                }
+                player.getInventory().placeItemBackInInventory(stack, true);
                 itemStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(pContext.getHand()));
             }
             player.awardStat(Stats.ITEM_USED.get(this));

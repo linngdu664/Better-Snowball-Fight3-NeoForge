@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.entity.executor;
 
+import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -13,8 +14,8 @@ public abstract class AbstractFixedForceExecutor extends AbstractForceExecutor {
         super(pEntityType, pLevel);
     }
 
-    public AbstractFixedForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, int GM, int boundaryR2, int range) {
-        super(pEntityType, pX, pY, pZ, pLevel, GM, boundaryR2, range, 200);
+    public AbstractFixedForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, int GM, int boundaryR2, int range, RegionData region) {
+        super(pEntityType, pX, pY, pZ, pLevel, GM, boundaryR2, range, 200, region);
     }
 
     @Override

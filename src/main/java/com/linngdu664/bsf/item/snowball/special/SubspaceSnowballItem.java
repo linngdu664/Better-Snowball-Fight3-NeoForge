@@ -2,6 +2,7 @@ package com.linngdu664.bsf.item.snowball.special;
 
 import com.linngdu664.bsf.entity.snowball.special.SubspaceSnowballEntity;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -31,7 +32,7 @@ public class SubspaceSnowballItem extends AbstractBSFSnowballItem {
         if (!storageInTank(pPlayer)) {
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
             if (!pLevel.isClientSide) {
-                SubspaceSnowballEntity snowballEntity = new SubspaceSnowballEntity(pPlayer, pLevel, getLaunchAdjustment(1), !pPlayer.isShiftKeyDown());
+                SubspaceSnowballEntity snowballEntity = new SubspaceSnowballEntity(pPlayer, pLevel, getLaunchAdjustment(1), !pPlayer.isShiftKeyDown(), itemStack.get(DataComponentRegister.REGION.get()));
                 snowballEntity.shootFromRotation(pPlayer, pPlayer.getXRot(), pPlayer.getYRot(), 0.0F, 1.5F * getSnowballSlowdownRate(pPlayer), 0F); // testing, original 1.5
                 pLevel.addFreshEntity(snowballEntity);
             }

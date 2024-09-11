@@ -3,6 +3,7 @@ package com.linngdu664.bsf.event;
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
@@ -48,6 +49,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.BinomialDistributionGenerator;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -57,6 +60,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -130,11 +134,40 @@ public class GamePlayEvents {
     public static void onLivingUseItemTick(LivingEntityUseItemEvent.Tick event) {
         LivingEntity livingEntity = event.getEntity();
         ItemStack itemStack = event.getItem();
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get())) {
+            RegionData region = itemStack.get(DataComponentRegister.REGION.get());
+            if (!region.inRegion(event.getEntity().position())) {
+                event.setCanceled(true);
+                return;
+            }
+        }
         if (EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(livingEntity, BSFEnchantmentHelper.FLOATING_SHOOTING), itemStack) > 0) {
             double vy = livingEntity.getDeltaMovement().y;
             if (vy < 0) {
                 livingEntity.resetFallDistance();
                 livingEntity.push(0, -0.25 * vy, 0);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        ItemStack itemStack = event.getItemStack();
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get())) {
+            RegionData region = itemStack.get(DataComponentRegister.REGION.get());
+            if (!region.inRegion(event.getEntity().position())) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        ItemStack itemStack = event.getItemStack();
+        if (itemStack.has(DataComponentRegister.REGION.get())) {
+            RegionData region = itemStack.get(DataComponentRegister.REGION.get());
+            if (!region.inRegion(event.getHitVec().getLocation())) {
+                event.setCanceled(true);
             }
         }
     }

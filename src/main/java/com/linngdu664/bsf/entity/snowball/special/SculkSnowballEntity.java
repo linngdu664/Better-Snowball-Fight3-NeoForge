@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
@@ -26,8 +27,8 @@ public class SculkSnowballEntity extends AbstractBSFSnowballEntity {
         this.soundId = -1;
     }
 
-    public SculkSnowballEntity(LivingEntity pShooter, Level pLevel, int soundId) {
-        super(EntityRegister.SCULK_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicPunch(2));
+    public SculkSnowballEntity(LivingEntity pShooter, Level pLevel, int soundId, RegionData region) {
+        super(EntityRegister.SCULK_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicPunch(2), region);
         this.setItem(new ItemStack(ItemRegister.SCULK_SNOWBALL.get()));
         this.soundId = soundId;
     }

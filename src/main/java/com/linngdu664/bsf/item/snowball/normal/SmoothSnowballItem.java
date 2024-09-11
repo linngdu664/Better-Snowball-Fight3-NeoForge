@@ -1,7 +1,9 @@
 package com.linngdu664.bsf.item.snowball.normal;
 
 import com.linngdu664.bsf.entity.snowball.nomal.SmoothSnowballEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
@@ -36,7 +38,7 @@ public class SmoothSnowballItem extends AbstractBSFSnowballItem {
         if (pUsedHand == InteractionHand.MAIN_HAND) {
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
             if (!pLevel.isClientSide) {
-                SmoothSnowballEntity snowballEntity = new SmoothSnowballEntity(pPlayer, pLevel, getLaunchAdjustment(getSnowballDamageRate(pPlayer)));
+                SmoothSnowballEntity snowballEntity = new SmoothSnowballEntity(pPlayer, pLevel, getLaunchAdjustment(getSnowballDamageRate(pPlayer)), itemStack.get(DataComponentRegister.REGION.get()));
                 snowballEntity.shootFromRotation(pPlayer, pPlayer.getXRot(), pPlayer.getYRot(), 0.0F, 1.25F * getSnowballSlowdownRate(pPlayer), 1.0F);
                 pLevel.addFreshEntity(snowballEntity);
             }
@@ -44,7 +46,11 @@ public class SmoothSnowballItem extends AbstractBSFSnowballItem {
                 itemStack.shrink(1);
             }
         } else if (pPlayer.getMainHandItem().isEmpty()) {
-            pPlayer.getInventory().placeItemBackInInventory(new ItemStack(ItemRegister.COMPACTED_SNOWBALL.get()), true);
+            ItemStack stack = new ItemStack(ItemRegister.COMPACTED_SNOWBALL.get());
+            if (itemStack.has(DataComponentRegister.REGION.get())) {
+                stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+            }
+            pPlayer.getInventory().placeItemBackInInventory(stack, true);
             if (!pPlayer.getAbilities().instabuild) {
                 itemStack.shrink(1);
             }

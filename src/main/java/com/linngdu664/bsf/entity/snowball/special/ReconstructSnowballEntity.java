@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.core.BlockPos;
@@ -33,8 +34,8 @@ public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity
         setNoGravity(true);
     }
 
-    public ReconstructSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, int snowStock) {
-        super(EntityRegister.RECONSTRUCT_SNOWBALL.get(), pShooter, pLevel, launchAdjustment, snowStock, ServerConfig.RECONSTRUCT_SNOWBALL_DURATION.getConfigValue());
+    public ReconstructSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, int snowStock, RegionData region) {
+        super(EntityRegister.RECONSTRUCT_SNOWBALL.get(), pShooter, pLevel, launchAdjustment, snowStock, ServerConfig.RECONSTRUCT_SNOWBALL_DURATION.getConfigValue(), region);
         setNoGravity(true);
         this.destroyStepSize = Math.max(snowStock / 40, 1);
     }

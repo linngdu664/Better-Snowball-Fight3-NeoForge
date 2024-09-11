@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.snowball.force;
 
 import com.linngdu664.bsf.entity.executor.ProjectileGravityExecutor;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.world.entity.Entity;
@@ -17,8 +18,8 @@ public class ProjectileGravitySnowballEntity extends AbstractForceSnowballEntity
         super(pEntityType, pLevel);
     }
 
-    public ProjectileGravitySnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment) {
-        super(EntityRegister.PROJECTILE_GRAVITY_SNOWBALL.get(), pShooter, pLevel, launchAdjustment);
+    public ProjectileGravitySnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
+        super(EntityRegister.PROJECTILE_GRAVITY_SNOWBALL.get(), pShooter, pLevel, launchAdjustment, region);
     }
 
     @Override
@@ -28,6 +29,6 @@ public class ProjectileGravitySnowballEntity extends AbstractForceSnowballEntity
 
     @Override
     public Entity getExecutor() {
-        return new ProjectileGravityExecutor(EntityRegister.PROJECTILE_GRAVITY_EXECUTOR.get(), getX(), correctedY(), getZ(), level());
+        return new ProjectileGravityExecutor(EntityRegister.PROJECTILE_GRAVITY_EXECUTOR.get(), getX(), correctedY(), getZ(), level(), getRegion());
     }
 }

@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.entity.executor;
 
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import net.minecraft.server.level.ServerLevel;
@@ -12,8 +13,8 @@ public class PowderExecutor extends AbstractExecutor {
         super(pEntityType, pLevel);
     }
 
-    public PowderExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel) {
-        super(pEntityType, pLevel, 200);
+    public PowderExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, RegionData region) {
+        super(pEntityType, pLevel, 200, region);
         setPos(pX, pY, pZ);
     }
 

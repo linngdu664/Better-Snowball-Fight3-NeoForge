@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.nomal;
 
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.world.entity.EntityType;
@@ -19,8 +20,8 @@ public class GoldSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.GOLD_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7));
     }
 
-    public GoldSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment) {
-        super(EntityRegister.GOLD_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7).applyAdjustment(launchAdjustment));
+    public GoldSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
+        super(EntityRegister.GOLD_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7).applyAdjustment(launchAdjustment), region);
     }
 
 //    @Override

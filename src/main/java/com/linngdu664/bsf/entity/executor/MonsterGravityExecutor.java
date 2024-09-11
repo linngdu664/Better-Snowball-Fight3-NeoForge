@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.entity.executor;
 
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.particle.util.ParticleUtil;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
@@ -16,8 +17,8 @@ public class MonsterGravityExecutor extends AbstractFixedForceExecutor {
         super(pEntityType, pLevel);
     }
 
-    public MonsterGravityExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel) {
-        super(pEntityType, pX, pY, pZ, pLevel, 2, 2, 15);
+    public MonsterGravityExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, RegionData region) {
+        super(pEntityType, pX, pY, pZ, pLevel, 2, 2, 15, region);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class MonsterGravityExecutor extends AbstractFixedForceExecutor {
     @Override
     public List<? extends Entity> getTargetList() {
         double r2 = range * range;
-        return level().getEntities(this, getBoundingBox().inflate(range), p -> p instanceof Enemy && distanceToSqr(p) < r2);
+        return level().getEntities(this, getBoundingBox().inflate(range), p -> p instanceof Enemy && distanceToSqr(p) < r2 && getAliveRange().inRegion(p.position()));
     }
 
     @Override

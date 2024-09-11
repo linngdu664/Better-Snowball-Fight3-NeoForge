@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.entity.executor;
 
+import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,13 +23,13 @@ public abstract class AbstractForceExecutor extends AbstractExecutor {
         super(pEntityType, pLevel);
     }
 
-    public AbstractForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, int maxTime) {
-        super(pEntityType, pLevel, maxTime);
+    public AbstractForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, int maxTime, RegionData region) {
+        super(pEntityType, pLevel, maxTime, region);
         setPos(pX, pY, pZ);
     }
 
-    public AbstractForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, double GM, double boundaryR2, double range, int maxTime) {
-        this(pEntityType, pX, pY, pZ, pLevel, maxTime);
+    public AbstractForceExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, double GM, double boundaryR2, double range, int maxTime, RegionData region) {
+        this(pEntityType, pX, pY, pZ, pLevel, maxTime, region);
         this.range = range;
         this.boundaryR2 = boundaryR2;
         this.GM = GM;

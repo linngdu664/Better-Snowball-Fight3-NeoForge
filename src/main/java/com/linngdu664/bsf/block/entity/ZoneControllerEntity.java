@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.block.entity;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -19,7 +20,7 @@ import java.util.List;
 public class ZoneControllerEntity extends BlockEntity {
     private ArrayList<CompoundTag> snowGolemList = new ArrayList<>();
     private ArrayList<BlockPos> summonPosList = new ArrayList<>();
-    private BlockPos regionStart = BlockPos.ZERO, regionEnd = BlockPos.ZERO;
+    private RegionData region = RegionData.EMPTY;
     private int currentRank;        // 同步到客户端
     private byte teamId;            // 同步到客户端
 
@@ -49,12 +50,9 @@ public class ZoneControllerEntity extends BlockEntity {
         for (int i = 0, size = listTag.size(); i < size; i++) {
             snowGolemList.add(listTag.getCompound(i));
         }
-        CompoundTag compoundTag = tag.getCompound("RegionStart");
-        regionStart = new BlockPos(compoundTag.getInt("x"), compoundTag.getInt("y"), compoundTag.getInt("z"));
-        compoundTag = tag.getCompound("RegionEnd");
-        regionEnd = new BlockPos(compoundTag.getInt("x"), compoundTag.getInt("y"), compoundTag.getInt("z"));
-        currentRank = compoundTag.getInt("CurrentRank");
-        teamId = compoundTag.getByte("TeamId");
+        region = RegionData.loadFromCompoundTag("Region", tag);
+        currentRank = tag.getInt("CurrentRank");
+        teamId = tag.getByte("TeamId");
     }
 
     @Override
@@ -78,16 +76,7 @@ public class ZoneControllerEntity extends BlockEntity {
             i++;
         }
         tag.put("SnowGolem", listTag);
-        CompoundTag cTag = new CompoundTag();
-        cTag.putInt("x", regionStart.getX());
-        cTag.putInt("y", regionStart.getY());
-        cTag.putInt("z", regionStart.getZ());
-        tag.put("RegionStart", cTag);
-        cTag = new CompoundTag();
-        cTag.putInt("x", regionEnd.getX());
-        cTag.putInt("y", regionEnd.getY());
-        cTag.putInt("z", regionEnd.getZ());
-        tag.put("RegionEnd", cTag);
+        region.saveToCompoundTag("Region", tag);
         tag.putInt("CurrentRank", currentRank);
         tag.putByte("TeamId", teamId);
     }
@@ -109,11 +98,10 @@ public class ZoneControllerEntity extends BlockEntity {
         currentRank = tag.getInt("CurrentRank");
     }
 
-    public void setRegionAndSummon(BlockPos regionStart, BlockPos regionEnd) {
-        this.regionStart = regionStart;
-        this.regionEnd = regionEnd;
+    public void setRegionAndSummon(RegionData region) {
+        this.region = region;
         summonPosList = new ArrayList<>();
-        BlockPos.betweenClosedStream(regionStart, regionEnd)
+        BlockPos.betweenClosedStream(region.start(), region.end())
                 .forEach(p -> {
                     if (level.getBlockState(p).getBlock() == Blocks.EMERALD_BLOCK) {
                         summonPosList.add(new BlockPos(p.getX(), p.getY(), p.getZ()));
@@ -122,7 +110,9 @@ public class ZoneControllerEntity extends BlockEntity {
         setChanged();
     }
 
-    public void setSnowGolemList(BlockPos regionStart, BlockPos regionEnd) {
+    public void setSnowGolemList(RegionData region) {
+        BlockPos regionStart = region.start();
+        BlockPos regionEnd = region.end();
         AABB aabb = new AABB(new Vec3(regionStart.getX(), regionStart.getY(), regionStart.getZ()), new Vec3(regionEnd.getX(), regionEnd.getY(), regionEnd.getZ()));
         List<BSFSnowGolemEntity> golemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, aabb, p -> true);
         snowGolemList = new ArrayList<>();

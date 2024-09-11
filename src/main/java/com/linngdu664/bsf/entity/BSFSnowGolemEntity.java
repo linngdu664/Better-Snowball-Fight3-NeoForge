@@ -5,6 +5,7 @@ import com.linngdu664.bsf.entity.ai.goal.target.*;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.ItemData;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
@@ -99,7 +100,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private double shootZ;
     private int rank;                    // 等级，配合积分器使用
     private boolean dropEquipment;
-    private AABB aliveRange;
+//    private AABB aliveRange;
+    private RegionData aliveRange;
     /*
      status flag:
      0: standby
@@ -153,8 +155,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         pCompound.putByte("FixedTeamId", getFixedTeamId());
         pCompound.putInt("Rank", rank);
         if (aliveRange != null) {
-            BSFCommonUtil.putVec3d(pCompound, "AliveMin", aliveRange.getMinPosition());
-            BSFCommonUtil.putVec3d(pCompound, "AliveMax", aliveRange.getMaxPosition());
+            aliveRange.saveToCompoundTag("AliveRange", pCompound);
         }
         if (getTarget() != null) {
             pCompound.putUUID("TargetUUID", getTarget().getUUID());
@@ -177,9 +178,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         dropEquipment = pCompound.getBoolean("DropEquipment");
         setFixedTeamId(pCompound.getByte("FixedTeamId"));
         rank = pCompound.getInt("Rank");
-        if (pCompound.contains("AliveMin") && pCompound.contains("AliveMax")) {
-            aliveRange = new AABB(BSFCommonUtil.getVec3d(pCompound, "AliveMin"), BSFCommonUtil.getVec3d(pCompound, "AliveMax"));
-        }
+        aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
         if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
             setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
         }
@@ -310,8 +309,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         return rank;
     }
 
-    public void setAliveRange(Vec3 vec31, Vec3 vec32) {
-        aliveRange = new AABB(vec31, vec32);
+    public void setAliveRange(RegionData region) {
+        aliveRange = region;
     }
 
     @Override
@@ -518,7 +517,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     public void tick() {
         Level level = level();
         if (!level.isClientSide) {
-            if (aliveRange != null && !aliveRange.contains(position())) {
+            if (aliveRange != null && !aliveRange.inRegion(position())) {
                 hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
             }
             setTicksFrozen(0);
@@ -612,7 +611,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
             if (!ammo.has(DataComponentRegister.AMMO_ITEM)) {
                 break;
             }
-            AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment);
+            AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment, aliveRange);
             snowball.shoot(shootX, shootY, shootZ, launchVelocity, launchAccuracy);
             level.addFreshEntity(snowball);
             if (!getEnhance()) {

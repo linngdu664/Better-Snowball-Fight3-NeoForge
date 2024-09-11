@@ -66,10 +66,10 @@ public class ZoneController extends Block implements EntityBlock {
                 if (!level.isClientSide()) {
                     RegionData regionData = stack.get(DataComponentRegister.REGION);
                     if (regionData.start().getY() < regionData.end().getY()) {
-                        zoneControllerEntity.setSnowGolemList(regionData.start(), regionData.end());
+                        zoneControllerEntity.setSnowGolemList(regionData);
                         player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSnowGolemCount() + " golems"), false);
                     } else {
-                        zoneControllerEntity.setRegionAndSummon(regionData.start(), regionData.end());
+                        zoneControllerEntity.setRegionAndSummon(regionData);
                         player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSummonPosList().size() + " spawn points"), false);
                     }
                 }

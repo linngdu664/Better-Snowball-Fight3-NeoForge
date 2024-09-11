@@ -50,14 +50,26 @@ public class SnowballTankItem extends Item {
                     itemStack.remove(DataComponentRegister.AMMO_ITEM);
                 }
                 for (int i = 0; i < k / 16; i++) {
-                    inventory.placeItemBackInInventory(new ItemStack(item, 16), true);
+                    ItemStack stack = new ItemStack(item, 16);
+                    if (itemStack.has(DataComponentRegister.REGION.get())) {
+                        stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                    }
+                    inventory.placeItemBackInInventory(stack, true);
                 }
-                inventory.placeItemBackInInventory(new ItemStack(item, k % 16), true);
+                ItemStack stack = new ItemStack(item, k % 16);
+                if (itemStack.has(DataComponentRegister.REGION.get())) {
+                    stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                }
+                inventory.placeItemBackInInventory(stack, true);
             } else {
                 if (!pPlayer.getAbilities().instabuild) {
                     itemStack.setDamageValue(damageValue + 16);
                 }
-                inventory.placeItemBackInInventory(new ItemStack(item, 16), true);
+                ItemStack stack = new ItemStack(item, 16);
+                if (itemStack.has(DataComponentRegister.REGION.get())) {
+                    stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                }
+                inventory.placeItemBackInInventory(stack, true);
             }
             pPlayer.awardStat(Stats.ITEM_USED.get(this));
         }
