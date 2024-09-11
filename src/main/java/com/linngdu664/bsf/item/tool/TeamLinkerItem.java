@@ -3,6 +3,8 @@ package com.linngdu664.bsf.item.tool;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
+import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -23,10 +25,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class TeamLinkerItem extends Item {
     public static boolean shouldShowHighlight = false;  // client only
@@ -37,8 +36,11 @@ public class TeamLinkerItem extends Item {
         this.teamId = teamId;
     }
 
-    private String getColorNameKeyById(int id) {
+    public static String getColorNameKeyById(int id) {
         return "color.minecraft." + DyeColor.byId(id).getName();
+    }
+    public static String getColorTransNameById(int id){
+        return BSFCommonUtil.getTransStr(getColorNameKeyById(id));
     }
 
     @Override
@@ -53,8 +55,8 @@ public class TeamLinkerItem extends Item {
             Component playerName = pPlayer.getName();
             UUID uuid = pPlayer.getUUID();
             int oldId = savedData.getTeam(uuid);
-            Object[] oldNameParam = new Object[]{playerName, MutableComponent.create(new TranslatableContents(getColorNameKeyById(oldId), null, new Object[]{}))};
-            Object[] newNameParam = new Object[]{playerName, MutableComponent.create(new TranslatableContents(getColorNameKeyById(teamId), null, new Object[]{}))};
+            Object[] oldNameParam = new Object[]{playerName, getColorTransNameById(oldId)};
+            Object[] newNameParam = new Object[]{playerName, getColorTransNameById(teamId)};
             HashSet<UUID> oldMembers = savedData.getMembers(oldId);
             oldMembers.stream()
                     .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))
@@ -103,4 +105,26 @@ public class TeamLinkerItem extends Item {
     public byte getTeamId() {
         return (byte) teamId;
     }
+
+    public static ItemStack getItemStackById(byte id){
+        return switch (id) {
+            case 0 -> ItemRegister.WHITE_TEAM_LINKER.toStack();
+            case 1 -> ItemRegister.ORANGE_TEAM_LINKER.toStack();
+            case 2 -> ItemRegister.MAGENTA_TEAM_LINKER.toStack();
+            case 3 -> ItemRegister.LIGHT_BLUE_TEAM_LINKER.toStack();
+            case 4 -> ItemRegister.YELLOW_TEAM_LINKER.toStack();
+            case 5 -> ItemRegister.LIME_TEAM_LINKER.toStack();
+            case 6 -> ItemRegister.PINK_TEAM_LINKER.toStack();
+            case 7 -> ItemRegister.GRAY_TEAM_LINKER.toStack();
+            case 8 -> ItemRegister.LIGHT_GRAY_TEAM_LINKER.toStack();
+            case 9 -> ItemRegister.CYAN_TEAM_LINKER.toStack();
+            case 10 -> ItemRegister.PURPLE_TEAM_LINKER.toStack();
+            case 11 -> ItemRegister.BLUE_TEAM_LINKER.toStack();
+            case 12 -> ItemRegister.BROWN_TEAM_LINKER.toStack();
+            case 13 -> ItemRegister.GREEN_TEAM_LINKER.toStack();
+            case 14 -> ItemRegister.RED_TEAM_LINKER.toStack();
+            default -> ItemRegister.BLACK_TEAM_LINKER.toStack();
+        };
+    }
+
 }

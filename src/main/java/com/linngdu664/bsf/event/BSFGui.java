@@ -198,7 +198,7 @@ public class BSFGui {
         renderFillSquareTool(guiGraphics,equipPoint.add(new Vec2( -1f,0)),equipPoint.add(new Vec2(1f,2f)),color);
         EQUIPMENT_SLOT_FRAME_GUI.render(guiGraphics, (int) framePoint.x, (int) framePoint.y);
         guiGraphics.renderItem(itemStack, (int) (framePoint.x + 3), (int) (framePoint.y + 3));
-        guiGraphics.drawString(font,msg,framePoint.x-font.width(msg),framePoint.y+7,0xffffffff,true);
+        guiGraphics.drawString(font,msg,framePoint.x-font.width(msg),framePoint.y+7,color,true);
     }
 
     public static void renderLineTool(GuiGraphics guiGraphics, Vec2 p1, Vec2 p2, float d, int color, boolean isDown, float padding, int padColor) {
@@ -256,14 +256,31 @@ public class BSFGui {
         float tanHalfFovy = Mth.sin(fovy * 0.5F) / Mth.cos(fovy * 0.5F);
         float tanHalfFovx = tanHalfFovy * (float) window.getWidth() / (float) window.getHeight();
         for (Pair<Vec3, Consumer<Vec2>> pMethod : points) {
-            Vec3 vec3 = pMethod.getA();
-            Vector3f vector3f = new Vector3f((float) (vec3.x - cameraPos.x), (float) (vec3.y - cameraPos.y), (float) (vec3.z - cameraPos.z));
-            rotMat.transform(vector3f);
-            float rx = vector3f.x / -vector3f.z / tanHalfFovx;
-            float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp( guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
-            float ry = vector3f.y / Mth.sqrt(vector3f.x * vector3f.x + vector3f.z * vector3f.z) / tanHalfFovy;
-            float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
-            pMethod.getB().accept(new Vec2(xScreen, yScreen));
+            doCalcScreenPos(pMethod, guiWidth, guiHeight, widthProtect, heightProtect, cameraPos, rotMat, tanHalfFovy, tanHalfFovx);
         }
+    }
+    public static void calcScreenPosFromWorldPos(Pair<Vec3, Consumer<Vec2>> point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
+        Minecraft mc = Minecraft.getInstance();
+        GameRenderer gameRenderer = mc.gameRenderer;
+        Camera camera = gameRenderer.getMainCamera();
+        Vec3 cameraPos = camera.getPosition();
+        Matrix3f rotMat = new Matrix3f().rotation(camera.rotation().conjugate(new Quaternionf()));      // make rot mat
+        Window window = mc.getWindow();
+        float fovy = (float) gameRenderer.getFov(camera, partialTicks, true) * Mth.DEG_TO_RAD;
+        float tanHalfFovy = Mth.sin(fovy * 0.5F) / Mth.cos(fovy * 0.5F);
+        float tanHalfFovx = tanHalfFovy * (float) window.getWidth() / (float) window.getHeight();
+
+        doCalcScreenPos(point, guiWidth, guiHeight, widthProtect, heightProtect, cameraPos, rotMat, tanHalfFovy, tanHalfFovx);
+    }
+
+    private static void doCalcScreenPos(Pair<Vec3, Consumer<Vec2>> point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, Vec3 cameraPos, Matrix3f rotMat, float tanHalfFovy, float tanHalfFovx) {
+        Vec3 vec3 = point.getA();
+        Vector3f vector3f = new Vector3f((float) (vec3.x - cameraPos.x), (float) (vec3.y - cameraPos.y), (float) (vec3.z - cameraPos.z));
+        rotMat.transform(vector3f);
+        float rx = vector3f.x / -vector3f.z / tanHalfFovx;
+        float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp( guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
+        float ry = vector3f.y / Mth.sqrt(vector3f.x * vector3f.x + vector3f.z * vector3f.z) / tanHalfFovy;
+        float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
+        point.getB().accept(new Vec2(xScreen, yScreen));
     }
 }

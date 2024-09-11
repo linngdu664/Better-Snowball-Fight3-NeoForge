@@ -1,10 +1,13 @@
 package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.block.entity.VendingMachineEntity;
+import com.linngdu664.bsf.block.entity.ZoneControllerEntity;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
+import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
@@ -16,11 +19,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -159,6 +161,20 @@ public class RenderGuiEventHandler {
                 V2I v2I = v2IRatio(window, 0.4, 0.5);
                 String dpsStr = String.format(dummy.getDPS() < 10 ? "DPS: %.2f" : "DPS: %.3g", dummy.getDPS());
                 guiGraphics.drawString(instance.font, dpsStr, v2I.x - instance.font.width(dpsStr), v2I.y - 5, 0xffffffff);
+            }
+        } else if (pick.getType() == HitResult.Type.BLOCK) {
+            BlockEntity blockEntity = player.level().getBlockEntity(((BlockHitResult) pick).getBlockPos());
+            if (blockEntity instanceof VendingMachineEntity vendingMachine){
+                calcScreenPosFromWorldPos(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2->{
+                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, "["+BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", vendingMachine.getMinRank())+"]["+BSFCommonUtil.getTransStr("scoring_device_money.tooltip", vendingMachine.getPrice()));
+                }),guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, event.getPartialTick().getGameTimeDeltaPartialTick(true));
+            }else if(blockEntity instanceof ZoneControllerEntity zoneController){
+                calcScreenPosFromWorldPos(new Pair<>(zoneController.getBlockPos().getCenter(), v2->{
+                    V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
+                    byte teamId = zoneController.getTeamId();
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor(), TeamLinkerItem.getItemStackById(teamId), instance.font, TeamLinkerItem.getColorTransNameById(teamId));
+                }),guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, event.getPartialTick().getGameTimeDeltaPartialTick(true));
             }
         }
         ItemStack tweaker = null;
