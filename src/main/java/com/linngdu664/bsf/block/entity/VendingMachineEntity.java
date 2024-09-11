@@ -4,6 +4,9 @@ import com.linngdu664.bsf.registry.BlockEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -55,6 +58,11 @@ public class VendingMachineEntity extends BlockEntity {
         minRank = tag.getInt("MinRank");
         price = tag.getInt("Price");
         canSell = tag.getBoolean("CanSell");
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     public ItemStack getGoods() {

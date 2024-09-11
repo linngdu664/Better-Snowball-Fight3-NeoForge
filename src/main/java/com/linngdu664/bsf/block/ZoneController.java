@@ -20,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -35,10 +34,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class ZoneController extends Block implements EntityBlock {
+    protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
+
     public ZoneController() {
         super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
     }
-    protected static final VoxelShape SHAPE;
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -83,6 +84,7 @@ public class ZoneController extends Block implements EntityBlock {
                 if (!level.isClientSide()) {
                     byte teamId = teamLinkerItem.getTeamId();
                     zoneControllerEntity.setTeamId(teamId);
+                    level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set controller team " + DyeColor.byId(teamId).getName()), false);
                 }
                 return ItemInteractionResult.SUCCESS;
@@ -100,10 +102,9 @@ public class ZoneController extends Block implements EntityBlock {
             ((ServerPlayer) player).connection.send(new ClientboundSetEntityMotionPacket(player));
         }
     }
+
+    @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
-    }
-    static {
-        SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
     }
 }

@@ -36,6 +36,7 @@ public class VendingMachine extends Block implements EntityBlock {
             if (hand == InteractionHand.OFF_HAND && !stack.isEmpty() && !stack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get()) && player.getMainHandItem().isEmpty()) {
                 if (!level.isClientSide) {
                     be.setGoods(stack);
+                    level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set goods to " + stack.getHoverName().getString()), false);
                 }
                 return ItemInteractionResult.SUCCESS;
@@ -43,6 +44,7 @@ public class VendingMachine extends Block implements EntityBlock {
             if (stack.getItem().equals(Items.COMMAND_BLOCK)) {
                 if (!level.isClientSide) {
                     be.setCanSell(!be.isCanSell());
+                    level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set allow sell to " + be.isCanSell()), false);
                 }
                 return ItemInteractionResult.SUCCESS;

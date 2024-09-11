@@ -2,6 +2,7 @@ package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -20,14 +21,17 @@ public class ValueAdjustmentTool extends Item {
         Level level = context.getLevel();
         Player player = context.getPlayer();
         ItemStack stack = context.getItemInHand();
+        BlockPos blockPos = context.getClickedPos();
         if (player.getAbilities().instabuild && level.getBlockEntity(context.getClickedPos()) instanceof VendingMachineEntity be) {
             if (!level.isClientSide) {
                 int val = stack.getOrDefault(DataComponentRegister.GENERIC_INT_VALUE, 0);
                 if (player.isShiftKeyDown()) {
                     be.setMinRank(val);
+                    level.sendBlockUpdated(blockPos, level.getBlockState(blockPos), level.getBlockState(blockPos), 2);
                     player.displayClientMessage(Component.literal("Set min rank to " + val), false);
                 } else {
                     be.setPrice(val);
+                    level.sendBlockUpdated(blockPos, level.getBlockState(blockPos), level.getBlockState(blockPos), 2);
                     player.displayClientMessage(Component.literal("Set price to " + val), false);
                 }
             }
