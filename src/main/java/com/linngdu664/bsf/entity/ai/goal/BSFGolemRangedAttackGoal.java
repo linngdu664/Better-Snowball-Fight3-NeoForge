@@ -34,6 +34,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
     private int strafingTime = -1;
     private boolean strafingClockwise;
     private boolean strafingBackwards;
+    private Vec3 lastPos;
 
     public BSFGolemRangedAttackGoal(BSFSnowGolemEntity golem, double pSpeedModifier, int pAttackInterval, float pAttackRadius) {
         this.golem = golem;
@@ -65,6 +66,13 @@ public class BSFGolemRangedAttackGoal extends Goal {
     }
 
     @Override
+    public void start() {
+        if (golem.getTarget() != null) {
+            lastPos = golem.getTarget().getEyePosition();
+        }
+    }
+
+    @Override
     public boolean requiresUpdateEveryTick() {
         return true;
     }
@@ -89,16 +97,36 @@ public class BSFGolemRangedAttackGoal extends Goal {
         double x2 = BSFCommonUtil.lengthSqr(dx, dz);
         double d = Math.sqrt(x2 + h * h);   // d是总距离
         double x = Math.sqrt(x2);
-        dx /= x;
-        dz /= x;
         double cosTheta, sinTheta;
         boolean isNoGravity = golem.getAmmo().getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item().equals(ItemRegister.GHOST_SNOWBALL.get());
         if (isNoGravity) {
+            if (golem.getCore().getItem().equals(ItemRegister.MOVEMENT_PREDICTION_GOLEM_CORE.get())) {
+                double t = d / v;
+                Vec3 vel = pTarget.getEyePosition().subtract(lastPos);
+                h += t * vel.y;
+                dx += t * vel.x;
+                dz += t * vel.z;
+                x2 = BSFCommonUtil.lengthSqr(dx, dz);
+                d = Math.sqrt(x2 + h * h);
+                x = Math.sqrt(x2);
+            }
             cosTheta = x / d;
             sinTheta = h / d;
         } else {
             double k = 0.015 * x2 / (v * v);    // 0.5 * g / 400.0, g = 12
             cosTheta = 0.7071067811865475 / d * Math.sqrt(x2 - 2 * k * h + x * Math.sqrt(x2 - 4 * k * k - 4 * k * h));
+            if (golem.getCore().getItem().equals(ItemRegister.MOVEMENT_PREDICTION_GOLEM_CORE.get())) {
+                double t = x / (v * cosTheta);      // tick
+                Vec3 vel = pTarget.getEyePosition().subtract(lastPos);
+                h += t * vel.y;
+                dx += t * vel.x;
+                dz += t * vel.z;
+                x2 = BSFCommonUtil.lengthSqr(dx, dz);
+                d = Math.sqrt(x2 + h * h);
+                x = Math.sqrt(x2);
+                k = 0.015 * x2 / (v * v);
+                cosTheta = 0.7071067811865475 / d * Math.sqrt(x2 - 2 * k * h + x * Math.sqrt(x2 - 4 * k * k - 4 * k * h));
+            }
             if (cosTheta > 1) {
                 sinTheta = 0;
             } else {
@@ -108,8 +136,8 @@ public class BSFGolemRangedAttackGoal extends Goal {
                 }
             }
         }
-        dx *= cosTheta;
-        dz *= cosTheta;
+        dx = dx / x * cosTheta;
+        dz = dz / x * cosTheta;
         List<LivingEntity> list = golem.level().getEntitiesOfClass(LivingEntity.class, golem.getBoundingBox().inflate(x), p -> !golem.equals(p) && !pTarget.equals(p));
         for (LivingEntity entity : list) {
             double dx1 = entity.getX() - golem.getX();
@@ -162,13 +190,13 @@ public class BSFGolemRangedAttackGoal extends Goal {
 
     public void tick() {
         LivingEntity target = golem.getTarget();
-        float attackRadiusSqr = this.attackRadiusSqr;
-        float attackRadius = this.attackRadius;
-        if (golem.getWeapon().getItem() instanceof SnowballShotgunItem) {
-            attackRadius *= 0.2F;
-            attackRadiusSqr *= 0.04F;
-        }
         if (target != null) {
+            float attackRadiusSqr = this.attackRadiusSqr;
+            float attackRadius = this.attackRadius;
+            if (golem.getWeapon().getItem() instanceof SnowballShotgunItem) {
+                attackRadius *= 0.2F;
+                attackRadiusSqr *= 0.04F;
+            }
             if (golem.getCore().getItem().equals(ItemRegister.ACTIVE_TELEPORTATION_GOLEM_CORE.get()) && golem.getCoreCoolDown() == 0 && (golem.getStatus() == 2 || golem.getStatus() == 3)) {
                 Vec3 vec3 = getTargetBackTeleportPos();
                 if (vec3 != null) {
@@ -224,6 +252,7 @@ public class BSFGolemRangedAttackGoal extends Goal {
                 }
                 attackTime = attackInterval;
             }
+            lastPos = target.getEyePosition();
         }
     }
 

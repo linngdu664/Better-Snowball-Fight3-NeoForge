@@ -125,6 +125,8 @@ public class ItemRegister {
     public static final DeferredItem<Item> NEAR_TELEPORTATION_GOLEM_CORE = ITEMS.register("near_teleportation_golem_core", () -> new SnowGolemCoreItem(160, new String[]{"near_teleportation_golem_core.tooltip","near_teleportation_golem_core_cd.tooltip"}, new ChatFormatting[]{ChatFormatting.BLUE,ChatFormatting.GRAY}));
     public static final DeferredItem<Item> ENDER_TELEPORTATION_GOLEM_CORE = ITEMS.register("ender_teleportation_golem_core", () -> new SnowGolemCoreItem(200, new String[]{"ender_teleportation_golem_core.tooltip","ender_teleportation_golem_core_cd.tooltip"}, new ChatFormatting[]{ChatFormatting.BLUE,ChatFormatting.GRAY}));
     public static final DeferredItem<Item> ACTIVE_TELEPORTATION_GOLEM_CORE = ITEMS.register("active_teleportation_golem_core", () -> new SnowGolemCoreItem(240, new String[]{"active_teleportation_golem_core.tooltip","active_teleportation_golem_core_cd.tooltip"}, new ChatFormatting[]{ChatFormatting.BLUE,ChatFormatting.GRAY}));
+    public static final DeferredItem<Item> MOVEMENT_PREDICTION_GOLEM_CORE = ITEMS.register("movement_prediction_golem_core", () -> new SnowGolemCoreItem(0, new String[]{}, new ChatFormatting[]{ChatFormatting.BLUE,ChatFormatting.GRAY}));
+
     public static final DeferredItem<Item> SNOW_GOLEM_CORE_REMOVER = ITEMS.register("snow_golem_core_remover", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> BLANK_GOLEM_CORE = ITEMS.register("blank_golem_core", () -> new Item(new Item.Properties()));
 

@@ -327,6 +327,7 @@ public class CreativeTabRegister {
                 output.accept(ItemRegister.NEAR_TELEPORTATION_GOLEM_CORE.get());
                 output.accept(ItemRegister.ENDER_TELEPORTATION_GOLEM_CORE.get());
                 output.accept(ItemRegister.ACTIVE_TELEPORTATION_GOLEM_CORE.get());
+                output.accept(ItemRegister.MOVEMENT_PREDICTION_GOLEM_CORE.get());
 
                 output.accept(ItemRegister.SNOWBALL_CANNON_UPGRADE_SMITHING_TEMPLATE.get());
                 output.accept(ItemRegister.SUPER_POWER_CORE.get());
