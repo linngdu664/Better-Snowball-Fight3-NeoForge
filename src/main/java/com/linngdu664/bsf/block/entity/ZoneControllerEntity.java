@@ -48,9 +48,8 @@ public class ZoneControllerEntity extends BlockEntity {
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (!level.isClientSide && level.hasNeighborSignal(pos)) {
-            ZoneControllerEntity be = (ZoneControllerEntity) blockEntity;
-            if (be.timer == 0 && !be.snowGolemList.isEmpty()) {
+        if (!level.isClientSide && level.hasNeighborSignal(pos) && blockEntity instanceof ZoneControllerEntity be && !be.snowGolemList.isEmpty()) {
+            if (be.timer == 0) {
                 List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
                 if (friendlyGolemList.size() < be.maxGolem) {
                     float enemyGolemStrength = 0;
