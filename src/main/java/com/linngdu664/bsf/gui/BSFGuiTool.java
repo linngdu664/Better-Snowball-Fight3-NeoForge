@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.event;
+package com.linngdu664.bsf.gui;
 
 import com.linngdu664.bsf.Main;
 import com.mojang.blaze3d.platform.Window;
@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
@@ -25,7 +24,7 @@ import oshi.util.tuples.Pair;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BSFGui {
+public class BSFGuiTool {
     public static final GuiTexture SNOWBALL_FRAME = new GuiTexture("textures/gui/snowball_frame.png", 23, 62);
     public static final GuiTexture TWEAKER_FRAME = new GuiTexture("textures/gui/tweaker_frame.png", 114, 106);
     public static final GuiImage SNOWBALL_SLOT_FRAME_GUI = new GuiImage(SNOWBALL_FRAME, 0, 0, 23, 62);
