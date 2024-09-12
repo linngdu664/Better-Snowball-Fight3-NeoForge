@@ -522,8 +522,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         Level level = level();
         if (!level.isClientSide) {
             if (aliveRange != null && !aliveRange.inRegion(position())) {
-//                System.out.println("alive range: " + aliveRange);
-//                System.out.println("position: " + position());
                 hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
             }
             setTicksFrozen(0);

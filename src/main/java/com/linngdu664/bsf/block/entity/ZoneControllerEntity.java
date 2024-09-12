@@ -99,6 +99,8 @@ public class ZoneControllerEntity extends BlockEntity {
                                 snowGolem.setFixedTeamId(be.teamId);
                                 snowGolem.setAliveRange(be.region);
                                 snowGolem.setOwnerUUID(null);
+                                snowGolem.setOrderedToSit(false);
+                                snowGolem.setTame(false, false);
                                 snowGolem.setLocator((byte) 2);
                                 snowGolem.setStatus((byte) 3);
                                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);

@@ -48,7 +48,11 @@ public class BSFGolemRangedAttackGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity livingEntity = golem.getTarget();
-        return livingEntity != null && livingEntity.isAlive() && golem.getStatus() != 1;
+        if (livingEntity != null && livingEntity.isAlive() && golem.getStatus() != 1) {
+            lastPos = golem.getTarget().getEyePosition();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -63,13 +67,6 @@ public class BSFGolemRangedAttackGoal extends Goal {
         golem.setZza(0);
         golem.setXxa(0);
         golem.setSpeed(0);
-    }
-
-    @Override
-    public void start() {
-        if (golem.getTarget() != null) {
-            lastPos = golem.getTarget().getEyePosition();
-        }
     }
 
     @Override
