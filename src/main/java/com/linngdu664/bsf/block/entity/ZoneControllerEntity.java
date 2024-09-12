@@ -130,6 +130,9 @@ public class ZoneControllerEntity extends BlockEntity {
             snowGolemList.add(listTag.getCompound(i));
         }
         region = RegionData.loadFromCompoundTag("Region", tag);
+        if (region == null) {
+            region = RegionData.EMPTY;
+        }
         playerMultiplier = tag.getInt("PlayerMultiplier");
         golemMultiplier = tag.getInt("GolemMultiplier");
         lHalf = tag.getInt("LHalf");
