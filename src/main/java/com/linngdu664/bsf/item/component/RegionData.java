@@ -26,6 +26,17 @@ public class RegionData {
         this.maxZ = Math.max(start.getZ(), end.getZ());
     }
 
+    public RegionData(RegionData another) {
+        this.start = another.start;
+        this.end = another.end;
+        this.minX = another.minX;
+        this.minY = another.minY;
+        this.minZ = another.minZ;
+        this.maxX = another.maxX;
+        this.maxY = another.maxY;
+        this.maxZ = another.maxZ;
+    }
+
     public static final Codec<RegionData> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     BlockPos.CODEC.fieldOf("start").forGetter(RegionData::start),
@@ -75,9 +86,9 @@ public class RegionData {
 
     public static RegionData loadFromCompoundTag(String key, CompoundTag tag) {
         if (tag.contains(key + "Start") && tag.contains(key + "End")) {
-            CompoundTag cTag = tag.getCompound("AliveRangeStart");
+            CompoundTag cTag = tag.getCompound(key + "Start");
             BlockPos start = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
-            cTag = tag.getCompound("AliveRangeEnd");
+            cTag = tag.getCompound(key + "End");
             BlockPos end = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
             return new RegionData(start, end);
         }
@@ -95,5 +106,13 @@ public class RegionData {
     @Override
     public int hashCode() {
         return Objects.hash(start, end);
+    }
+
+    @Override
+    public String toString() {
+        return "RegionData{" +
+                "start=" + start +
+                ", end=" + end +
+                '}';
     }
 }

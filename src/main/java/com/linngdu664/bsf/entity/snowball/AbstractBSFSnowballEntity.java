@@ -57,7 +57,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties, RegionData region) {
         super(pEntityType, pShooter, pLevel);
         this.properties = pProperties;
-        aliveRange = region;
+        aliveRange = new RegionData(region);
     }
 
     @Override

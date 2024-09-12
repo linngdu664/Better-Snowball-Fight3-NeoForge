@@ -141,6 +141,8 @@ public class ZoneControllerEntity extends BlockEntity {
         teamId = tag.getByte("TeamId");
     }
 
+
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
@@ -194,7 +196,7 @@ public class ZoneControllerEntity extends BlockEntity {
     }
 
     public void setRegionAndSummon(RegionData region) {
-        this.region = region;
+        this.region = new RegionData(region);       // copy
         summonPosList = new ArrayList<>();
         BlockPos.betweenClosedStream(region.start(), region.end())
                 .forEach(p -> {

@@ -22,7 +22,7 @@ public abstract class AbstractExecutor extends Entity implements Absorbable {
     public AbstractExecutor(EntityType<?> pEntityType, Level pLevel, int maxTime, RegionData region) {
         this(pEntityType, pLevel);
         entityData.set(MAX_TIME, maxTime);
-        aliveRange = region;
+        aliveRange = new RegionData(region);
     }
 
     public int getTimer() {
