@@ -167,10 +167,12 @@ public class RenderGuiEventHandler {
         } else if (pick.getType() == HitResult.Type.BLOCK) {
             BlockEntity blockEntity = player.level().getBlockEntity(((BlockHitResult) pick).getBlockPos());
             if (blockEntity instanceof VendingMachineEntity vendingMachine){
+                //显示货物
                 calcScreenPosFromWorldPos(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2->{
                     V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.4);
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, "["+ BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", vendingMachine.getMinRank()) +"] ["+BSFCommonUtil.getTransStr("scoring_device_money.tooltip", vendingMachine.getPrice())+"]");
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font,BSFCommonUtil.getTransStr("goods.tip") );
                 }),guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, event.getPartialTick().getGameTimeDeltaPartialTick(true));
+                //显示价格等级百分比条
                 if (mainHandItem.getItem() instanceof ScoringDevice){
                     V2I barFrame = new V2I(100, 10);
                     int padding = 2;
@@ -185,12 +187,26 @@ public class RenderGuiEventHandler {
                     String rankTransStr = BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
                     guiGraphics.drawString(instance.font, rankTransStr,barPos.x+(barFrame.x-instance.font.width(rankTransStr)/2),barPos.y+10,0xffffffff);
                 }
+                //显示操作提示文字
+                V2I v2I = v2IRatio(window, 0.6, 0.4);
+                guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("vending_price.tip",vendingMachine.getPrice()),v2I.x,v2I.y,0xffffffff);
+                guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("vending_rank.tip",vendingMachine.getMinRank()),v2I.x,v2I.y+10,0xffffffff);
+                guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("vending_buy.tip",instance.options.keyUse.getTranslatedKeyMessage()),v2I.x,v2I.y+20,0xffffffff);
+                if (vendingMachine.isCanSell()){
+                    guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("recyclable.tip"),v2I.x,v2I.y+40,0xff3574f0);
+                    guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("vending_recycle.tip",vendingMachine.getPrice()),v2I.x,v2I.y+50,0xffffffff);
+                    guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("vending_sell.tip",instance.options.keyShift.getTranslatedKeyMessage(),instance.options.keyUse.getTranslatedKeyMessage()),v2I.x,v2I.y+60,0xffffffff);
+                }
             }else if(blockEntity instanceof ZoneControllerEntity zoneController){
+                //显示队伍
                 calcScreenPosFromWorldPos(new Pair<>(zoneController.getBlockPos().getCenter(), v2->{
                     V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
                     byte teamId = zoneController.getTeamId();
                     renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor(), TeamLinkerItem.getItemStackById(teamId), instance.font, TeamLinkerItem.getColorTransNameById(teamId));
                 }),guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, event.getPartialTick().getGameTimeDeltaPartialTick(true));
+                //显示操作提示文字
+                V2I v2I = v2IRatio(window, 0.6, 0.4);
+                guiGraphics.drawString(instance.font,BSFCommonUtil.getTransStr("zone_controller_enter.tip",instance.options.keyUse.getTranslatedKeyMessage()),v2I.x,v2I.y,0xffffffff);
             }
         }
         ItemStack tweaker = null;
@@ -202,6 +218,7 @@ public class RenderGuiEventHandler {
         String tLocatorStr = "";
         String tStatusStr = "";
         if (tweaker != null) {
+            //显示模式调整器gui
             byte locator = tweaker.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
             tLocatorStr = BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator));
             byte status = tweaker.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0);
@@ -220,6 +237,7 @@ public class RenderGuiEventHandler {
             }
         }
         if (!(sLocatorStr.isEmpty() && tLocatorStr.isEmpty())) {
+            //显示模式调整文字
             String lStr = BSFCommonUtil.getTransStr("tweaker_target.tip", sLocatorStr.isEmpty() ? tLocatorStr : tLocatorStr.isEmpty() || sLocatorStr.equals(tLocatorStr) ? sLocatorStr : sLocatorStr + " << " + tLocatorStr);
             String sStr = BSFCommonUtil.getTransStr("tweaker_status.tip", sStatusStr.isEmpty() ? tStatusStr : tStatusStr.isEmpty() || sStatusStr.equals(tStatusStr) ? sStatusStr : sStatusStr + " << " + tStatusStr);
             V2I v2I = v2IRatio(window, 0.6, 0.75);

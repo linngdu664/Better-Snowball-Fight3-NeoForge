@@ -358,6 +358,7 @@
   "scoring_device_money.tooltip": "金钱：%1$s",
   "scoring_device_region.tooltip": "绑定区域：(%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
 
+
   "region_limit.tooltip": "此物品仅可在区域 (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s) 内使用",
 
   "lunch_yes_hand.tooltip": "投掷√",
@@ -437,7 +438,7 @@
   "join_bsf_team.tip": "%1$s加入了%2$s队",
   "random_sound.tip": "随机音效",
   "sound_id.tip": "音效%1$s",
-  "show_detail.tip": "<%1$s> 查看详细信息",
+  "show_detail.tip": "(%1$s) 展开使用说明",
   "scoring_device_rank_low.tip": "等级不足，无法购买",
   "scoring_device_no_money.tip": "金钱不足，无法购买",
   "scoring_device_buy_success.tip": "谢谢惠顾",
@@ -448,6 +449,14 @@
   "scoring_device_death_punishment.tip": "金钱 -%1$s",
   "scoring_device_tp_failed1.tip": "区域内不能携带区域限制与积分器不同的物品，且必须加入一个队伍",
   "scoring_device_tp_failed2.tip": "只有在区域内才能传送",
+  "goods.tip": "商品",
+  "recyclable.tip": "可回收",
+  "vending_price.tip": "售价：[%1$s]",
+  "vending_rank.tip": "：所需等级：[%1$s]",
+  "vending_recycle.tip": "回收单价：[%1$s]",
+  "vending_buy.tip": "<%1$s> 购买",
+  "vending_sell.tip": "<%1$s+%2$s> 回收全部",
+  "zone_controller_enter.tip": "<%1$s> 进入区域",
 
   "block.bsf.smart_snow_block": "智慧雪块",
   "block.bsf.loose_snow_block": "松散雪块",
