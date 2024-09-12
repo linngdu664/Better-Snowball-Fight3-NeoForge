@@ -30,7 +30,8 @@ public class RegionData {
             instance.group(
                     BlockPos.CODEC.fieldOf("start").forGetter(RegionData::start),
                     BlockPos.CODEC.fieldOf("end").forGetter(RegionData::end)
-            ).apply(instance, RegionData::new));
+            ).apply(instance, RegionData::new)
+    );
     public static final StreamCodec<ByteBuf, RegionData> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, RegionData::start,
             BlockPos.STREAM_CODEC, RegionData::end,

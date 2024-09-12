@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.network.to_server;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import io.netty.buffer.ByteBuf;
@@ -29,14 +30,46 @@ public record ValueAdjustmentToolPayload(boolean isIncrease, boolean speedUp) im
             Player sender = context.player();
             ItemStack itemStack = sender.getItemInHand(InteractionHand.MAIN_HAND);
             if (itemStack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
-                int value = itemStack.getOrDefault(DataComponentRegister.GENERIC_INT_VALUE.get(), 0);
+                int index = itemStack.getOrDefault(DataComponentRegister.SELECTED_INDEX.get(), 0);
+                IntegerGroupData group = itemStack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY);
                 if (payload.isIncrease) {
-                    value += payload.speedUp ? 10 : 1;
+                    switch (index) {
+                        case 0:
+                            group = new IntegerGroupData(group.val1() + (payload.speedUp ? 10 : 1), group.val2(), group.val3(), group.val4());
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1())));
+                            break;
+                        case 1:
+                            group = new IntegerGroupData(group.val1(), group.val2() + (payload.speedUp ? 10 : 1), group.val3(), group.val4());
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2())));
+                            break;
+                        case 2:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3() + (payload.speedUp ? 10 : 1), group.val4());
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3())));
+                            break;
+                        default:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4() + (payload.speedUp ? 10 : 1));
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4())));
+                    }
                 } else {
-                    value -= payload.speedUp ? 10 : 1;
+                    switch (index) {
+                        case 0:
+                            group = new IntegerGroupData(group.val1() - (payload.speedUp ? 10 : 1), group.val2(), group.val3(), group.val4());
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1())));
+                            break;
+                        case 1:
+                            group = new IntegerGroupData(group.val1(), group.val2() - (payload.speedUp ? 10 : 1), group.val3(), group.val4());
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2())));
+                            break;
+                        case 2:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3() - (payload.speedUp ? 10 : 1), group.val4());
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3())));
+                            break;
+                        default:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4() - (payload.speedUp ? 10 : 1));
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4())));
+                    }
                 }
-                itemStack.set(DataComponentRegister.GENERIC_INT_VALUE.get(), value);
-                itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("value: " + value)));
+                itemStack.set(DataComponentRegister.INTEGER_GROUP.get(), group);
             }
         });
     }

@@ -1,10 +1,12 @@
 package com.linngdu664.bsf.block;
 
 import com.linngdu664.bsf.block.entity.ZoneControllerEntity;
+import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -66,10 +68,10 @@ public class ZoneController extends Block implements EntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof ZoneControllerEntity zoneControllerEntity) {
-            if (stack.has(DataComponentRegister.REGION) && player.getAbilities().instabuild) {
+        if (level.getBlockEntity(pos) instanceof ZoneControllerEntity zoneControllerEntity && player.getAbilities().instabuild) {
+            if (stack.getItem().equals(ItemRegister.REGION_TOOL.get())) {
                 if (!level.isClientSide()) {
-                    RegionData regionData = stack.get(DataComponentRegister.REGION);
+                    RegionData regionData = stack.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                     if (regionData.start().getY() < regionData.end().getY()) {
                         zoneControllerEntity.setSnowGolemList(regionData);
                         player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSnowGolemCount() + " golems"), false);
@@ -80,12 +82,26 @@ public class ZoneController extends Block implements EntityBlock {
                 }
                 return ItemInteractionResult.SUCCESS;
             }
-            if (stack.getItem() instanceof TeamLinkerItem teamLinkerItem && player.getAbilities().instabuild) {
+            if (stack.getItem() instanceof TeamLinkerItem teamLinkerItem) {
                 if (!level.isClientSide()) {
                     byte teamId = teamLinkerItem.getTeamId();
                     zoneControllerEntity.setTeamId(teamId);
                     level.sendBlockUpdated(pos, state, state, 2);
-                    player.displayClientMessage(Component.literal("Set controller team " + DyeColor.byId(teamId).getName()), false);
+                    player.displayClientMessage(Component.literal("Set controller team to " + DyeColor.byId(teamId).getName()), false);
+                }
+                return ItemInteractionResult.SUCCESS;
+            }
+            if (stack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
+                if (!level.isClientSide()) {
+                    IntegerGroupData group = stack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY);
+                    zoneControllerEntity.setPlayerMultiplier(group.val1());
+                    zoneControllerEntity.setGolemMultiplier(group.val2());
+                    zoneControllerEntity.setLHalf(group.val3());
+                    zoneControllerEntity.setMaxGolem(group.val4());
+                    player.displayClientMessage(Component.literal("Set player multiplier to " + group.val1()), false);
+                    player.displayClientMessage(Component.literal("Set golem multiplier to " + group.val2()), false);
+                    player.displayClientMessage(Component.literal("Set half l to " + group.val3()), false);
+                    player.displayClientMessage(Component.literal("Set max golem to " + group.val4()), false);
                 }
                 return ItemInteractionResult.SUCCESS;
             }

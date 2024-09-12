@@ -1,6 +1,8 @@
 package com.linngdu664.bsf.block;
 
 import com.linngdu664.bsf.block.entity.VendingMachineEntity;
+import com.linngdu664.bsf.item.component.IntegerGroupData;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -8,7 +10,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -41,10 +42,15 @@ public class VendingMachine extends Block implements EntityBlock {
                 }
                 return ItemInteractionResult.SUCCESS;
             }
-            if (stack.getItem().equals(Items.COMMAND_BLOCK)) {
+            if (stack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
                 if (!level.isClientSide) {
-                    be.setCanSell(!be.isCanSell());
+                    IntegerGroupData group = stack.getOrDefault(DataComponentRegister.INTEGER_GROUP, IntegerGroupData.EMPTY);
+                    be.setMinRank(group.val1());
+                    be.setPrice(group.val2());
+                    be.setCanSell(group.val3() != 0);
                     level.sendBlockUpdated(pos, state, state, 2);
+                    player.displayClientMessage(Component.literal("Set min rank to " + be.getMinRank()), false);
+                    player.displayClientMessage(Component.literal("Set price to " + be.getPrice()), false);
                     player.displayClientMessage(Component.literal("Set allow sell to " + be.isCanSell()), false);
                 }
                 return ItemInteractionResult.SUCCESS;

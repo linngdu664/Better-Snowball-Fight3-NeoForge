@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
@@ -61,9 +62,19 @@ public class DataComponentRegister {
                     "machine_gun_is_cool_down",
                     builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
             );
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GENERIC_INT_VALUE =
+//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GENERIC_INT_VALUE =
+//            DATA_COMPONENTS.registerComponentType(
+//                    "generic_int_value",
+//                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
+//            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<IntegerGroupData>> INTEGER_GROUP =
             DATA_COMPONENTS.registerComponentType(
-                    "generic_int_value",
+                    "integer_group",
+                    builder -> builder.persistent(IntegerGroupData.CODEC).networkSynchronized(IntegerGroupData.STREAM_CODEC)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SELECTED_INDEX =
+            DATA_COMPONENTS.registerComponentType(
+                    "selected_index",
                     builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
             );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<RegionData>> REGION =

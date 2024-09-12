@@ -219,6 +219,10 @@ public class ZoneControllerEntity extends BlockEntity {
         setChanged();
     }
 
+    public byte getTeamId() {
+        return teamId;
+    }
+
     public ArrayList<BlockPos> getSummonPosList() {
         return summonPosList;
     }
@@ -231,8 +235,24 @@ public class ZoneControllerEntity extends BlockEntity {
         return currentStrength;
     }
 
-    public byte getTeamId() {
-        return teamId;
+    public void setPlayerMultiplier(int playerMultiplier) {
+        this.playerMultiplier = playerMultiplier;
+        setChanged();
+    }
+
+    public void setGolemMultiplier(int golemMultiplier) {
+        this.golemMultiplier = golemMultiplier;
+        setChanged();
+    }
+
+    public void setLHalf(int lHalf) {
+        this.lHalf = lHalf;
+        setChanged();
+    }
+
+    public void setMaxGolem(int maxGolem) {
+        this.maxGolem = maxGolem;
+        setChanged();
     }
 
     private static float lnRank(int rank) {

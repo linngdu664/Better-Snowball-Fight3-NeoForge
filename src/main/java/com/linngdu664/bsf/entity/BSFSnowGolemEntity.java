@@ -4,6 +4,7 @@ import com.linngdu664.bsf.entity.ai.goal.*;
 import com.linngdu664.bsf.entity.ai.goal.target.*;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
+import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
@@ -476,7 +477,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 pPlayer.getInventory().placeItemBackInInventory(getCore(), true);
                 setCore(ItemStack.EMPTY);
             } else if (item.equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
-                rank = itemStack.getOrDefault(DataComponentRegister.GENERIC_INT_VALUE, 0);
+                rank = itemStack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY).val1();
                 pPlayer.displayClientMessage(Component.literal("Set rank to " + rank), false);
             }
         }
