@@ -77,7 +77,7 @@ public class GuiHandler {
     }
 
     public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, Entity pickEntity, float partialTick, Map<String, Object> varMap) {
-        if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()) && player.equals(((BSFSnowGolemEntity) pickEntity).getOwner())) {
+        if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get())) {
             BSFSnowGolemEntity entity = (BSFSnowGolemEntity) pickEntity;
             //显示装备
             List<Pair<Vec3, Consumer<Vec2>>> list = new ArrayList<>();
