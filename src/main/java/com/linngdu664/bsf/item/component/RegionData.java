@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Objects;
@@ -47,23 +48,15 @@ public class RegionData {
     }
 
     public boolean inRegion(Vec3 vec3) {
-//        int minX = Math.min(start.getX(), end.getX());
-//        int minY = Math.min(start.getY(), end.getY());
-//        int minZ = Math.min(start.getZ(), end.getZ());
-//        int maxX = Math.max(start.getX(), end.getX()) + 1;
-//        int maxY = Math.max(start.getY(), end.getY()) + 1;
-//        int maxZ = Math.max(start.getZ(), end.getZ()) + 1;
         return vec3.x > minX && vec3.x < maxX + 1 && vec3.y > minY && vec3.y < maxY + 1 && vec3.z > minZ && vec3.z < maxZ + 1;
     }
 
     public boolean inRegion(BlockPos pos) {
-//        int minX = Math.min(start.getX(), end.getX());
-//        int minY = Math.min(start.getY(), end.getY());
-//        int minZ = Math.min(start.getZ(), end.getZ());
-//        int maxX = Math.max(start.getX(), end.getX());
-//        int maxY = Math.max(start.getY(), end.getY());
-//        int maxZ = Math.max(start.getZ(), end.getZ());
         return pos.getX() >= minX && pos.getX() <= maxX && pos.getY() >= minY && pos.getY() <= maxY && pos.getZ() >= minZ && pos.getZ() <= maxZ;
+    }
+
+    public AABB toBoundingBox() {
+        return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
     }
 
     public void saveToCompoundTag(String key, CompoundTag tag) {

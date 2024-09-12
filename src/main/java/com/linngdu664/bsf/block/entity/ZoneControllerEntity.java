@@ -2,7 +2,12 @@ package com.linngdu664.bsf.block.entity;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
+import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
+import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.EntityRegister;
+import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -10,22 +15,33 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class ZoneControllerEntity extends BlockEntity {
+    private static final float LN2 = 0.69314718F;
+    private static final float[] LN_TABLE = new float[256];
     private ArrayList<CompoundTag> snowGolemList = new ArrayList<>();
     private ArrayList<BlockPos> summonPosList = new ArrayList<>();
     private RegionData region = RegionData.EMPTY;
-    private int currentRank;        // 同步到客户端
-    private byte teamId;            // 同步到客户端
+    private int playerMultiplier;
+    private int golemMultiplier;
+    private int lHalf;
+    private int maxGolem;
+    private int timer;                // 不需要持久化
+    private float currentStrength;    // 同步到客户端
+    private byte teamId;              // 同步到客户端
 
     public ZoneControllerEntity(BlockPos pos, BlockState blockState) {
         super(BlockEntityRegister.ZONE_CONTROLLER_ENTITY.get(), pos, blockState);
@@ -33,7 +49,68 @@ public class ZoneControllerEntity extends BlockEntity {
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
         if (!level.isClientSide && level.hasNeighborSignal(pos)) {
-            // 启动！
+            ZoneControllerEntity be = (ZoneControllerEntity) blockEntity;
+            if (be.timer == 0) {
+                List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
+                if (friendlyGolemList.size() < be.maxGolem) {
+                    float enemyGolemStrength = 0;
+                    float enemyPlayerStrength = 0;
+                    List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
+                    for (BSFSnowGolemEntity golem : enemyGolemList) {
+                        enemyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
+                    }
+                    List<? extends Player> playerList = level.players();
+                    BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+                    for (Player player : playerList) {
+                        if (be.region.inRegion(player.position()) && savedData.getTeam(player.getUUID()) != be.teamId && !player.isCreative() && !player.isSpectator()) {
+                            List<ItemStack> scoringDevices = BSFCommonUtil.findInventoryItemStacks(player, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()));
+                            for (ItemStack scoringDevice : scoringDevices) {
+                                enemyPlayerStrength += ZoneControllerEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK.get(), 0));
+                            }
+                        }
+                    }
+                    be.currentStrength = be.golemMultiplier * enemyGolemStrength + be.playerMultiplier * enemyPlayerStrength;
+                    level.sendBlockUpdated(pos, state, state, 2);
+                    float mu = Mth.clamp(be.currentStrength, be.snowGolemList.getFirst().getInt("Rank"), be.snowGolemList.getLast().getInt("Rank"));
+                    int size = be.snowGolemList.size();
+                    float[] cumulativeDistribution = new float[size];
+                    float total = 0;
+                    for (int i = 0; i < size; i++) {
+                        float rank = be.snowGolemList.get(i).getInt("Rank");
+                        float val = Math.max(0, Mth.abs(mu - rank) / be.lHalf + 1);
+                        cumulativeDistribution[i] = val;
+                        total += val;
+                    }
+                    for (int i = 0; i < size; i++) {
+                        cumulativeDistribution[i] /= total;
+                    }
+                    for (int i = 1; i < size; i++) {
+                        cumulativeDistribution[i] += cumulativeDistribution[i - 1];
+                    }
+                    float randNum = level.random.nextFloat();
+                    for (int i = 0; i < size; i++) {
+                        if (randNum < cumulativeDistribution[i]) {
+                            // summon golem
+                            List<BlockPos> blockPosList = be.summonPosList;
+                            if (!blockPosList.isEmpty()) {
+                                BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));
+                                Vec3 summonPos = blockPos.above().getBottomCenter();
+                                BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(level);
+                                snowGolem.readAdditionalSaveData(be.snowGolemList.get(i));
+                                snowGolem.setFixedTeamId(be.teamId);
+                                snowGolem.setAliveRange(be.region);
+                                snowGolem.setOwnerUUID(null);
+                                snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
+                                level.addFreshEntity(snowGolem);
+                            }
+                            break;
+                        }
+                    }
+                }
+                be.timer = level.random.nextIntBetweenInclusive(40, 100);
+            } else {
+                be.timer--;
+            }
         }
     }
 
@@ -54,7 +131,11 @@ public class ZoneControllerEntity extends BlockEntity {
             snowGolemList.add(listTag.getCompound(i));
         }
         region = RegionData.loadFromCompoundTag("Region", tag);
-        currentRank = tag.getInt("CurrentRank");
+        playerMultiplier = tag.getInt("PlayerMultiplier");
+        golemMultiplier = tag.getInt("GolemMultiplier");
+        lHalf = tag.getInt("LHalf");
+        maxGolem = tag.getInt("MaxGolem");
+        currentStrength = tag.getFloat("CurrentStrength");
         teamId = tag.getByte("TeamId");
     }
 
@@ -80,7 +161,11 @@ public class ZoneControllerEntity extends BlockEntity {
         }
         tag.put("SnowGolem", listTag);
         region.saveToCompoundTag("Region", tag);
-        tag.putInt("CurrentRank", currentRank);
+        tag.putInt("PlayerMultiplier", playerMultiplier);
+        tag.putInt("GolemMultiplier", golemMultiplier);
+        tag.putInt("LHalf", lHalf);
+        tag.putInt("MaxGolem", maxGolem);
+        tag.putFloat("CurrentStrength", currentStrength);
         tag.putByte("TeamId", teamId);
     }
 
@@ -89,13 +174,8 @@ public class ZoneControllerEntity extends BlockEntity {
         // send these data to client
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putByte("TeamId", teamId);
-        tag.putInt("CurrentRank", currentRank);
+        tag.putFloat("CurrentStrength", currentStrength);
         return tag;
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
@@ -103,7 +183,12 @@ public class ZoneControllerEntity extends BlockEntity {
         // in client these fields are valid
         super.handleUpdateTag(tag, lookupProvider);
         teamId = tag.getByte("TeamId");
-        currentRank = tag.getInt("CurrentRank");
+        currentStrength = tag.getFloat("CurrentStrength");
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     public void setRegionAndSummon(RegionData region) {
@@ -119,16 +204,14 @@ public class ZoneControllerEntity extends BlockEntity {
     }
 
     public void setSnowGolemList(RegionData region) {
-        BlockPos regionStart = region.start();
-        BlockPos regionEnd = region.end();
-        AABB aabb = new AABB(new Vec3(regionStart.getX(), regionStart.getY(), regionStart.getZ()), new Vec3(regionEnd.getX(), regionEnd.getY(), regionEnd.getZ()));
-        List<BSFSnowGolemEntity> golemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, aabb, p -> true);
+        List<BSFSnowGolemEntity> golemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, region.toBoundingBox(), p -> true);
         snowGolemList = new ArrayList<>();
         for (BSFSnowGolemEntity golem : golemList) {
             CompoundTag compoundTag = new CompoundTag();
             golem.addAdditionalSaveData(compoundTag);
             snowGolemList.add(compoundTag);
         }
+        snowGolemList.sort(Comparator.comparingInt(e -> e.getInt("Rank")));
         setChanged();
     }
 
@@ -145,11 +228,25 @@ public class ZoneControllerEntity extends BlockEntity {
         return snowGolemList.size();
     }
 
-    public int getCurrentRank() {
-        return currentRank;
+    public float getCurrentStrength() {
+        return currentStrength;
     }
 
     public byte getTeamId() {
         return teamId;
+    }
+
+    private static float lnRank(int rank) {
+        if (rank <= 0) {
+            return 0F;
+        }
+        int fRank = Float.floatToIntBits((float) rank);
+        return (float) ((fRank >> 23) - 127) * LN2 + LN_TABLE[(fRank >> 15) & 0xff];
+    }
+
+    static {
+        for (int i = 0; i < 256; i++) {
+            LN_TABLE[i] = (float) Math.log(1.0 + (double) i / 256.0);
+        }
     }
 }

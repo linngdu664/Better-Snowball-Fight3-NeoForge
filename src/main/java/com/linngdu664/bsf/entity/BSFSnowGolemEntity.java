@@ -330,8 +330,11 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
 
     @Override
     public @NotNull InteractionResult mobInteract(@NotNull Player pPlayer, @NotNull InteractionHand pHand) {
+        if (!pPlayer.equals(getOwner())) {
+            return InteractionResult.PASS;
+        }
         Level level = level();
-        if (!level.isClientSide && pPlayer.equals(getOwner())) {
+        if (!level.isClientSide) {
             ItemStack itemStack = pPlayer.getItemInHand(pHand);
             Item item = itemStack.getItem();
             if (item instanceof SnowballTankItem && getAmmo().isEmpty()) {
@@ -341,7 +344,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 playSound(SoundEvents.ARMOR_EQUIP_IRON.value(), 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 Vec3 color = new Vec3(1, 0.5, 0.5);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5,0,-0.5), this.getPosition(1).add(0.5,1,0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
             } else if ((item instanceof SnowballCannonItem || item instanceof SnowballShotgunItem) && getWeapon().isEmpty()) {
                 setWeapon(itemStack.copy());
                 if (!pPlayer.getAbilities().instabuild) {
@@ -353,7 +356,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 playSound(SoundEvents.ARMOR_EQUIP_IRON.value(), 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 Vec3 color = new Vec3(0.5, 0.5, 1);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5,0,-0.5), this.getPosition(1).add(0.5,1,0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
             } else if (itemStack.isEmpty()) {
                 if (pPlayer.isShiftKeyDown()) {
                     if (!getWeapon().isEmpty()) {
@@ -395,7 +398,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                         ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, this.getX(), this.getEyeY(), this.getZ(), 16, 0, 0, 0, 0.04);
                         playSound(SoundEvents.GLASS_BREAK, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                     }
-                    ((ServerLevel) level).sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY()+1, this.getZ(), 7, 0.4, 0.5, 0.4, 0.05);
+                    ((ServerLevel) level).sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY() + 1, this.getZ(), 7, 0.4, 0.5, 0.4, 0.05);
                     this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 } else {
                     pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("potionSickness.tip", null, new Object[]{String.valueOf(getPotionSickness())})), false);
@@ -411,16 +414,16 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 setOrderedToSit(statusMode == 0);
                 pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("import_state.tip", null, new Object[0])), false);
                 Vec3 color = new Vec3(0.5, 1, 0.5);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5,0,-0.5), this.getPosition(1).add(0.5,1,0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-            } else if (item.equals(ItemRegister.TARGET_LOCATOR.get()) && getLocator()==1) {
+            } else if (item.equals(ItemRegister.TARGET_LOCATOR.get()) && getLocator() == 1) {
                 Entity entity = ((ServerLevel) level).getEntity(itemStack.getOrDefault(DataComponentRegister.TARGET_UUID, new UuidData(new UUID(0, 0))).uuid());
                 if (entity instanceof LivingEntity livingEntity && entity != this) {
                     pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("snow_golem_locator_tip", null, new Object[0])), false);
                     setTarget(livingEntity);
                 }
                 Vec3 color = new Vec3(0.5, 1, 1);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5,0,-0.5), this.getPosition(1).add(0.5,1,0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item instanceof SnowballClampItem snowballClamp) {
                 if (snowballClamp.getTier().equals(BSFTiers.EMERALD)) {
@@ -431,7 +434,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pHand));
             } else if (item.equals(Items.SNOWBALL)) {
                 setStyle((byte) ((getStyle() + 1) % STYLE_NUM));
-                ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY()+1, this.getZ(), 20, 0, 0.5, 0, 0.05);
+                ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY() + 1, this.getZ(), 20, 0, 0.5, 0, 0.05);
                 this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.CREATIVE_SNOW_GOLEM_TOOL.get())) {
                 if (pPlayer.isShiftKeyDown()) {
@@ -443,7 +446,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                     setEnhance(!getEnhance());
                     pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("golem_enhance.tip", null, new Object[]{String.valueOf(getEnhance())})), false);
                     Vec3 color = new Vec3(1, 0.8, 0.5);
-                    PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5,0,-0.5), this.getPosition(1).add(0.5,1,0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
+                    PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 }
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.SNOW_GOLEM_CONTAINER.get())) {
@@ -452,7 +455,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                     addAdditionalSaveData(tag1);
                     itemStack.set(DataComponentRegister.SNOW_GOLEM_DATA, tag1);
                     playSound(SoundEvents.SNOW_BREAK);
-                    ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY()+1, this.getZ(), 20, 0, 0.5, 0, 0.05);
+                    ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY() + 1, this.getZ(), 20, 0, 0.5, 0, 0.05);
                     discard();
                 }
             } else if (item instanceof SnowGolemCoreItem && getCore().isEmpty()) {
@@ -465,7 +468,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 playSound(SoundEvents.ARMOR_EQUIP_IRON.value(), 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 Vec3 color = new Vec3(0.9, 0.4, 0.9);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5,0,-0.5), this.getPosition(1).add(0.5,1,0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
             } else if (item.equals(ItemRegister.SNOW_GOLEM_CORE_REMOVER.get())) {
                 if (!getCore().isEmpty()) {
                     playSound(SoundEvents.DISPENSER_DISPENSE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
