@@ -452,7 +452,7 @@
   "goods.tip": "goods",
   "recyclable.tip": "Recyclable",
   "vending_price.tip": "price: [%1$s]",
-  "vending_rank.tip": "：Required rank: [%1$s]",
+  "vending_rank.tip": "Required rank: [%1$s]",
   "vending_recycle.tip": "Recycling unit price: [%1$s]",
   "vending_buy.tip": "<%1$s> Buy",
   "vending_sell.tip": "<%1$s+%2$s> Recycle all",

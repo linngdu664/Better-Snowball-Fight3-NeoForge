@@ -452,7 +452,7 @@
   "goods.tip": "商品",
   "recyclable.tip": "可回收",
   "vending_price.tip": "售价：[%1$s]",
-  "vending_rank.tip": "：所需等级：[%1$s]",
+  "vending_rank.tip": "所需等级：[%1$s]",
   "vending_recycle.tip": "回收单价：[%1$s]",
   "vending_buy.tip": "<%1$s> 购买",
   "vending_sell.tip": "<%1$s+%2$s> 回收全部",
