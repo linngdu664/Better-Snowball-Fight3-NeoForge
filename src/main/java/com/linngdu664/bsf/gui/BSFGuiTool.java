@@ -125,6 +125,7 @@ public class BSFGuiTool {
     public static V2I v2IRatio(Window window, int width, int height, double widthRatio, double heightRatio, int xOffset, int yOffset) {
         return new V2I(widthFrameRatio(window, width, widthRatio) + xOffset, heightFrameRatio(window, height, heightRatio) + yOffset);
     }
+
     public static V2I v2IRatio(Window window, double widthRatio, double heightRatio) {
         return new V2I((int) (window.getWidth() * widthRatio / window.getGuiScale()), (int) (window.getHeight() * heightRatio / window.getGuiScale()));
     }
@@ -158,13 +159,14 @@ public class BSFGuiTool {
 
     /**
      * 渲染进度条
+     *
      * @param guiGraphics
-     * @param pos 进度条位置(取点左上角)
-     * @param frame 进度条长宽
-     * @param padding 内外框间隔
-     * @param frameColor 外框颜色
-     * @param innerColor 内框颜色
-     * @param percent 进度条进度(0-1)
+     * @param pos         进度条位置(取点左上角)
+     * @param frame       进度条长宽
+     * @param padding     内外框间隔
+     * @param frameColor  外框颜色
+     * @param innerColor  内框颜色
+     * @param percent     进度条进度(0-1)
      */
     public static void renderProgressBar(GuiGraphics guiGraphics, V2I pos, V2I frame, int padding, int frameColor, int innerColor, float percent) {
         guiGraphics.fill(pos.x + 1, pos.y + 1, pos.x + frame.x - 1, pos.y + frame.y - 1, 0x80000000);
@@ -175,29 +177,30 @@ public class BSFGuiTool {
 
     /**
      * 渲染装备介绍
+     *
      * @param guiGraphics
-     * @param equipPoint 装备映射到屏幕上的位置
-     * @param framePoint 装备框显示位置
+     * @param equipPoint    装备映射到屏幕上的位置
+     * @param framePoint    装备框显示位置
      * @param lineXDistance 斜线水平长度
-     * @param color 线颜色
-     * @param itemStack 装备
-     * @param font 字体
-     * @param msg 装备描述
+     * @param color         线颜色
+     * @param itemStack     装备
+     * @param font          字体
+     * @param msg           装备描述
      */
-    public static void renderEquipIntroduced(GuiGraphics guiGraphics, Vec2 equipPoint, Vec2 framePoint, int lineXDistance, int color, ItemStack itemStack, Font font,String msg) {
+    public static void renderEquipIntroduced(GuiGraphics guiGraphics, Vec2 equipPoint, Vec2 framePoint, int lineXDistance, int color, ItemStack itemStack, Font font, String msg) {
         Vec2 linkPoint = new Vec2(framePoint.x + EQUIPMENT_SLOT_FRAME_GUI.width, framePoint.y + (float) EQUIPMENT_SLOT_FRAME_GUI.height / 2);
         Vec2 xPoint = new Vec2(equipPoint.x - lineXDistance, linkPoint.y);
         if (xPoint.x < linkPoint.x) {
             xPoint = linkPoint;
         }
         float d = 2;
-        renderLineTool(guiGraphics, xPoint.add(new Vec2(0, xPoint.y < equipPoint.y ? 0 : d)),equipPoint, d, color, xPoint.y < equipPoint.y, 0.3f, 0xff000000);
+        renderLineTool(guiGraphics, xPoint.add(new Vec2(0, xPoint.y < equipPoint.y ? 0 : d)), equipPoint, d, color, xPoint.y < equipPoint.y, 0.3f, 0xff000000);
         renderLineTool(guiGraphics, linkPoint, xPoint, d, color, true, 0.3f, 0xff000000);
-        renderFillSquareTool(guiGraphics,equipPoint.add(new Vec2( -2f,-1f)),equipPoint.add(new Vec2(2f,3f)),0xff000000);
-        renderFillSquareTool(guiGraphics,equipPoint.add(new Vec2( -1f,0)),equipPoint.add(new Vec2(1f,2f)),color);
+        renderFillSquareTool(guiGraphics, equipPoint.add(new Vec2(-2f, -1f)), equipPoint.add(new Vec2(2f, 3f)), 0xff000000);
+        renderFillSquareTool(guiGraphics, equipPoint.add(new Vec2(-1f, 0)), equipPoint.add(new Vec2(1f, 2f)), color);
         EQUIPMENT_SLOT_FRAME_GUI.render(guiGraphics, (int) framePoint.x, (int) framePoint.y);
         guiGraphics.renderItem(itemStack, (int) (framePoint.x + 3), (int) (framePoint.y + 3));
-        guiGraphics.drawString(font,msg,framePoint.x-font.width(msg),framePoint.y+7,color,true);
+        guiGraphics.drawString(font, msg, framePoint.x - font.width(msg), framePoint.y + 7, color, true);
     }
 
     public static void renderLineTool(GuiGraphics guiGraphics, Vec2 p1, Vec2 p2, float d, int color, boolean isDown, float padding, int padColor) {
@@ -222,8 +225,8 @@ public class BSFGuiTool {
 //            p2=p2.add(v2.negated());
 //            renderFillTool(guiGraphics, p1.add(v2), p1, p2, p2.add(v2), padColor);
 //            renderFillTool(guiGraphics, p1.add(v2d), p1.add(v2s), p2.add(v2s), p2.add(v2d), color);
-            p2=p2.add(v2.negated());
-            Vec2 v2s = v2.scale(1-padding);
+            p2 = p2.add(v2.negated());
+            Vec2 v2s = v2.scale(1 - padding);
             renderFillTool(guiGraphics, p1.add(v2), p1, p2, p2.add(v2), color);
             renderFillTool(guiGraphics, p1.add(v2s), p1, p2, p2.add(v2s), padColor);
         }
@@ -240,8 +243,9 @@ public class BSFGuiTool {
         vertexconsumer.addVertex(matrix4f, d.x, d.y, 0).setColor(pColor);
         guiGraphics.flushIfUnmanaged();
     }
+
     public static void renderFillSquareTool(GuiGraphics guiGraphics, Vec2 a, Vec2 b, int pColor) {
-        renderFillTool(guiGraphics,a,new Vec2(a.x,b.y),b,new Vec2(b.x,a.y),pColor);
+        renderFillTool(guiGraphics, a, new Vec2(a.x, b.y), b, new Vec2(b.x, a.y), pColor);
     }
 
     public static void calcScreenPosFromWorldPos(List<Pair<Vec3, Consumer<Vec2>>> points, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
@@ -258,6 +262,7 @@ public class BSFGuiTool {
             doCalcScreenPos(pMethod, guiWidth, guiHeight, widthProtect, heightProtect, cameraPos, rotMat, tanHalfFovy, tanHalfFovx);
         }
     }
+
     public static void calcScreenPosFromWorldPos(Pair<Vec3, Consumer<Vec2>> point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
@@ -277,7 +282,7 @@ public class BSFGuiTool {
         Vector3f vector3f = new Vector3f((float) (vec3.x - cameraPos.x), (float) (vec3.y - cameraPos.y), (float) (vec3.z - cameraPos.z));
         rotMat.transform(vector3f);
         float rx = vector3f.x / -vector3f.z / tanHalfFovx;
-        float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp( guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
+        float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp(guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
         float ry = vector3f.y / Mth.sqrt(vector3f.x * vector3f.x + vector3f.z * vector3f.z) / tanHalfFovy;
         float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
         point.getB().accept(new Vec2(xScreen, yScreen));
