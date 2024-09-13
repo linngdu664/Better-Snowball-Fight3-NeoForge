@@ -131,7 +131,9 @@ public class ScoringDevice extends Item {
 
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity,new SpawnSnowParticlesPayload(livingEntity.getX(),livingEntity.getY(),livingEntity.getZ(),2,5));
+        if (!level.isClientSide) {
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity,new SpawnSnowParticlesPayload(livingEntity.getX(),livingEntity.getY(),livingEntity.getZ(),2,5));
+        }
     }
 
     @Override
