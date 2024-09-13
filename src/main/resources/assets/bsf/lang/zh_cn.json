@@ -460,6 +460,7 @@
   "vending_buy.tip": "<%1$s> 购买",
   "vending_sell.tip": "<%1$s+%2$s> 回收全部",
   "zone_controller_enter.tip": "<%1$s> 进入区域",
+  "zone_controller_strength.tip": "强度指数：%1$s",
 
   "block.bsf.smart_snow_block": "智慧雪块",
   "block.bsf.loose_snow_block": "松散雪块",

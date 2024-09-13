@@ -460,6 +460,7 @@
   "vending_buy.tip": "<%1$s> Buy",
   "vending_sell.tip": "<%1$s+%2$s> Recycle all",
   "zone_controller_enter.tip": "<%1$s> Enter area",
+  "zone_controller_strength.tip": "Current Strength: %1$s",
 
   "block.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.loose_snow_block": "Loose Snow Block",
