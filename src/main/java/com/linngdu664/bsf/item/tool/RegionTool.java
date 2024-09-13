@@ -4,12 +4,17 @@ import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 public class RegionTool extends Item {
     public RegionTool(Properties properties) {
@@ -33,5 +38,20 @@ public class RegionTool extends Item {
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        RegionData region = stack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+        tooltipComponents.add(Component.translatable(
+                "scoring_device_region.tooltip",
+                region.start().getX(),
+                region.start().getY(),
+                region.start().getZ(),
+                region.end().getX(),
+                region.end().getY(),
+                region.end().getZ()
+        ));
+        tooltipComponents.add(MutableComponent.create(new PlainTextContents.LiteralContents("mode: "+(region.start().getY()>region.end().getY()?"spawn point":"golem"))));
     }
 }

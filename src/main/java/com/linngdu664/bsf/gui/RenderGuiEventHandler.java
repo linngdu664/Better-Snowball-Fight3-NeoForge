@@ -49,7 +49,7 @@ public class RenderGuiEventHandler {
             GuiHandler.pickBlockEntityZoneController(guiGraphics, blockEntity, partialTick);
         }
         GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varMap);
-        GuiHandler.specialModelText(guiGraphics, varMap);
+        GuiHandler.specialModeText(guiGraphics, varMap);
 
 
         guiGraphics.pose().popPose();

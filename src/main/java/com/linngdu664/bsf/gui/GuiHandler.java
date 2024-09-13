@@ -240,7 +240,7 @@ public class GuiHandler {
         }
     }
 
-    public static void specialModelText(GuiGraphics guiGraphics, Map<String, Object> varMap) {
+    public static void specialModeText(GuiGraphics guiGraphics, Map<String, Object> varMap) {
         String sLocatorStr = (String) varMap.get("sLocatorStr");
         String tLocatorStr = (String) varMap.get("tLocatorStr");
         String sStatusStr = (String) varMap.get("sStatusStr");

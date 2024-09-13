@@ -151,8 +151,8 @@ public class ScoringDevice extends Item {
                 region.start().getY(),
                 region.start().getZ(),
                 region.end().getX(),
-                region.end().getX(),
-                region.end().getX()
+                region.end().getY(),
+                region.end().getZ()
         ));
     }
 }
