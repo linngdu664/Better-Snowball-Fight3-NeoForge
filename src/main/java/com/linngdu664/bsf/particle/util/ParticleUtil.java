@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.particle.util;
 
+import com.linngdu664.bsf.registry.ParticleRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.util.Mth;
@@ -142,6 +143,13 @@ public class ParticleUtil {
     public static void spawnVectorInversionParticles(Level level, ParticleOptions particleOptions, Vec3 pos, double range, int num, double v) {
         for (int i = 0; i < num; i++) {
             level.addParticle(particleOptions, pos.x, pos.y, pos.z, 0, Mth.PI / 2, v);
+        }
+    }
+
+    public static void spawnSnowParticles(Level level, Vec3 pos,double height, int num) {
+        RandomSource random = level.getRandom();
+        for (int i = 0; i < num; i++) {
+            level.addParticle(ParticleRegister.SPAWN_SNOW.get(), pos.x, pos.y + BSFCommonUtil.randDouble(random,0,height), pos.z,0,0,0);
         }
     }
     public static Color hsvColor(int hue, int saturation, int brightness){

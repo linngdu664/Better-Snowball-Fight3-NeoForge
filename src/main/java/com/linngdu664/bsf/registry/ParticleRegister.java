@@ -34,6 +34,7 @@ public class ParticleRegister {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SUBSPACE_SNOWBALL_RELEASE_TRACE = PARTICLES.register("subspace_snowball_release_trace", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> IMPLOSION_SNOWBALL_CANNON = PARTICLES.register("implosion_snowball_cannon", () -> new SimpleParticleType(false));
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SNOW_GOLEM_EQUIP = PARTICLES.register("snow_golen_equip", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SPAWN_SNOW = PARTICLES.register("spawn_snow", () -> new SimpleParticleType(false));
 
     @SubscribeEvent
     public static void registerParticleProvider(RegisterParticleProvidersEvent event) {
@@ -54,5 +55,6 @@ public class ParticleRegister {
         particleEngine.register(ParticleRegister.SUBSPACE_SNOWBALL_RELEASE_TRACE.get(), SubspaceSnowballReleaseTraceParticle.Provider::new);
         particleEngine.register(ParticleRegister.IMPLOSION_SNOWBALL_CANNON.get(), ImplosionSnowballCannonParticle.Provider::new);
         particleEngine.register(ParticleRegister.SNOW_GOLEM_EQUIP.get(), SnowGolemEquipParticle.Provider::new);
+        particleEngine.register(ParticleRegister.SPAWN_SNOW.get(), SpawnSnowParticle.Provider::new);
     }
 }

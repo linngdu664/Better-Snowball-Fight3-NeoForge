@@ -4,6 +4,7 @@ import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
+import com.linngdu664.bsf.network.to_client.SpawnSnowParticlesPayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.component.DataComponents;
@@ -19,6 +20,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -120,6 +122,11 @@ public class ScoringDevice extends Item {
         }
         pPlayer.startUsingItem(pUsedHand);
         return InteractionResultHolder.consume(itemStack);
+    }
+
+    @Override
+    public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity,new SpawnSnowParticlesPayload(livingEntity.getX(),livingEntity.getY(),livingEntity.getZ(),2,5));
     }
 
     @Override
