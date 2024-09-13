@@ -111,14 +111,19 @@ public class ScoringDevice extends Item {
             }
         } else {
             BSFTeamSavedData savedData = pLevel.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            if (savedData.getTeam(pPlayer.getUUID()) < 0 || BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
-                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1.tip"), false);
-                return InteractionResultHolder.fail(itemStack);
-            }
             if (rank < 0 && !region.inRegion(pPlayer.position())) {
                 pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed2.tip"), false);
                 return InteractionResultHolder.fail(itemStack);
             }
+            if (savedData.getTeam(pPlayer.getUUID()) < 0) {
+                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_0.tip"), false);
+                return InteractionResultHolder.fail(itemStack);
+            }
+            if (BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
+                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_1.tip"), false);
+                return InteractionResultHolder.fail(itemStack);
+            }
+
         }
         pPlayer.startUsingItem(pUsedHand);
         return InteractionResultHolder.consume(itemStack);
