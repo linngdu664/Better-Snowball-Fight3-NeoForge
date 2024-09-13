@@ -618,7 +618,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
             AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment, aliveRange);
             snowball.shoot(shootX, shootY, shootZ, launchVelocity, launchAccuracy);
             level.addFreshEntity(snowball);
-            if (!getEnhance()) {
+            if (!getEnhance() && getOwner()!=null) {
                 ammo.setDamageValue(ammo.getDamageValue() + 1);
                 if (ammo.getDamageValue() == ammo.getMaxDamage()) {
                     ItemStack empty;
