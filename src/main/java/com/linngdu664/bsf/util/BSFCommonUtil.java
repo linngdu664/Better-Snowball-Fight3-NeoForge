@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.util;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -275,27 +276,31 @@ public class BSFCommonUtil {
     }
 
     public static List<ItemStack> findInventoryItemStacks(Player player, Predicate<ItemStack> filter) {
-        Inventory inventory = player.getInventory();
-        int k = inventory.getContainerSize();
+        NonNullList<ItemStack>[] playerInventoryList = getPlayerInventoryList(player);
         List<ItemStack> outItemStacks=new ArrayList<>();
-        for (int i = 0; i < k; i++) {
-            ItemStack itemStack = inventory.getItem(i);
-            if (filter.test(itemStack)){
-                outItemStacks.add(itemStack);
+        for (NonNullList<ItemStack> inv : playerInventoryList) {
+            for (ItemStack itemStack : inv) {
+                if (filter.test(itemStack)) {
+                    outItemStacks.add(itemStack);
+                }
             }
         }
         return outItemStacks;
     }
 
     public static ItemStack findInventoryItemStack(Player player, Predicate<ItemStack> filter) {
-        Inventory inventory = player.getInventory();
-        int k = inventory.getContainerSize();
-        for (int i = 0; i < k; i++) {
-            ItemStack itemStack = inventory.getItem(i);
-            if (filter.test(itemStack)) {
-                return itemStack;
+        NonNullList<ItemStack>[] playerInventoryList = getPlayerInventoryList(player);
+        for (NonNullList<ItemStack> inv : playerInventoryList) {
+            for (ItemStack itemStack : inv) {
+                if (filter.test(itemStack)) {
+                    return itemStack;
+                }
             }
         }
         return null;
+    }
+    private static NonNullList<ItemStack>[] getPlayerInventoryList(Player player){
+        Inventory inventory = player.getInventory();
+        return new NonNullList[]{inventory.items,inventory.armor,inventory.offhand};
     }
 }
