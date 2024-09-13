@@ -6,7 +6,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,6 +40,16 @@ public class RegionTool extends Item {
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        if (!level.isClientSide && usedHand.equals(InteractionHand.MAIN_HAND)){
+            ItemStack offhandItem = player.getOffhandItem();
+            ItemStack mainHandItem = player.getMainHandItem();
+            offhandItem.set(DataComponentRegister.REGION,mainHandItem.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY));
+        }
+        return InteractionResultHolder.success(player.getMainHandItem());
     }
 
     @Override
