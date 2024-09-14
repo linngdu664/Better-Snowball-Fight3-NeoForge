@@ -1,6 +1,8 @@
 package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.block.entity.VendingMachineEntity;
+import com.linngdu664.bsf.client.renderer.block.VendingMachineEntityRenderer;
 import com.linngdu664.bsf.client.renderer.entity.*;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
@@ -137,6 +139,7 @@ public class EntityRegister {
             event.registerEntityRenderer(GHOST_SNOWBALL.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(SCULK_SNOWBALL.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(DUCK_SNOWBALL.get(), ThrownItemRenderer::new);
+            event.registerBlockEntityRenderer(BlockEntityRegister.VENDING_MACHINE_ENTITY.get(), VendingMachineEntityRenderer::new);
         }
     }
 

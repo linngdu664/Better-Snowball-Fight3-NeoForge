@@ -32,6 +32,8 @@ import java.util.LinkedHashSet;
 
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientForgeEvents {
+    public static int tickCount = 0;
+
     public static final RandomSource BSF_RANDOM_SOURCE = RandomSource.create();
 
     @SubscribeEvent
@@ -126,6 +128,7 @@ public class ClientForgeEvents {
         if (level == null || minecraft.isPaused()) {
             return;
         }
+        tickCount++;
         ScoringGuiHandler.tick();
         Camera camera = minecraft.gameRenderer.getMainCamera();
         ScreenshakeHandler.clientTick(camera, null);
