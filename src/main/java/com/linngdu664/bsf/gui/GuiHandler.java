@@ -41,6 +41,7 @@ import static com.linngdu664.bsf.gui.BSFGuiTool.*;
 @OnlyIn(Dist.CLIENT)
 public class GuiHandler {
     private static final Minecraft instance = Minecraft.getInstance();
+    private static final Player player = instance.player;
     private static final Window window = instance.getWindow();
 
     public static void itemInHandBSFWeapon(GuiGraphics guiGraphics, ItemStack mainHandItem, ItemStack offHandItem) {
@@ -77,7 +78,7 @@ public class GuiHandler {
     }
 
     public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, Entity pickEntity, float partialTick, Map<String, Object> varMap) {
-        if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get())) {
+        if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()) && player.equals(((BSFSnowGolemEntity) pickEntity).getOwner())) {
             BSFSnowGolemEntity entity = (BSFSnowGolemEntity) pickEntity;
             //显示装备
             List<Pair<Vec3, Consumer<Vec2>>> list = new ArrayList<>();
