@@ -157,6 +157,8 @@ public class ScoringDevice extends Item {
         int rank = stack.getOrDefault(DataComponentRegister.RANK.get(), 0);
         int money = stack.getOrDefault(DataComponentRegister.MONEY.get(), 0);
         RegionData region = stack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+        tooltipComponents.add(Component.translatable("scoring_device.tooltip"));
+        tooltipComponents.add(Component.translatable("scoring_device1.tooltip"));
         tooltipComponents.add(Component.translatable("scoring_device_rank.tooltip", String.valueOf(rank)));
         tooltipComponents.add(Component.translatable("scoring_device_money.tooltip", String.valueOf(money)));
         tooltipComponents.add(Component.translatable(
