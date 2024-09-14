@@ -2,6 +2,7 @@ package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
+import com.linngdu664.bsf.gui.ScoringGuiHandler;
 import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
@@ -125,6 +126,7 @@ public class ClientForgeEvents {
         if (level == null || minecraft.isPaused()) {
             return;
         }
+        ScoringGuiHandler.tick();
         Camera camera = minecraft.gameRenderer.getMainCamera();
         ScreenshakeHandler.clientTick(camera, null);
         ScreenshakeHandler.clientTick(camera, BSF_RANDOM_SOURCE);

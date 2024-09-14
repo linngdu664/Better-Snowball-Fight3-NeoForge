@@ -309,7 +309,6 @@ public class GamePlayEvents {
         Player player = event.getEntity();
         ItemStack shoes = player.getItemBySlot(EquipmentSlot.FEET);
         AttributeMap attributes = player.getAttributes();
-        ScoringGuiHandler.tick();
         if (!shoes.isEmpty() && shoes.getItem().equals(ItemRegister.ICE_SKATES_ITEM.get()) && player.isSprinting() && player.onGround()) {
             Level level = player.level();
             BlockPos pos = player.blockPosition().below();
