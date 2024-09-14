@@ -19,14 +19,14 @@ public class SpawnSnowParticle extends TextureSheetParticle {
     protected SpawnSnowParticle(ClientLevel pLevel, Vec3 center, Vec3 offset, Vec3 axis, float r, float g, float b, SpriteSet pSprites) {
         super(pLevel, center.x + offset.x, center.y + offset.y, center.z + offset.z);
         this.hasPhysics = false;
-        this.gravity = -0.01F;
+        this.gravity = -0.05F;
         this.friction = 0.9F;
         this.sprites = pSprites;
         this.speed = (float)BSFCommonUtil.randDoubleWithInfer(this.random,0.2,1);
         this.rCol = r;
         this.gCol = g;
         this.bCol = b;
-        this.quadSize = 0.4F * (this.random.nextFloat() * this.random.nextFloat() * 1.0F + 4.5F);
+        this.quadSize = 0.1F * (this.random.nextFloat() * this.random.nextFloat() + 2.5F);
         this.lifetime = 40;
         this.setSpriteFromAge(pSprites);
         rotationHelper = new SphereAxisRotationHelper(offset, axis);
@@ -66,7 +66,7 @@ public class SpawnSnowParticle extends TextureSheetParticle {
             RandomSource randomSource = pLevel.getRandom();
             float f = randomSource.nextFloat() * 0.6F + 0.4F;
             double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);
-            return new SpawnSnowParticle(pLevel,  new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(1, theta, 0),new Vec3(0, 1, 0), f * 0.9F, f * 0.9F, f * 0.9F, this.sprite);
+            return new SpawnSnowParticle(pLevel,  new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(0.5, theta, 0),new Vec3(0, 1, 0), f * 0.9F, f * 0.9F, f * 0.9F, this.sprite);
         }
     }
 

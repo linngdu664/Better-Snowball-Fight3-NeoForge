@@ -3,6 +3,7 @@ package com.linngdu664.bsf.block.entity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
+import com.linngdu664.bsf.network.to_client.SpawnSnowParticlesPayload;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -127,6 +129,7 @@ public class ZoneControllerEntity extends BlockEntity {
                                 snowGolem.setDropEquipment(false);
                                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                                 level.addFreshEntity(snowGolem);
+                                PacketDistributor.sendToPlayersTrackingEntity(snowGolem,new SpawnSnowParticlesPayload(snowGolem.getX(),snowGolem.getY(),snowGolem.getZ(),2,100));
                             }
                             break;
                         }
