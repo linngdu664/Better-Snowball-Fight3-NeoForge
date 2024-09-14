@@ -87,12 +87,10 @@ public class GamePlayEvents {
                             int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                             device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
                             PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(getPoints));
-                            deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
                             int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                             device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
                             device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
                             PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getPoints));
-                            killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
                         }
                     }
                 } else if (deathEntity instanceof BSFSnowGolemEntity deathGolem) {
@@ -103,7 +101,6 @@ public class GamePlayEvents {
                         device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
                         device.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
                         PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getPoints));
-                        killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
                     }
                 }
             } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
@@ -113,7 +110,6 @@ public class GamePlayEvents {
                     int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                     device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
                     PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(getPoints));
-                    deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
                 }
             }
         }

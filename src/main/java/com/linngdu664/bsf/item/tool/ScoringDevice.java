@@ -10,6 +10,7 @@ import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -140,18 +141,26 @@ public class ScoringDevice extends Item {
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
         if (!level.isClientSide) {
             Vec3 color = new Vec3(0.9, 0.9, 0.9);
-            PacketDistributor.sendToPlayersTrackingEntity(livingEntity, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(livingEntity.getPosition(1).add(-0.5, 0, -0.5), livingEntity.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 5), BSFParticleType.SPAWN_SNOW.ordinal()));
-            livingEntity.playSound(SoundRegister.FREEZING.get(), 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(livingEntity.getPosition(1).add(-0.5, 0, -0.5), livingEntity.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 5), BSFParticleType.SPAWN_SNOW.ordinal()));
         }
+            livingEntity.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
     }
 
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
-        if (count == 0) {
-            Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), entity.getPosition(1));
-            entity.moveTo(tpPoint);
-            entity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
-        }
+//        if (count == 0) {
+//            Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), entity.getPosition(1));
+//            entity.moveTo(tpPoint);
+//            entity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
+//        }
+    }
+
+    @Override
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
+        Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), livingEntity.getPosition(1));
+        livingEntity.moveTo(tpPoint);
+        livingEntity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
+        return super.finishUsingItem(stack, level, livingEntity);
     }
 
     public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
