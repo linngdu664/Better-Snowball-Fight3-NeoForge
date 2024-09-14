@@ -10,6 +10,7 @@ import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -85,6 +86,8 @@ public class ScoringDevice extends Item {
                         player.displayClientMessage(Component.translatable("scoring_device_buy_success.tip"), false);
                     }
                 }
+                Vec3 soundPos = be.getBlockPos().getCenter();
+                level.playSound(null, soundPos.x, soundPos.y, soundPos.z, SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 6.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }
             return InteractionResult.SUCCESS;
         }
