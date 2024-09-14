@@ -96,12 +96,14 @@ public class ZoneController extends Block implements EntityBlock {
                     IntegerGroupData group = stack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY);
                     zoneControllerEntity.setPlayerMultiplier(group.val1());
                     zoneControllerEntity.setGolemMultiplier(group.val2());
-                    zoneControllerEntity.setLHalf(group.val3());
-                    zoneControllerEntity.setMaxGolem(group.val4());
+                    zoneControllerEntity.setDiffMultiplier(group.val3());
+                    zoneControllerEntity.setLHalf(group.val4());
+                    zoneControllerEntity.setMaxGolem(group.val5());
                     player.displayClientMessage(Component.literal("Set player multiplier to " + group.val1()), false);
                     player.displayClientMessage(Component.literal("Set golem multiplier to " + group.val2()), false);
-                    player.displayClientMessage(Component.literal("Set half l to " + group.val3()), false);
-                    player.displayClientMessage(Component.literal("Set max golem to " + group.val4()), false);
+                    player.displayClientMessage(Component.literal("Set diff multiplier to " + group.val3()), false);
+                    player.displayClientMessage(Component.literal("Set half l to " + group.val4()), false);
+                    player.displayClientMessage(Component.literal("Set max golem to " + group.val5()), false);
                 }
                 return ItemInteractionResult.SUCCESS;
             }

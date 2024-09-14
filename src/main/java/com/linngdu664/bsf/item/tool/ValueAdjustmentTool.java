@@ -27,7 +27,7 @@ public class ValueAdjustmentTool extends Item {
         if (!level.isClientSide) {
             int index = itemStack.getOrDefault(DataComponentRegister.SELECTED_INDEX.get(), 0);
             IntegerGroupData group = itemStack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY);
-            if (index == 3) {
+            if (index == 4) {
                 index = 0;
             } else {
                 index++;
@@ -36,7 +36,8 @@ public class ValueAdjustmentTool extends Item {
                 case 0: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1()))); break;
                 case 1: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2()))); break;
                 case 2: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3()))); break;
-                default: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4()))); break;
+                case 3: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4()))); break;
+                default: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val5: " + group.val5()))); break;
             }
             itemStack.set(DataComponentRegister.SELECTED_INDEX.get(), index);
         }
@@ -50,5 +51,6 @@ public class ValueAdjustmentTool extends Item {
         tooltipComponents.add(Component.literal("val2: " + group.val2()));
         tooltipComponents.add(Component.literal("val3: " + group.val3()));
         tooltipComponents.add(Component.literal("val4: " + group.val4()));
+        tooltipComponents.add(Component.literal("val5: " + group.val5()));
     }
 }

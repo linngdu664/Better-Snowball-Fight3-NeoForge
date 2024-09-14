@@ -29,6 +29,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -121,13 +122,51 @@ public class GamePlayEvents {
 
     @SubscribeEvent
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
-        if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {
-            BSFTeamSavedData savedData = player1.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            int id = savedData.getTeam(player1.getUUID());
-            String msgId = event.getSource().getMsgId();
-            if (id >= 0 && id == savedData.getTeam(player2.getUUID()) && msgId.equals("thrown") && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
+//        if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {
+//            BSFTeamSavedData savedData = player1.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+//            int id = savedData.getTeam(player1.getUUID());
+//            String msgId = event.getSource().getMsgId();
+//            if (id >= 0 && id == savedData.getTeam(player2.getUUID()) && msgId.equals("thrown") && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
+//                event.setNewDamage(0);
+//            }
+//        }
+        Entity targetEntity = event.getEntity();
+        DamageSource damageSource = event.getSource();
+        if (!targetEntity.level().isClientSide && damageSource.is(DamageTypes.THROWN) && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
+            BSFTeamSavedData savedData = targetEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+            Entity killerEntity = damageSource.getEntity();
+            if (killerEntity instanceof Player killerPlayer && (targetEntity instanceof Player targetPlayer && savedData.isSameTeam(killerPlayer, targetPlayer) || targetEntity instanceof BSFSnowGolemEntity targetGolem && (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerPlayer.getUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerPlayer, targetGolem.getOwner())))
+                    || killerEntity instanceof BSFSnowGolemEntity killerGolem && (targetEntity instanceof Player targetPlayer && (killerGolem.getFixedTeamId() >= 0 && savedData.getTeam(targetPlayer.getUUID()) == killerGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetPlayer))
+                    || targetEntity instanceof BSFSnowGolemEntity targetGolem && (killerGolem.getFixedTeamId() >= 0 && (targetGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() == targetGolem.getFixedTeamId() || killerGolem.getFixedTeamId() == savedData.getTeam(targetGolem.getOwnerUUID())) || killerGolem.getFixedTeamId() < 0 && (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerGolem.getOwnerUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetGolem.getOwner()))))) {
                 event.setNewDamage(0);
             }
+//            if (killerEntity instanceof Player killerPlayer) {
+//                if (targetEntity instanceof Player targetPlayer) {
+//                    if (savedData.isSameTeam(killerPlayer, targetPlayer)) {
+//                        event.setNewDamage(0);
+//                    }
+//                } else if (targetEntity instanceof BSFSnowGolemEntity targetGolem) {
+//                    if (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerPlayer.getUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerPlayer, targetGolem.getOwner())) {
+//                        event.setNewDamage(0);
+//                    }
+//                }
+//            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem) {
+//                if (targetEntity instanceof Player targetPlayer) {
+//                    if (killerGolem.getFixedTeamId() >= 0 && savedData.getTeam(targetPlayer.getUUID()) == killerGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetPlayer)) {
+//                        event.setNewDamage(0);
+//                    }
+//                } else if (targetEntity instanceof BSFSnowGolemEntity targetGolem) {
+//                    if (killerGolem.getFixedTeamId() >= 0) {
+//                        if (targetGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() == targetGolem.getFixedTeamId() || killerGolem.getFixedTeamId() == savedData.getTeam(targetGolem.getOwnerUUID())) {
+//                            event.setNewDamage(0);
+//                        }
+//                    } else {
+//                        if (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerGolem.getOwnerUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetGolem.getOwner())) {
+//                            event.setNewDamage(0);
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 

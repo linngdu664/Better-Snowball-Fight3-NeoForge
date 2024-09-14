@@ -51,7 +51,7 @@ public class ClientForgeEvents {
             PacketDistributor.sendToServer(new SwitchTweakerStatusModePayload(event.getScrollDeltaY() < 0));
             event.setCanceled(true);
         } else if (itemStack.is(ItemRegister.VALUE_ADJUSTMENT_TOOL.get()) && minecraft.options.keyShift.isDown()) {
-            PacketDistributor.sendToServer(new ValueAdjustmentToolPayload(event.getScrollDeltaY() < 0,minecraft.options.keySprint.isDown()));
+            PacketDistributor.sendToServer(new ValueAdjustmentToolPayload(event.getScrollDeltaY() > 0, minecraft.options.keySprint.isDown()));
             event.setCanceled(true);
         }
     }

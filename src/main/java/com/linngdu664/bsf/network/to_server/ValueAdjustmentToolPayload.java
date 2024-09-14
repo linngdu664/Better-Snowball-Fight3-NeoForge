@@ -35,38 +35,46 @@ public record ValueAdjustmentToolPayload(boolean isIncrease, boolean speedUp) im
                 if (payload.isIncrease) {
                     switch (index) {
                         case 0:
-                            group = new IntegerGroupData(group.val1() + (payload.speedUp ? 10 : 1), group.val2(), group.val3(), group.val4());
+                            group = new IntegerGroupData(group.val1() + (payload.speedUp ? 10 : 1), group.val2(), group.val3(), group.val4(), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1())));
                             break;
                         case 1:
-                            group = new IntegerGroupData(group.val1(), group.val2() + (payload.speedUp ? 10 : 1), group.val3(), group.val4());
+                            group = new IntegerGroupData(group.val1(), group.val2() + (payload.speedUp ? 10 : 1), group.val3(), group.val4(), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2())));
                             break;
                         case 2:
-                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3() + (payload.speedUp ? 10 : 1), group.val4());
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3() + (payload.speedUp ? 10 : 1), group.val4(), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3())));
                             break;
-                        default:
-                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4() + (payload.speedUp ? 10 : 1));
+                        case 3:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4() + (payload.speedUp ? 10 : 1), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4())));
+                            break;
+                        default:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4(), group.val5() + (payload.speedUp ? 10 : 1));
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val5: " + group.val5())));
                     }
                 } else {
                     switch (index) {
                         case 0:
-                            group = new IntegerGroupData(group.val1() - (payload.speedUp ? 10 : 1), group.val2(), group.val3(), group.val4());
+                            group = new IntegerGroupData(group.val1() - (payload.speedUp ? 10 : 1), group.val2(), group.val3(), group.val4(), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1())));
                             break;
                         case 1:
-                            group = new IntegerGroupData(group.val1(), group.val2() - (payload.speedUp ? 10 : 1), group.val3(), group.val4());
+                            group = new IntegerGroupData(group.val1(), group.val2() - (payload.speedUp ? 10 : 1), group.val3(), group.val4(), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2())));
                             break;
                         case 2:
-                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3() - (payload.speedUp ? 10 : 1), group.val4());
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3() - (payload.speedUp ? 10 : 1), group.val4(), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3())));
                             break;
-                        default:
-                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4() - (payload.speedUp ? 10 : 1));
+                        case 3:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4() - (payload.speedUp ? 10 : 1), group.val5());
                             itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4())));
+                            break;
+                        default:
+                            group = new IntegerGroupData(group.val1(), group.val2(), group.val3(), group.val4(), group.val5() - (payload.speedUp ? 10 : 1));
+                            itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val5: " + group.val5())));
                     }
                 }
                 itemStack.set(DataComponentRegister.INTEGER_GROUP.get(), group);

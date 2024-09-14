@@ -38,6 +38,7 @@ public class ZoneControllerEntity extends BlockEntity {
     private RegionData region = RegionData.EMPTY;
     private int playerMultiplier;
     private int golemMultiplier;
+    private int diffMultiplier;
     private int lHalf;
     private int maxGolem;
     private int timer;                // 不需要持久化
@@ -81,9 +82,9 @@ public class ZoneControllerEntity extends BlockEntity {
                 }
                 float minRank = be.snowGolemList.getFirst().getInt("Rank");
                 float maxRank = be.snowGolemList.getLast().getInt("Rank");
-                be.currentStrength = 1.5F * (be.golemMultiplier * (enemyGolemStrength - friendlyGolemStrength) + be.playerMultiplier * (enemyPlayerStrength - friendlyPlayerStrength)) + 0.5F * (minRank + maxRank);
+                be.currentStrength = be.diffMultiplier * 0.01F * (be.golemMultiplier * (enemyGolemStrength - friendlyGolemStrength) + be.playerMultiplier * (enemyPlayerStrength - friendlyPlayerStrength)) + 0.5F * (minRank + maxRank);
                 level.sendBlockUpdated(pos, state, state, 2);
-                float mu = Mth.clamp(be.currentStrength, minRank, maxRank);
+                float mu = Mth.clamp(be.currentStrength, minRank - be.lHalf * 0.5F, maxRank + be.lHalf * 0.5F);
                 if (friendlyGolemList.size() < be.maxGolem) {
                     int size = be.snowGolemList.size();
                     float[] cumulativeDistribution = new float[size];
@@ -136,7 +137,9 @@ public class ZoneControllerEntity extends BlockEntity {
                         }
                     }
                 }
-                int minTime = (int) (60F / (minRank - maxRank) * (mu - maxRank) + 20F);
+                int minTime = (int) (80F / (minRank - maxRank - be.lHalf) * (mu - maxRank - be.lHalf * 0.5F) + 20F);
+                // 1s-5s
+                // 2s-10s
                 be.timer = level.random.nextIntBetweenInclusive(minTime, 2 * minTime);
             } else {
                 be.timer--;
@@ -166,6 +169,7 @@ public class ZoneControllerEntity extends BlockEntity {
         }
         playerMultiplier = tag.getInt("PlayerMultiplier");
         golemMultiplier = tag.getInt("GolemMultiplier");
+        diffMultiplier = tag.getInt("DiffMultiplier");
         lHalf = tag.getInt("LHalf");
         maxGolem = tag.getInt("MaxGolem");
         currentStrength = tag.getFloat("CurrentStrength");
@@ -198,6 +202,7 @@ public class ZoneControllerEntity extends BlockEntity {
         region.saveToCompoundTag("Region", tag);
         tag.putInt("PlayerMultiplier", playerMultiplier);
         tag.putInt("GolemMultiplier", golemMultiplier);
+        tag.putInt("DiffMultiplier", diffMultiplier);
         tag.putInt("LHalf", lHalf);
         tag.putInt("MaxGolem", maxGolem);
         tag.putFloat("CurrentStrength", currentStrength);
@@ -278,6 +283,11 @@ public class ZoneControllerEntity extends BlockEntity {
 
     public void setGolemMultiplier(int golemMultiplier) {
         this.golemMultiplier = golemMultiplier;
+        setChanged();
+    }
+
+    public void setDiffMultiplier(int diffMultiplier) {
+        this.diffMultiplier = diffMultiplier;
         setChanged();
     }
 
