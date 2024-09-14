@@ -137,9 +137,9 @@ public class ZoneControllerEntity extends BlockEntity {
                         }
                     }
                 }
-                int minTime = (int) (80F / (minRank - maxRank - be.lHalf) * (mu - maxRank - be.lHalf * 0.5F) + 20F);
-                // 1s-5s
-                // 2s-10s
+                int minTime = (int) (60F / (minRank - maxRank - be.lHalf) * (mu - maxRank - be.lHalf * 0.5F) + 20F);
+                // 1s-4s
+                // 2s-8s
                 be.timer = level.random.nextIntBetweenInclusive(minTime, 2 * minTime);
             } else {
                 be.timer--;
