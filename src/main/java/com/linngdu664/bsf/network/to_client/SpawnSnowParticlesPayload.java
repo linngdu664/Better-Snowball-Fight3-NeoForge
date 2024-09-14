@@ -19,7 +19,7 @@ public record SpawnSnowParticlesPayload(double px, double py, double pz,double h
             ByteBufCodecs.DOUBLE, SpawnSnowParticlesPayload::py,
             ByteBufCodecs.DOUBLE, SpawnSnowParticlesPayload::pz,
             ByteBufCodecs.DOUBLE, SpawnSnowParticlesPayload::height,
-            ByteBufCodecs.INT, SpawnSnowParticlesPayload::num,
+            ByteBufCodecs.VAR_INT, SpawnSnowParticlesPayload::num,
             SpawnSnowParticlesPayload::new
     );
 

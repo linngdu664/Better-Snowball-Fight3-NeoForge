@@ -4,10 +4,7 @@ import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.SpawnSnowParticlesPayload;
-import com.linngdu664.bsf.registry.BlockEntityRegister;
-import com.linngdu664.bsf.registry.DataComponentRegister;
-import com.linngdu664.bsf.registry.EntityRegister;
-import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -130,6 +127,7 @@ public class ZoneControllerEntity extends BlockEntity {
                                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                                 level.addFreshEntity(snowGolem);
                                 PacketDistributor.sendToPlayersTrackingEntity(snowGolem,new SpawnSnowParticlesPayload(snowGolem.getX(),snowGolem.getY(),snowGolem.getZ(),2,100));
+                                snowGolem.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
                             }
                             break;
                         }

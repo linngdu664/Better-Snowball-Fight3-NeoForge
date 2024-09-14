@@ -14,6 +14,7 @@ import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -40,7 +41,6 @@ import static com.linngdu664.bsf.gui.BSFGuiTool.*;
 @OnlyIn(Dist.CLIENT)
 public class GuiHandler {
     private static final Minecraft instance = Minecraft.getInstance();
-    private static final Player player = instance.player;
     private static final Window window = instance.getWindow();
 
     public static void itemInHandBSFWeapon(GuiGraphics guiGraphics, ItemStack mainHandItem, ItemStack offHandItem) {
@@ -256,4 +256,13 @@ public class GuiHandler {
         }
     }
 
+    public static void specialScoreText(GuiGraphics guiGraphics) {
+        if (ScoringGuiHandler.hourMeter>0){
+            V2I v2I = v2IRatio(window, 0.95, 0.3);
+            String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score>0?"scoring_device_kill_bonus.tip":"scoring_device_death_punishment.tip",String.valueOf(ScoringGuiHandler.score));
+            RenderSystem.enableBlend();
+            guiGraphics.drawString(instance.font, scoreStr, v2I.x-instance.font.width(scoreStr), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
+            RenderSystem.disableBlend();
+        }
+    }
 }

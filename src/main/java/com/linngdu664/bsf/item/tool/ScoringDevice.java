@@ -6,9 +6,11 @@ import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.SpawnSnowParticlesPayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -133,6 +135,7 @@ public class ScoringDevice extends Item {
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
         if (!level.isClientSide) {
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity,new SpawnSnowParticlesPayload(livingEntity.getX(),livingEntity.getY(),livingEntity.getZ(),2,5));
+            livingEntity.playSound(SoundRegister.FREEZING.get(), 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
     }
 
@@ -141,6 +144,7 @@ public class ScoringDevice extends Item {
         if (count == 0) {
             Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), entity.getPosition(1));
             entity.moveTo(tpPoint);
+            entity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
         }
     }
 

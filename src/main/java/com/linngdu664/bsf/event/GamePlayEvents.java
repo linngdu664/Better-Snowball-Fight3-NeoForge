@@ -3,12 +3,14 @@ package com.linngdu664.bsf.event;
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.gui.ScoringGuiHandler;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
+import com.linngdu664.bsf.network.to_client.UpdateScorePayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
@@ -74,8 +76,8 @@ public class GamePlayEvents {
             DamageSource source = event.getSource();
             Entity killerEntity = source.getEntity();
             BSFTeamSavedData savedData = deathEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            if (killerEntity instanceof Player killerPlayer) {
-                if (deathEntity instanceof Player deathPlayer) {
+            if (killerEntity instanceof ServerPlayer killerPlayer) {
+                if (deathEntity instanceof ServerPlayer deathPlayer) {
                     ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                     ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                     if (device != null && device1 != null && !savedData.isSameTeam(killerPlayer, deathEntity)) {
@@ -85,10 +87,12 @@ public class GamePlayEvents {
                             int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                             int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                             device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                            PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(getPoints));
                             deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
                             int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                             device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
                             device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
+                            PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getPoints));
                             killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
                         }
                     }
@@ -99,15 +103,17 @@ public class GamePlayEvents {
                         int getPoints = deathGolem.getRank();
                         device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
                         device.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
+                        PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getPoints));
                         killerPlayer.displayClientMessage(Component.translatable("scoring_device_kill_bonus.tip", getPoints), false);
                     }
                 }
-            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof Player deathPlayer) {
+            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
                 ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                 if (device != null && (killerGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) || killerGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerGolem.getOwner(), deathPlayer)) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(deathPlayer.position())) {
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                     int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
                     device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                    PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(getPoints));
                     deathPlayer.displayClientMessage(Component.translatable("scoring_device_death_punishment.tip", getPoints), false);
                 }
             }
@@ -303,6 +309,7 @@ public class GamePlayEvents {
         Player player = event.getEntity();
         ItemStack shoes = player.getItemBySlot(EquipmentSlot.FEET);
         AttributeMap attributes = player.getAttributes();
+        ScoringGuiHandler.tick();
         if (!shoes.isEmpty() && shoes.getItem().equals(ItemRegister.ICE_SKATES_ITEM.get()) && player.isSprinting() && player.onGround()) {
             Level level = player.level();
             BlockPos pos = player.blockPosition().below();
