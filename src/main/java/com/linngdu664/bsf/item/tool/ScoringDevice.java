@@ -4,7 +4,9 @@ import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
-import com.linngdu664.bsf.network.to_client.SpawnSnowParticlesPayload;
+import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
+import com.linngdu664.bsf.particle.util.BSFParticleType;
+import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
@@ -137,7 +139,8 @@ public class ScoringDevice extends Item {
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
         if (!level.isClientSide) {
-            PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity,new SpawnSnowParticlesPayload(livingEntity.getX(),livingEntity.getY(),livingEntity.getZ(),2,5));
+            Vec3 color = new Vec3(0.9, 0.9, 0.9);
+            PacketDistributor.sendToPlayersTrackingEntity(livingEntity, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(livingEntity.getPosition(1).add(-0.5, 0, -0.5), livingEntity.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 5), BSFParticleType.SPAWN_SNOW.ordinal()));
             livingEntity.playSound(SoundRegister.FREEZING.get(), 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
     }

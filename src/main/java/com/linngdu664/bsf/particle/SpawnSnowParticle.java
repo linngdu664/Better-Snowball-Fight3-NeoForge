@@ -13,60 +13,59 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpawnSnowParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
-    private final SphereAxisRotationHelper rotationHelper;
-    private float speed;
 
-    protected SpawnSnowParticle(ClientLevel pLevel, Vec3 center, Vec3 offset, Vec3 axis, float r, float g, float b, SpriteSet pSprites) {
-        super(pLevel, center.x + offset.x, center.y + offset.y, center.z + offset.z);
-        this.hasPhysics = false;
-        this.gravity = -0.05F;
-        this.friction = 0.9F;
-        this.sprites = pSprites;
-        this.speed = (float)BSFCommonUtil.randDoubleWithInfer(this.random,0.2,1);
-        this.rCol = r;
-        this.gCol = g;
-        this.bCol = b;
-        this.quadSize = 0.1F * (this.random.nextFloat() * this.random.nextFloat() + 2.5F);
-        this.lifetime = 40;
-        this.setSpriteFromAge(pSprites);
-        rotationHelper = new SphereAxisRotationHelper(offset, axis);
+    protected SpawnSnowParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, float sizeMultiplier, SpriteSet sprites) {
+        super(level, x, y, z, 0.0, 0.0, 0.0);
+        this.sprites = sprites;
+        this.friction = 0.96F;
+        this.gravity = -0.1F;
+        this.speedUpWhenYMotionIsBlocked = true;
+        this.xd *= 0.0;
+        this.yd *= 1.2;
+        this.zd *= 0.0;
+        this.xd += xSpeed;
+        this.yd += ySpeed;
+        this.zd += zSpeed;
+        this.quadSize *= 0.75F * sizeMultiplier;
+        this.lifetime = (int)(5.0F / Mth.randomBetween(this.random, 0.5F, 1.0F) * sizeMultiplier);
+        this.lifetime = Math.max(this.lifetime, 1);
+        this.setSpriteFromAge(sprites);
+        this.hasPhysics = true;
     }
 
-    @Override
-    public @NotNull ParticleRenderType getRenderType() {
+    public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
 
-    @Override
+    public int getLightColor(float partialTick) {
+        return 240;
+    }
+
+    public SingleQuadParticle.FacingCameraMode getFacingCameraMode() {
+        return FacingCameraMode.LOOKAT_Y;
+    }
+
     public void tick() {
-        this.xo = this.x;
-        this.yo = this.y;
-        this.zo = this.z;
-        if (this.age++ >= this.lifetime) {
-            this.remove();
-        } else {
-            Vec3 posDiff = rotationHelper.getDeltaMovement(speed);
-            this.move(posDiff.x, posDiff.y, posDiff.z);
-            this.speed *= this.friction;
-        }
+        super.tick();
         this.setSpriteFromAge(this.sprites);
-        scale(0.92f);
+    }
+
+    public float getQuadSize(float scaleFactor) {
+        return this.quadSize * Mth.clamp(((float)this.age + scaleFactor) / (float)this.lifetime * 32.0F, 0.0F, 1.0F);
     }
 
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
-        private final SpriteSet sprite;
+        private final SpriteSet sprites;
 
-        public Provider(SpriteSet pSprite) {
-            this.sprite = pSprite;
+        public Provider(SpriteSet sprites) {
+            this.sprites = sprites;
         }
 
-        @Override
-        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
-            RandomSource randomSource = pLevel.getRandom();
-            float f = randomSource.nextFloat() * 0.6F + 0.4F;
-            double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);
-            return new SpawnSnowParticle(pLevel,  new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(0.5, theta, 0),new Vec3(0, 1, 0), f * 0.9F, f * 0.9F, f * 0.9F, this.sprite);
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+            SpawnSnowParticle spawnSnowParticle = new SpawnSnowParticle(level, x, y, z, 0, 0.2, 0, 1.5F, this.sprites);
+            spawnSnowParticle.setColor((float) xSpeed, (float) ySpeed, (float) zSpeed);
+            return spawnSnowParticle;
         }
     }
 

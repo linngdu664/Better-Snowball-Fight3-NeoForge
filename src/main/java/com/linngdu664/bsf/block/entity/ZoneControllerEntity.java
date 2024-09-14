@@ -3,7 +3,9 @@ package com.linngdu664.bsf.block.entity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
-import com.linngdu664.bsf.network.to_client.SpawnSnowParticlesPayload;
+import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
+import com.linngdu664.bsf.particle.util.BSFParticleType;
+import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
@@ -126,7 +128,8 @@ public class ZoneControllerEntity extends BlockEntity {
                                 snowGolem.setDropEquipment(false);
                                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                                 level.addFreshEntity(snowGolem);
-                                PacketDistributor.sendToPlayersTrackingEntity(snowGolem,new SpawnSnowParticlesPayload(snowGolem.getX(),snowGolem.getY(),snowGolem.getZ(),2,100));
+                                Vec3 color = new Vec3(0.9, 0.9, 0.9);
+                                PacketDistributor.sendToPlayersTrackingEntity(snowGolem, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(snowGolem.getPosition(1).add(-0.5, 0, -0.5), snowGolem.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 100), BSFParticleType.SPAWN_SNOW.ordinal()));
                                 snowGolem.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
                             }
                             break;

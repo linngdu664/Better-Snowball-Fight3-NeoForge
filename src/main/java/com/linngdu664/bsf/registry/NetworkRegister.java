@@ -23,7 +23,6 @@ public class NetworkRegister {
         registrar.playToClient(TeamMembersPayload.TYPE, TeamMembersPayload.STREAM_CODEC, TeamMembersPayload::handleDataInClient);
         registrar.playToClient(ToggleMovingSoundPayload.TYPE, ToggleMovingSoundPayload.STREAM_CODEC, ToggleMovingSoundPayload::handleDataInClient);
         registrar.playToClient(VectorInversionParticlesPayload.TYPE, VectorInversionParticlesPayload.STREAM_CODEC, VectorInversionParticlesPayload::handleDataInClient);
-        registrar.playToClient(SpawnSnowParticlesPayload.TYPE, SpawnSnowParticlesPayload.STREAM_CODEC, SpawnSnowParticlesPayload::handleDataInClient);
         registrar.playToClient(UpdateScorePayload.TYPE, UpdateScorePayload.STREAM_CODEC, UpdateScorePayload::handleDataInClient);
 
         registrar.playToServer(AmmoTypePayload.TYPE, AmmoTypePayload.STREAM_CODEC, AmmoTypePayload::handleDataInServer);

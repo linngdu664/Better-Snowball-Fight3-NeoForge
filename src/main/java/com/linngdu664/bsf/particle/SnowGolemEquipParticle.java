@@ -10,7 +10,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class SnowGolemEquipParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
-    private static final int BASE_LIFETIME = 8;
 
     protected SnowGolemEquipParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, float sizeMultiplier, SpriteSet sprites) {
         super(level, x, y, z, 0.0, 0.0, 0.0);
