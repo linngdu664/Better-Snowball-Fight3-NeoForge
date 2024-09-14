@@ -259,8 +259,8 @@ public class GuiHandler {
 
     public static void specialScoreText(GuiGraphics guiGraphics) {
         if (ScoringGuiHandler.hourMeter>0){
-            V2I v2I = v2IRatio(window, 0.95, 0.3);
-            String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score>0?"scoring_device_kill_bonus.tip":"scoring_device_death_punishment.tip",String.valueOf(ScoringGuiHandler.score));
+            V2I v2I = v2IRatio(window, 0.9, 0.4);
+            String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score>=0?"scoring_device_kill_bonus.tip":"scoring_device_death_punishment.tip",String.valueOf(ScoringGuiHandler.score));
             RenderSystem.enableBlend();
             guiGraphics.drawString(instance.font, scoreStr, v2I.x-instance.font.width(scoreStr), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
             RenderSystem.disableBlend();
