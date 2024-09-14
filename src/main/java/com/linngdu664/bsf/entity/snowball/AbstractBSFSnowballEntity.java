@@ -259,9 +259,9 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         Level level = level();
         if (!level.isClientSide) {
             if (level.getGameRules().getBoolean((GameRules.RULE_MOBGRIEFING)) && ServerConfig.EXPLOSIVE_DESTROY.getConfigValue()) {
-                level.explode(null, location.x, location.y, location.z, radius, Level.ExplosionInteraction.TNT);
+                level.explode(getOwner(), location.x, location.y, location.z, radius, Level.ExplosionInteraction.TNT);
             } else {
-                level.explode(null, location.x, location.y, location.z, radius, Level.ExplosionInteraction.NONE);
+                level.explode(getOwner(), location.x, location.y, location.z, radius, Level.ExplosionInteraction.NONE);
             }
         }
 

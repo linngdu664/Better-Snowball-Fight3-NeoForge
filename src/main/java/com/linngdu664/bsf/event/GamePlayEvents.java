@@ -3,7 +3,6 @@ package com.linngdu664.bsf.event;
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.gui.ScoringGuiHandler;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
