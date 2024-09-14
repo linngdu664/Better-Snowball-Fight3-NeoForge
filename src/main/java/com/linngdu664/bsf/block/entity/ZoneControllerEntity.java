@@ -51,38 +51,59 @@ public class ZoneControllerEntity extends BlockEntity {
         if (!level.isClientSide && level.hasNeighborSignal(pos) && blockEntity instanceof ZoneControllerEntity be && !be.snowGolemList.isEmpty()) {
             if (be.timer <= 0) {
                 List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
-                if (friendlyGolemList.size() < be.maxGolem) {
-                    float enemyGolemStrength = 0;
-                    float enemyPlayerStrength = 0;
-                    List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
-                    for (BSFSnowGolemEntity golem : enemyGolemList) {
-                        enemyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
-                    }
-                    List<? extends Player> playerList = level.players();
-                    BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-                    for (Player player : playerList) {
-                        if (be.region.inRegion(player.position()) && savedData.getTeam(player.getUUID()) != be.teamId && !player.isCreative() && !player.isSpectator()) {
-                            List<ItemStack> scoringDevices = BSFCommonUtil.findInventoryItemStacks(player, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()));
+                float enemyGolemStrength = 0;
+                float enemyPlayerStrength = 0;
+                float friendlyGolemStrength = 0;
+                float friendlyPlayerStrength = 0;
+                List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
+                for (BSFSnowGolemEntity golem : enemyGolemList) {
+                    enemyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
+                }
+                for (BSFSnowGolemEntity golem : friendlyGolemList) {
+                    friendlyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
+                }
+                List<? extends Player> playerList = level.players();
+                BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+                for (Player player : playerList) {
+                    if (be.region.inRegion(player.position()) && !player.isCreative() && !player.isSpectator()) {
+                        List<ItemStack> scoringDevices = BSFCommonUtil.findInventoryItemStacks(player, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()));
+                        if (savedData.getTeam(player.getUUID()) != be.teamId) {
                             for (ItemStack scoringDevice : scoringDevices) {
                                 enemyPlayerStrength += ZoneControllerEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK.get(), 0));
                             }
+                        } else {
+                            for (ItemStack scoringDevice : scoringDevices) {
+                                friendlyPlayerStrength += ZoneControllerEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK.get(), 0));
+                            }
                         }
                     }
-                    be.currentStrength = be.golemMultiplier * enemyGolemStrength + be.playerMultiplier * enemyPlayerStrength;
-                    level.sendBlockUpdated(pos, state, state, 2);
-                    float mu = Mth.clamp(be.currentStrength, be.snowGolemList.getFirst().getInt("Rank"), be.snowGolemList.getLast().getInt("Rank"));
+                }
+                float minRank = be.snowGolemList.getFirst().getInt("Rank");
+                float maxRank = be.snowGolemList.getLast().getInt("Rank");
+                be.currentStrength = 1.5F * (be.golemMultiplier * (enemyGolemStrength - friendlyGolemStrength) + be.playerMultiplier * (enemyPlayerStrength - friendlyPlayerStrength)) + 0.5F * (minRank + maxRank);
+                level.sendBlockUpdated(pos, state, state, 2);
+                float mu = Mth.clamp(be.currentStrength, minRank, maxRank);
+                if (friendlyGolemList.size() < be.maxGolem) {
                     int size = be.snowGolemList.size();
                     float[] cumulativeDistribution = new float[size];
                     float total = 0;
+//                    System.out.println("team " + TeamLinkerItem.getColorTransNameById(be.teamId) + ":");
+//                    System.out.println("strength: " + be.currentStrength);
+//                    System.out.println("l half: " + be.lHalf);
+//                    System.out.println("rank:");
                     for (int i = 0; i < size; i++) {
                         float rank = be.snowGolemList.get(i).getInt("Rank");
-                        float val = Math.max(0, Mth.abs(mu - rank) / be.lHalf + 1);
+                        float val = Math.max(0, -Mth.abs(mu - rank) / be.lHalf + 1);
                         cumulativeDistribution[i] = val;
                         total += val;
+//                        System.out.print(" " + rank);
                     }
+//                    System.out.println();
                     for (int i = 0; i < size; i++) {
                         cumulativeDistribution[i] /= total;
+//                        System.out.print(" " + cumulativeDistribution[i]);
                     }
+//                    System.out.println();
                     for (int i = 1; i < size; i++) {
                         cumulativeDistribution[i] += cumulativeDistribution[i - 1];
                     }
@@ -103,6 +124,7 @@ public class ZoneControllerEntity extends BlockEntity {
                                 snowGolem.setTame(false, false);
                                 snowGolem.setLocator((byte) 2);
                                 snowGolem.setStatus((byte) 3);
+                                snowGolem.setDropEquipment(false);
                                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                                 level.addFreshEntity(snowGolem);
                             }
@@ -110,7 +132,8 @@ public class ZoneControllerEntity extends BlockEntity {
                         }
                     }
                 }
-                be.timer = level.random.nextIntBetweenInclusive(40, 100);
+                int minTime = (int) (60F / (minRank - maxRank) * (mu - maxRank) + 20F);
+                be.timer = level.random.nextIntBetweenInclusive(minTime, 2 * minTime);
             } else {
                 be.timer--;
             }
