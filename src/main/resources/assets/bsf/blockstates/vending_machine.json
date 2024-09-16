@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "bsf:block/vending_machine"
+    }
+  }
+}

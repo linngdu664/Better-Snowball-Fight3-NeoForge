@@ -22,7 +22,7 @@ public class VendingMachineEntityRenderer implements BlockEntityRenderer<Vending
         if (!goods.isEmpty()) {
             float rotation = ClientForgeEvents.tickCount + partialTick;
             transform.pushPose();
-            transform.translate(0.5, 2, 0.5);
+            transform.translate(0.5, 1.2, 0.5);
             transform.scale(0.625F, 0.625F, 0.625F);
             transform.mulPose(Axis.YP.rotationDegrees(rotation));
             Minecraft.getInstance().getItemRenderer().renderStatic(goods, ItemDisplayContext.GROUND, LightTexture.FULL_BRIGHT, packedOverlay, transform, bufferSource, vendingMachineEntity.getLevel (), (int) vendingMachineEntity.getBlockPos().asLong());
