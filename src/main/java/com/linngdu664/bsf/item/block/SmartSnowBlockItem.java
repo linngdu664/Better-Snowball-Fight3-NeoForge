@@ -12,10 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
-import com.linngdu664.bsf.registry.*;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.im.InputContext;
 import java.util.List;
 
 public class SmartSnowBlockItem extends BlockItem {

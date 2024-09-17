@@ -13,7 +13,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import com.linngdu664.bsf.registry.*;
 
 public class CriticalSnowEntity extends BlockEntity {
     private int targetAge = BSFCommonUtil.staticRandInt(100, 140);

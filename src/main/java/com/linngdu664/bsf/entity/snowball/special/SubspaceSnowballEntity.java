@@ -30,7 +30,10 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
 //    private final ArrayList<ItemStack> itemStackArrayList = new ArrayList<>();

@@ -1,7 +1,6 @@
 package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.client.renderer.block.VendingMachineEntityRenderer;
 import com.linngdu664.bsf.client.renderer.entity.*;
 import com.linngdu664.bsf.entity.BSFDummyEntity;

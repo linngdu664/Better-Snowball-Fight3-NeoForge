@@ -1,8 +1,8 @@
 package com.linngdu664.bsf.item.tool;
 
+import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
-import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
@@ -25,7 +25,10 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class TeamLinkerItem extends Item {
     public static boolean shouldShowHighlight = false;  // client only

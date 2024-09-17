@@ -1,8 +1,8 @@
 package com.linngdu664.bsf.item.tool;
 
+import com.linngdu664.bsf.misc.BSFTiers;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.misc.BSFTiers;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

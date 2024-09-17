@@ -4,7 +4,6 @@ import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.particle.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.particle.SonicBoomParticle;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;

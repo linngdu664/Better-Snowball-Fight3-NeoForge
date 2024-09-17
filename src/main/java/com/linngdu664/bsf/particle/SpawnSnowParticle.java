@@ -1,15 +1,9 @@
 package com.linngdu664.bsf.particle;
 
-import com.linngdu664.bsf.item.weapon.ImplosionSnowballCannonItem;
-import com.linngdu664.bsf.util.BSFCommonUtil;
-import com.linngdu664.bsf.util.SphereAxisRotationHelper;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 
 public class SpawnSnowParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
