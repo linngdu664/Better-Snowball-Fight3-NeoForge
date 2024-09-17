@@ -195,7 +195,7 @@ public class BSFGuiTool {
         if (!(isInScreen(upperLeftCorner) && isInScreen(lowerRightCorner))) {
             return null;
         }
-        renderOutlineCoordinate(guiGraphics,upperLeftCorner.x,upperLeftCorner.y, lowerRightCorner.x, lowerRightCorner.y, frameColor);
+        renderOutlineCoordinate(guiGraphics,upperLeftCorner.x,upperLeftCorner.y, lowerRightCorner.x, lowerRightCorner.y, frameColor,0.5f);
         return new Vec2((upperLeftCorner.x+lowerRightCorner.x)/2, lowerRightCorner.y);
     }
 
@@ -353,6 +353,12 @@ public class BSFGuiTool {
         fill(guiGraphics,x, y2 - 1, x2, y2, color);
         fill(guiGraphics,x, y + 1, x + 1, y2 - 1, color);
         fill(guiGraphics,x2 - 1, y + 1, x2, y2 - 1, color);
+    }
+    public static void renderOutlineCoordinate(GuiGraphics guiGraphics,float x, float y, float x2, float y2, int color, float width) {
+        fill(guiGraphics,x, y, x2, y + width, color);
+        fill(guiGraphics,x, y2 - width, x2, y2, color);
+        fill(guiGraphics,x, y + width, x + width, y2 - width, color);
+        fill(guiGraphics,x2 - width, y + width, x2, y2 - width, color);
     }
 
     public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
