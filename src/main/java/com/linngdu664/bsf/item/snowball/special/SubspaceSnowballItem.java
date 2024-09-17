@@ -38,7 +38,7 @@ public class SubspaceSnowballItem extends AbstractBSFSnowballItem {
             }
             if (!pPlayer.getAbilities().instabuild) {
                 itemStack.shrink(1);
-                pPlayer.getCooldowns().addCooldown(this, 100);
+                pPlayer.getCooldowns().addCooldown(this, 40);
             }
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));//Feedback effect

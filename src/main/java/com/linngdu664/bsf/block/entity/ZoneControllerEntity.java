@@ -52,17 +52,17 @@ public class ZoneControllerEntity extends BlockEntity {
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
         if (!level.isClientSide && level.hasNeighborSignal(pos) && blockEntity instanceof ZoneControllerEntity be && !be.snowGolemList.isEmpty()) {
             if (be.timer <= 0) {
-                List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
                 float enemyGolemStrength = 0;
                 float enemyPlayerStrength = 0;
                 float friendlyGolemStrength = 0;
                 float friendlyPlayerStrength = 0;
+                List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
                 List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
-                for (BSFSnowGolemEntity golem : enemyGolemList) {
-                    enemyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
-                }
                 for (BSFSnowGolemEntity golem : friendlyGolemList) {
                     friendlyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
+                }
+                for (BSFSnowGolemEntity golem : enemyGolemList) {
+                    enemyGolemStrength += ZoneControllerEntity.lnRank(golem.getRank());
                 }
                 List<? extends Player> playerList = level.players();
                 BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
@@ -138,8 +138,6 @@ public class ZoneControllerEntity extends BlockEntity {
                     }
                 }
                 int minTime = (int) (60F / (minRank - maxRank - be.lHalf) * (mu - maxRank - be.lHalf * 0.5F) + 20F);
-                // 1s-4s
-                // 2s-8s
                 be.timer = level.random.nextIntBetweenInclusive(minTime, 2 * minTime);
             } else {
                 be.timer--;
@@ -175,8 +173,6 @@ public class ZoneControllerEntity extends BlockEntity {
         currentStrength = tag.getFloat("CurrentStrength");
         teamId = tag.getByte("TeamId");
     }
-
-
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
