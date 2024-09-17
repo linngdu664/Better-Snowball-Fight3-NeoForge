@@ -277,9 +277,8 @@ public class GuiHandler {
     public static void specialWallhackUi(GuiGraphics guiGraphics, float partialTick) {
         if (player.hasEffect(EffectRegister.WALLHACK)){
             Level level = player.level();
-            Vec3 eyePosition = player.getEyePosition();
-            level.getEntitiesOfClass(LivingEntity.class, new AABB(eyePosition,eyePosition).inflate(50), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable() && p instanceof Enemy)).forEach(livingEntity -> {
-                Vec2 boxBottom = renderHackBox(guiGraphics, livingEntity, player, 0xffff0000, partialTick);
+            level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> p instanceof Enemy)).forEach(livingEntity -> {
+                Vec2 boxBottom = renderHackBox(guiGraphics, livingEntity, 0xffff0000, partialTick);
                 if (boxBottom != null) {
                     renderLineTool(guiGraphics,boxBottom,v2IRatio(window,0.5,1.1).getVec2(),0.5f,0xff0000ff,true,0,0xff0000ff);
                 }

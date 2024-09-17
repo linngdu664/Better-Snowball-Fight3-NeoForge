@@ -1,7 +1,6 @@
 package com.linngdu664.bsf.gui;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.registry.EffectRegister;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -14,7 +13,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
@@ -25,6 +23,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import oshi.util.tuples.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -178,20 +177,49 @@ public class BSFGuiTool {
         int innerW = (int) ((frame.x - padding - padding) * percent);
         guiGraphics.fill(pos.x + padding, pos.y + padding, pos.x + padding + innerW, pos.y + frame.y - padding, innerColor);
     }
-    public static Vec2 renderHackBox(GuiGraphics guiGraphics, LivingEntity livingEntity, Player player, int frameColor,float particleTick) {
+    public static Vec2 renderHackBox(GuiGraphics guiGraphics, LivingEntity livingEntity, int frameColor,float particleTick) {
         AABB aabb = livingEntity.getBoundingBox();
-        double halfWidth = aabb.getXsize()/2;
-        Vec3 bottomCenter = aabb.getBottomCenter();
-        Vec3 ceilingCenter = bottomCenter.add(0, aabb.getYsize(), 0);
-        Vec3 yAxis = new Vec3(0, 1, 0);
-        Vec2 upperLeftCorner = calcScreenPosFromWorldPos(yAxis.cross(ceilingCenter.subtract(player.getEyePosition())).normalize().scale(halfWidth).add(ceilingCenter), guiGraphics, particleTick);
-        Vec2 lowerRightCorner = calcScreenPosFromWorldPos(yAxis.cross(bottomCenter.subtract(player.getEyePosition())).normalize().scale(-halfWidth).add(bottomCenter), guiGraphics, particleTick);
-        float dx = lowerRightCorner.x - upperLeftCorner.x;
-        float fixY = dx - lowerRightCorner.y + upperLeftCorner.y;
-        if (fixY > 0){
-            upperLeftCorner = upperLeftCorner.add(new Vec2(0,-fixY/2));
-            lowerRightCorner = lowerRightCorner.add(new Vec2(0,fixY/2));
+        List<Vec3> vec3List = List.of(
+                new Vec3(aabb.minX, aabb.minY, aabb.minZ),
+                new Vec3(aabb.minX, aabb.minY, aabb.maxZ),
+                new Vec3(aabb.minX, aabb.maxY, aabb.minZ),
+                new Vec3(aabb.minX, aabb.maxY, aabb.maxZ),
+                new Vec3(aabb.maxX, aabb.minY, aabb.minZ),
+                new Vec3(aabb.maxX, aabb.minY, aabb.maxZ),
+                new Vec3(aabb.maxX, aabb.maxY, aabb.minZ),
+                new Vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
+        );
+        List<Vec2> vec2List = calcScreenPosFromWorldPosAndReturn(vec3List, guiGraphics, particleTick);
+        float minX = vec2List.getFirst().x;
+        float minY = vec2List.getFirst().y;
+        float maxX = minX;
+        float maxY = minY;
+        for (Vec2 vec2 : vec2List) {
+            if (vec2.x < minX) {
+                minX = vec2.x;
+            } else if (vec2.x > maxX) {
+                maxX = vec2.x;
+            }
+            if (vec2.y < minY) {
+                minY = vec2.y;
+            } else if (vec2.y > maxY) {
+                maxY = vec2.y;
+            }
         }
+        Vec2 upperLeftCorner = new Vec2(minX, minY);
+        Vec2 lowerRightCorner = new Vec2(maxX, maxY);
+//        double halfWidth = aabb.getXsize()/2;
+//        Vec3 bottomCenter = aabb.getBottomCenter();
+//        Vec3 ceilingCenter = bottomCenter.add(0, aabb.getYsize(), 0);
+//        Vec3 yAxis = new Vec3(0, 1, 0);
+//        Vec2 upperLeftCorner = calcScreenPosFromWorldPos(yAxis.cross(ceilingCenter.subtract(player.getEyePosition())).normalize().scale(halfWidth).add(ceilingCenter), guiGraphics, particleTick);
+//        Vec2 lowerRightCorner = calcScreenPosFromWorldPos(yAxis.cross(bottomCenter.subtract(player.getEyePosition())).normalize().scale(-halfWidth).add(bottomCenter), guiGraphics, particleTick);
+//        float dx = lowerRightCorner.x - upperLeftCorner.x;
+//        float fixY = dx - lowerRightCorner.y + upperLeftCorner.y;
+//        if (fixY > 0){
+//            upperLeftCorner = upperLeftCorner.add(new Vec2(0,-fixY/2));
+//            lowerRightCorner = lowerRightCorner.add(new Vec2(0,fixY/2));
+//        }
         if (!(isInScreen(upperLeftCorner) && isInScreen(lowerRightCorner))) {
             return null;
         }
@@ -274,6 +302,24 @@ public class BSFGuiTool {
     public static void calcScreenPosFromWorldPos(List<Pair<Vec3, Consumer<Vec2>>> point,GuiGraphics guiGraphics, float partialTicks){
         calcScreenPosFromWorldPos(point,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0,0,partialTicks);
     }
+
+    public static List<Vec2> calcScreenPosFromWorldPosAndReturn(List<Vec3> point, GuiGraphics guiGraphics, float partialTicks){
+        ArrayList<Vec2> arrayList = new ArrayList<>();
+        Minecraft mc = Minecraft.getInstance();
+        GameRenderer gameRenderer = mc.gameRenderer;
+        Camera camera = gameRenderer.getMainCamera();
+        Vec3 cameraPos = camera.getPosition();
+        Matrix3f rotMat = new Matrix3f().rotation(camera.rotation().conjugate(new Quaternionf()));      // make rot mat
+        Window window = mc.getWindow();
+        float fovy = (float) gameRenderer.getFov(camera, partialTicks, true) * Mth.DEG_TO_RAD;
+        float tanHalfFovy = Mth.sin(fovy * 0.5F) / Mth.cos(fovy * 0.5F);
+        float tanHalfFovx = tanHalfFovy * (float) window.getWidth() / (float) window.getHeight();
+        for (Vec3 vec3 : point) {
+            arrayList.add(doCalcScreenPos(vec3, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, cameraPos, rotMat, tanHalfFovy, tanHalfFovx));
+        }
+        return arrayList;
+    }
+
     public static void calcScreenPosFromWorldPos(List<Pair<Vec3, Consumer<Vec2>>> points, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
@@ -325,7 +371,7 @@ public class BSFGuiTool {
         rotMat.transform(vector3f);
         float rx = vector3f.x / -vector3f.z / tanHalfFovx;
         float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp(guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
-        float ry = vector3f.y / Mth.sqrt(vector3f.x * vector3f.x + vector3f.z * vector3f.z) / tanHalfFovy;
+        float ry = vector3f.y / -vector3f.z / tanHalfFovy;
         float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
         point.getB().accept(new Vec2(xScreen, yScreen));
     }
@@ -334,7 +380,7 @@ public class BSFGuiTool {
         rotMat.transform(vector3f);
         float rx = vector3f.x / -vector3f.z / tanHalfFovx;
         float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp(guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
-        float ry = vector3f.y / Mth.sqrt(vector3f.x * vector3f.x + vector3f.z * vector3f.z) / tanHalfFovy;
+        float ry = vector3f.y / -vector3f.z / tanHalfFovy;
         float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
         return new Vec2(xScreen, yScreen);
     }
