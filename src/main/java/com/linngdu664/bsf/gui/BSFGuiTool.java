@@ -177,9 +177,10 @@ public class BSFGuiTool {
         int innerW = (int) ((frame.x - padding - padding) * percent);
         guiGraphics.fill(pos.x + padding, pos.y + padding, pos.x + padding + innerW, pos.y + frame.y - padding, innerColor);
     }
-    public static Vec2 renderHackBox(GuiGraphics guiGraphics, LivingEntity livingEntity, int frameColor,float particleTick) {
+    public static Vec2 renderHackBox(GuiGraphics guiGraphics, Window window, LivingEntity livingEntity, int frameColor,float particleTick) {
         AABB aabb = livingEntity.getBoundingBox();
-        List<Vec3> vec3List = List.of(
+        // todo: lerp bounding box
+        List<Vec2> vec2List = calcScreenPosFromWorldPosAndReturn(List.of(
                 new Vec3(aabb.minX, aabb.minY, aabb.minZ),
                 new Vec3(aabb.minX, aabb.minY, aabb.maxZ),
                 new Vec3(aabb.minX, aabb.maxY, aabb.minZ),
@@ -188,8 +189,7 @@ public class BSFGuiTool {
                 new Vec3(aabb.maxX, aabb.minY, aabb.maxZ),
                 new Vec3(aabb.maxX, aabb.maxY, aabb.minZ),
                 new Vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
-        );
-        List<Vec2> vec2List = calcScreenPosFromWorldPosAndReturn(vec3List, guiGraphics, particleTick);
+        ), guiGraphics, particleTick);
         float minX = vec2List.getFirst().x;
         float minY = vec2List.getFirst().y;
         float maxX = minX;
@@ -220,7 +220,7 @@ public class BSFGuiTool {
 //            upperLeftCorner = upperLeftCorner.add(new Vec2(0,-fixY/2));
 //            lowerRightCorner = lowerRightCorner.add(new Vec2(0,fixY/2));
 //        }
-        if (!(isInScreen(upperLeftCorner) && isInScreen(lowerRightCorner))) {
+        if (!(isInScreen(upperLeftCorner, window) && isInScreen(lowerRightCorner, window))) {
             return null;
         }
         renderOutlineCoordinate(guiGraphics,upperLeftCorner.x,upperLeftCorner.y, lowerRightCorner.x, lowerRightCorner.y, frameColor,0.5f);
@@ -384,8 +384,8 @@ public class BSFGuiTool {
         float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
         return new Vec2(xScreen, yScreen);
     }
-    public static boolean isInScreen(Vec2 point) {
-        return point.x > 0 && point.y > 0 && point.x < GuiHandler.window.getGuiScaledWidth() && point.y < GuiHandler.window.getGuiScaledHeight();
+    public static boolean isInScreen(Vec2 point, Window window) {
+        return point.x > 0 && point.y > 0 && point.x < window.getGuiScaledWidth() && point.y < window.getGuiScaledHeight();
     }
 
     public static void renderOutline(GuiGraphics guiGraphics,float x, float y, float width, float height, int color) {

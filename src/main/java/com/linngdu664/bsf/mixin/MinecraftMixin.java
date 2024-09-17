@@ -1,15 +1,12 @@
 package com.linngdu664.bsf.mixin;
 
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
-import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.mojang.blaze3d.platform.WindowEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.OwnableEntity;
 import net.neoforged.neoforge.client.extensions.IMinecraftExtension;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,13 +22,7 @@ public abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnabl
     @Inject(method = "shouldEntityAppearGlowing", at = @At(value = "HEAD"), cancellable = true)
     private void shouldEntityAppearGlowing(Entity pEntity, CallbackInfoReturnable<Boolean> cir) {
         if (TeamLinkerItem.shouldShowHighlight) {
-            if (TeamMembersPayload.staticMembers.contains(pEntity.getUUID())) {
-                cir.setReturnValue(true);
-            }
-            if (pEntity instanceof BSFSnowGolemEntity snowGolem && snowGolem.getFixedTeamId() >= 0 && snowGolem.getFixedTeamId() == CurrentTeamPayload.currentTeam) {
-                cir.setReturnValue(true);
-            }
-            if (pEntity instanceof OwnableEntity ownable && TeamMembersPayload.staticMembers.contains(ownable.getOwnerUUID())) {
+            if (TeamMembersPayload.isFriendly(pEntity)) {
                 cir.setReturnValue(true);
             }
         }

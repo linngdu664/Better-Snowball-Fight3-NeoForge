@@ -10,6 +10,7 @@ import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
+import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
@@ -19,17 +20,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -47,11 +44,8 @@ import static com.linngdu664.bsf.gui.BSFGuiTool.*;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiHandler {
-    public static final Minecraft instance = Minecraft.getInstance();
-    public static final Player player = instance.player;
-    public static final Window window = instance.getWindow();
-
     public static void itemInHandBSFWeapon(GuiGraphics guiGraphics, ItemStack mainHandItem, ItemStack offHandItem) {
+        Minecraft instance = Minecraft.getInstance();
         AbstractBSFWeaponItem weaponItem = null;
         ItemStack selectItem = null;
         if (mainHandItem.getItem() instanceof AbstractBSFWeaponItem item) {
@@ -62,6 +56,7 @@ public class GuiHandler {
             selectItem = offHandItem;
         }
         if (weaponItem != null) {
+            Window window = instance.getWindow();
             ItemStack current = weaponItem.getCurrentAmmoItemStack();
             ItemStack prev = weaponItem.getPrevAmmoItemStack();
             ItemStack next = weaponItem.getNextAmmoItemStack();
@@ -85,7 +80,10 @@ public class GuiHandler {
     }
 
     public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, Entity pickEntity, float partialTick, Map<String, Object> varMap) {
+        Minecraft instance = Minecraft.getInstance();
+        Player player = instance.player;
         if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()) && player.equals(((BSFSnowGolemEntity) pickEntity).getOwner())) {
+            Window window = instance.getWindow();
             BSFSnowGolemEntity entity = (BSFSnowGolemEntity) pickEntity;
             //显示装备
             List<Pair<Vec3, Consumer<Vec2>>> list = new ArrayList<>();
@@ -160,6 +158,8 @@ public class GuiHandler {
 
     public static void pickEntityBSFDummy(GuiGraphics guiGraphics, Entity pickEntity) {
         if (pickEntity.getType().equals(EntityRegister.BSF_DUMMY.get())) {
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
             BSFDummyEntity dummy = (BSFDummyEntity) pickEntity;
             V2I v2I = v2IRatio(window, 0.4, 0.5);
             String dpsStr = String.format(dummy.getDPS() < 10 ? "DPS: %.2f" : "DPS: %.3g", dummy.getDPS());
@@ -169,6 +169,8 @@ public class GuiHandler {
 
     public static void pickBlockEntityVendingMachine(GuiGraphics guiGraphics, BlockEntity blockEntity, ItemStack mainHandItem, float partialTick) {
         if (blockEntity instanceof VendingMachineEntity vendingMachine) {
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
             //显示货物
             calcScreenPosFromWorldPos(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.4);
@@ -206,6 +208,8 @@ public class GuiHandler {
 
     public static void pickBlockEntityZoneController(GuiGraphics guiGraphics, BlockEntity blockEntity, float partialTick) {
         if (blockEntity instanceof ZoneControllerEntity zoneController) {
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
             //显示队伍
             calcScreenPosFromWorldPos(new Pair<>(zoneController.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
@@ -227,6 +231,8 @@ public class GuiHandler {
             tweaker = offHandItem;
         }
         if (tweaker != null) {
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
             //显示模式调整器gui
             byte locator = tweaker.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
             varMap.put("tLocatorStr", BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator)));
@@ -255,6 +261,8 @@ public class GuiHandler {
         String sStatusStr = (String) varMap.get("sStatusStr");
         String tStatusStr = (String) varMap.get("tStatusStr");
         if (!(StringUtils.isBlank(sLocatorStr) && StringUtils.isBlank(tLocatorStr))) {
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
             //显示模式调整文字
             String lStr = BSFCommonUtil.getTransStr("tweaker_target.tip", StringUtils.isBlank(sLocatorStr) ? tLocatorStr : StringUtils.isBlank(tLocatorStr) || sLocatorStr.equals(tLocatorStr) ? sLocatorStr : sLocatorStr + " << " + tLocatorStr);
             String sStr = BSFCommonUtil.getTransStr("tweaker_status.tip", StringUtils.isBlank(sStatusStr) ? tStatusStr : StringUtils.isBlank(tStatusStr) || sStatusStr.equals(tStatusStr) ? sStatusStr : sStatusStr + " << " + tStatusStr);
@@ -266,6 +274,8 @@ public class GuiHandler {
 
     public static void specialScoreText(GuiGraphics guiGraphics) {
         if (ScoringGuiHandler.hourMeter>0){
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
             V2I v2I = v2IRatio(window, 0.9, 0.4);
             String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score>=0?"scoring_device_kill_bonus.tip":"scoring_device_death_punishment.tip",String.valueOf(ScoringGuiHandler.score));
             RenderSystem.enableBlend();
@@ -275,10 +285,13 @@ public class GuiHandler {
     }
 
     public static void specialWallhackUi(GuiGraphics guiGraphics, float partialTick) {
-        if (player.hasEffect(EffectRegister.WALLHACK)){
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
+        if (player.hasEffect(EffectRegister.WALLHACK)) {
+            Window window = mc.getWindow();
             Level level = player.level();
-            level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> p instanceof Enemy)).forEach(livingEntity -> {
-                Vec2 boxBottom = renderHackBox(guiGraphics, livingEntity, 0xffff0000, partialTick);
+            level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), p -> !TeamMembersPayload.isFriendly(p) && (p instanceof Enemy || p.getType().equals(EntityType.PLAYER) || p.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()))).forEach(livingEntity -> {
+                Vec2 boxBottom = renderHackBox(guiGraphics, window, livingEntity, 0xffff0000, partialTick);
                 if (boxBottom != null) {
                     renderLineTool(guiGraphics,boxBottom,v2IRatio(window,0.5,1.1).getVec2(),0.5f,0xff0000ff,true,0,0xff0000ff);
                 }
