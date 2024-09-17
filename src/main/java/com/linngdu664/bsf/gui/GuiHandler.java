@@ -11,6 +11,7 @@ import com.linngdu664.bsf.item.tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
@@ -19,10 +20,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -40,9 +47,9 @@ import static com.linngdu664.bsf.gui.BSFGuiTool.*;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiHandler {
-    private static final Minecraft instance = Minecraft.getInstance();
-    private static final Player player = instance.player;
-    private static final Window window = instance.getWindow();
+    public static final Minecraft instance = Minecraft.getInstance();
+    public static final Player player = instance.player;
+    public static final Window window = instance.getWindow();
 
     public static void itemInHandBSFWeapon(GuiGraphics guiGraphics, ItemStack mainHandItem, ItemStack offHandItem) {
         AbstractBSFWeaponItem weaponItem = null;
@@ -264,6 +271,16 @@ public class GuiHandler {
             RenderSystem.enableBlend();
             guiGraphics.drawString(instance.font, scoreStr, v2I.x-instance.font.width(scoreStr), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
             RenderSystem.disableBlend();
+        }
+    }
+
+    public static void specialWallhackUi(GuiGraphics guiGraphics, float partialTick) {
+        if (player.hasEffect(EffectRegister.WALLHACK)){
+            Level level = player.level();
+            Vec3 eyePosition = player.getEyePosition();
+            level.getEntitiesOfClass(LivingEntity.class, new AABB(eyePosition,eyePosition).inflate(50), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable() && p instanceof Enemy)).forEach(livingEntity -> {
+                renderHackBox(guiGraphics, livingEntity, player, 0xffff0000, partialTick);
+            });
         }
     }
 }

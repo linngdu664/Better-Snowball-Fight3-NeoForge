@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.gui;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.registry.EffectRegister;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -12,7 +13,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -174,6 +178,26 @@ public class BSFGuiTool {
         int innerW = (int) ((frame.x - padding - padding) * percent);
         guiGraphics.fill(pos.x + padding, pos.y + padding, pos.x + padding + innerW, pos.y + frame.y - padding, innerColor);
     }
+    public static Vec2 renderHackBox(GuiGraphics guiGraphics, LivingEntity livingEntity, Player player, int frameColor,float particleTick) {
+        AABB aabb = livingEntity.getBoundingBox();
+        double halfWidth = aabb.getXsize()/2;
+        Vec3 bottomCenter = aabb.getBottomCenter();
+        Vec3 ceilingCenter = bottomCenter.add(0, aabb.getYsize(), 0);
+        Vec3 yAxis = new Vec3(0, 1, 0);
+        Vec2 upperLeftCorner = calcScreenPosFromWorldPos(yAxis.cross(ceilingCenter.subtract(player.getEyePosition())).normalize().scale(halfWidth).add(ceilingCenter), guiGraphics, particleTick);
+        Vec2 lowerRightCorner = calcScreenPosFromWorldPos(yAxis.cross(bottomCenter.subtract(player.getEyePosition())).normalize().scale(-halfWidth).add(bottomCenter), guiGraphics, particleTick);
+        float dx = lowerRightCorner.x - upperLeftCorner.x;
+        float fixY = dx - lowerRightCorner.y + upperLeftCorner.y;
+        if (fixY > 0){
+            upperLeftCorner = upperLeftCorner.add(new Vec2(0,-fixY/2));
+            lowerRightCorner = lowerRightCorner.add(new Vec2(0,fixY/2));
+        }
+        if (!(isInScreen(upperLeftCorner) && isInScreen(lowerRightCorner))) {
+            return null;
+        }
+        renderOutlineCoordinate(guiGraphics,upperLeftCorner.x,upperLeftCorner.y, lowerRightCorner.x, lowerRightCorner.y, frameColor);
+        return new Vec2((upperLeftCorner.x+lowerRightCorner.x)/2, lowerRightCorner.y);
+    }
 
     /**
      * 渲染装备介绍
@@ -247,7 +271,9 @@ public class BSFGuiTool {
     public static void renderFillSquareTool(GuiGraphics guiGraphics, Vec2 a, Vec2 b, int pColor) {
         renderFillTool(guiGraphics, a, new Vec2(a.x, b.y), b, new Vec2(b.x, a.y), pColor);
     }
-
+    public static void calcScreenPosFromWorldPos(List<Pair<Vec3, Consumer<Vec2>>> point,GuiGraphics guiGraphics, float partialTicks){
+        calcScreenPosFromWorldPos(point,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0,0,partialTicks);
+    }
     public static void calcScreenPosFromWorldPos(List<Pair<Vec3, Consumer<Vec2>>> points, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
@@ -262,7 +288,9 @@ public class BSFGuiTool {
             doCalcScreenPos(pMethod, guiWidth, guiHeight, widthProtect, heightProtect, cameraPos, rotMat, tanHalfFovy, tanHalfFovx);
         }
     }
-
+    public static void calcScreenPosFromWorldPos(Pair<Vec3, Consumer<Vec2>> point,GuiGraphics guiGraphics, float partialTicks){
+        calcScreenPosFromWorldPos(point,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0,0,partialTicks);
+    }
     public static void calcScreenPosFromWorldPos(Pair<Vec3, Consumer<Vec2>> point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
@@ -276,7 +304,21 @@ public class BSFGuiTool {
 
         doCalcScreenPos(point, guiWidth, guiHeight, widthProtect, heightProtect, cameraPos, rotMat, tanHalfFovy, tanHalfFovx);
     }
-
+    public static Vec2 calcScreenPosFromWorldPos(Vec3 point,GuiGraphics guiGraphics, float partialTicks){
+        return calcScreenPosFromWorldPos(point,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0,0,partialTicks);
+    }
+    public static Vec2 calcScreenPosFromWorldPos(Vec3 point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, float partialTicks) {
+        Minecraft mc = Minecraft.getInstance();
+        GameRenderer gameRenderer = mc.gameRenderer;
+        Camera camera = gameRenderer.getMainCamera();
+        Vec3 cameraPos = camera.getPosition();
+        Matrix3f rotMat = new Matrix3f().rotation(camera.rotation().conjugate(new Quaternionf()));      // make rot mat
+        Window window = mc.getWindow();
+        float fovy = (float) gameRenderer.getFov(camera, partialTicks, true) * Mth.DEG_TO_RAD;
+        float tanHalfFovy = Mth.sin(fovy * 0.5F) / Mth.cos(fovy * 0.5F);
+        float tanHalfFovx = tanHalfFovy * (float) window.getWidth() / (float) window.getHeight();
+        return doCalcScreenPos(point, guiWidth, guiHeight, widthProtect, heightProtect, cameraPos, rotMat, tanHalfFovy, tanHalfFovx);
+    }
     private static void doCalcScreenPos(Pair<Vec3, Consumer<Vec2>> point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, Vec3 cameraPos, Matrix3f rotMat, float tanHalfFovy, float tanHalfFovx) {
         Vec3 vec3 = point.getA();
         Vector3f vector3f = new Vector3f((float) (vec3.x - cameraPos.x), (float) (vec3.y - cameraPos.y), (float) (vec3.z - cameraPos.z));
@@ -287,4 +329,52 @@ public class BSFGuiTool {
         float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
         point.getB().accept(new Vec2(xScreen, yScreen));
     }
+    private static Vec2 doCalcScreenPos(Vec3 point, int guiWidth, int guiHeight, int widthProtect, int heightProtect, Vec3 cameraPos, Matrix3f rotMat, float tanHalfFovy, float tanHalfFovx) {
+        Vector3f vector3f = new Vector3f((float) (point.x - cameraPos.x), (float) (point.y - cameraPos.y), (float) (point.z - cameraPos.z));
+        rotMat.transform(vector3f);
+        float rx = vector3f.x / -vector3f.z / tanHalfFovx;
+        float xScreen = vector3f.z >= 0 ? (vector3f.x >= 0 ? guiWidth - widthProtect : widthProtect) : Mth.clamp(guiWidth * 0.5F * (1 + rx), widthProtect, guiWidth - widthProtect);
+        float ry = vector3f.y / Mth.sqrt(vector3f.x * vector3f.x + vector3f.z * vector3f.z) / tanHalfFovy;
+        float yScreen = Mth.clamp(guiHeight * 0.5F * (1 - ry), heightProtect, guiHeight - heightProtect);
+        return new Vec2(xScreen, yScreen);
+    }
+    public static boolean isInScreen(Vec2 point) {
+        return point.x > 0 && point.y > 0 && point.x < GuiHandler.window.getGuiScaledWidth() && point.y < GuiHandler.window.getGuiScaledHeight();
+    }
+
+    public static void renderOutline(GuiGraphics guiGraphics,float x, float y, float width, float height, int color) {
+        fill(guiGraphics,x, y, x + width, y + 1, color);
+        fill(guiGraphics,x, y + height - 1, x + width, y + height, color);
+        fill(guiGraphics,x, y + 1, x + 1, y + height - 1, color);
+        fill(guiGraphics,x + width - 1, y + 1, x + width, y + height - 1, color);
+    }
+    public static void renderOutlineCoordinate(GuiGraphics guiGraphics,float x, float y, float x2, float y2, int color) {
+        fill(guiGraphics,x, y, x2, y + 1, color);
+        fill(guiGraphics,x, y2 - 1, x2, y2, color);
+        fill(guiGraphics,x, y + 1, x + 1, y2 - 1, color);
+        fill(guiGraphics,x2 - 1, y + 1, x2, y2 - 1, color);
+    }
+
+    public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
+        Matrix4f matrix4f = guiGraphics.pose.last().pose();
+        float j;
+        if (minX < maxX) {
+            j = minX;
+            minX = maxX;
+            maxX = j;
+        }
+
+        if (minY < maxY) {
+            j = minY;
+            minY = maxY;
+            maxY = j;
+        }
+        VertexConsumer vertexconsumer = guiGraphics.bufferSource.getBuffer(RenderType.gui());
+        vertexconsumer.addVertex(matrix4f, minX, minY, 0).setColor(color);
+        vertexconsumer.addVertex(matrix4f, minX, maxY, 0).setColor(color);
+        vertexconsumer.addVertex(matrix4f, maxX, maxY, 0).setColor(color);
+        vertexconsumer.addVertex(matrix4f, maxX, minY, 0).setColor(color);
+        guiGraphics.flushIfUnmanaged();
+    }
+
 }

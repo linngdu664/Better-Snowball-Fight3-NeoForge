@@ -38,6 +38,7 @@ public class RenderGuiEventHandler {
         guiGraphics.pose().translate(0F, 0F, 4932F);        // 显示在原版gui的上方
 
         //gui队列
+        GuiHandler.specialWallhackUi(guiGraphics,partialTick);
         GuiHandler.specialScoreText(guiGraphics);
         GuiHandler.itemInHandBSFWeapon(guiGraphics, mainHandItem, offHandItem);
         if (pickType == HitResult.Type.ENTITY) {
