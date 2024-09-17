@@ -40,8 +40,8 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     private static final int TRY_SUMMON_ICICLE_MAX_TIMES = 20;
     private static final int ICICLE_MAX_NUM = 15;
     private static final int TRY_SUMMON_ICICLE_DETECTION_RADIUS = 3;
-    private static final double FREEZE_PERCENTAGE = BSFCommonUtil.staticRandDouble(0.6, 0.9);
-    private static final int FREEZE_TIME = BSFCommonUtil.staticRandInt(40, 50);
+//    private static final double FREEZE_PERCENTAGE = BSFCommonUtil.staticRandDouble(0.6, 0.9);
+//    private static final int FREEZE_TIME = BSFCommonUtil.staticRandInt(40, 50);
     private static final float FREEZE_PROPAGATION_RATE = 0.1f;
     private final Icicle[] icicles = new Icicle[ICICLE_MAX_NUM];
     private final ArrayDeque<BlockPos> tmpFreezingBlocks = new ArrayDeque<>();
@@ -51,15 +51,21 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     private int initSnowStock = 0;
     private int freezingCount = 0;
     private BlockPos impactPoint;
+    private final double freezePrecentage;
+    private final int freezeTime;
 
     public IcicleSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, ServerConfig.ICICLE_SNOWBALL_DURATION.getConfigValue());
+        this.freezePrecentage = BSFCommonUtil.randDouble(pLevel.random, 0.6, 0.9);
+        this.freezeTime = pLevel.random.nextInt(40, 50);
     }
 
     public IcicleSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, int snowStock, RegionData region) {
         super(EntityRegister.ICICLE_SNOWBALL.get(), pShooter, pLevel, launchAdjustment, snowStock, ServerConfig.ICICLE_SNOWBALL_DURATION.getConfigValue(), region);
         this.initSnowStock = snowStock;
         this.destroyStepSize = Math.max(snowStock / 60, 1);
+        this.freezePrecentage = BSFCommonUtil.randDouble(pLevel.random, 0.6, 0.9);
+        this.freezeTime = pLevel.random.nextInt(40, 50);
     }
 
     @Override
@@ -113,9 +119,9 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     }
 
     private void hendleFrozenSpread(Level level) {
-        int freezingSpeed = initSnowStock / FREEZE_TIME;
+        int freezingSpeed = initSnowStock / freezeTime;
         if (!level.isClientSide) {
-            for (int t = 0; t < freezingSpeed && freezingCount < initSnowStock * FREEZE_PERCENTAGE && !tmpFreezingBlocks.isEmpty(); t++) {
+            for (int t = 0; t < freezingSpeed && freezingCount < initSnowStock * freezePrecentage && !tmpFreezingBlocks.isEmpty(); t++) {
                 BlockPos blockPos = tmpFreezingBlocks.poll();
                 int x = blockPos.getX();
                 int y = blockPos.getY();
@@ -140,7 +146,7 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     private void tryAddBlockState(Level level, int x, int y, int z) {
         BlockPos blockPos = new BlockPos(x, y, z);
         BlockState blockState = level.getBlockState(blockPos);
-        if (posIsLooseSnow(level, blockPos) && blockState.getValue(LooseSnowBlock.FROZEN) == 0 && level.random.nextDouble() < FREEZE_PROPAGATION_RATE && freezingCount < initSnowStock * FREEZE_PERCENTAGE) {
+        if (posIsLooseSnow(level, blockPos) && blockState.getValue(LooseSnowBlock.FROZEN) == 0 && level.random.nextDouble() < FREEZE_PROPAGATION_RATE && freezingCount < initSnowStock * freezePrecentage) {
             tmpFreezingBlocks.offer(blockPos);
             level.setBlockAndUpdate(blockPos, blockState.setValue(LooseSnowBlock.FROZEN, 1));
             level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundRegister.FREEZING.get(), SoundSource.NEUTRAL, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);

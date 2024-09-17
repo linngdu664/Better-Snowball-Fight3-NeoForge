@@ -78,13 +78,6 @@ public class BSFCommonUtil {
     /**
      * 不要在能获取到RandomSource对象时用这个方法！
      */
-    public static double staticRandDouble(double a, double b) {
-        return random.nextDouble(a, b);
-    }
-
-    /**
-     * 不要在能获取到RandomSource对象时用这个方法！
-     */
     public static int staticRandInt(int a, int b) {
         return random.nextInt(a, b);
     }
@@ -209,42 +202,6 @@ public class BSFCommonUtil {
         }
         return vec3;
     }
-//    public static EntityHitResult pickEntity(Entity entity ,Minecraft minecraft,float pPartialTicks) {
-//        double d0 = (double)minecraft.gameMode.getPickRange();
-//        double entityReach = minecraft.player.getEntityReach(); // Note - MC-76493 - We must validate players cannot click-through objects.
-//        minecraft.hitResult = entity.pick(Math.max(d0, entityReach), pPartialTicks, false); // Run pick() with the max of the two, so we can prevent click-through.
-//        Vec3 vec3 = entity.getEyePosition(pPartialTicks);
-//        boolean flag = false;
-//        int i = 3;
-//        double d1 = d0;
-//        if (d0 > 3.0D) {
-//            flag = true;
-//        }
-//
-//        d0 = d0;
-//        d0 = d1 = Math.max(d0, entityReach); // Pick entities with the max of both for the same reason.
-//
-//        d1 *= d1;
-//        // If we picked a block, we need to ignore entities past that block. Added != MISS check to not truncate on failed picks.
-//        // Also fixes MC-250858
-//        if (minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS) {
-//            d1 = minecraft.hitResult.getLocation().distanceToSqr(vec3);
-//            double blockReach = minecraft.player.getBlockReach();
-//            // Discard the result as a miss if it is outside the block reach.
-//            if (d1 > blockReach * blockReach) {
-//                Vec3 pos = minecraft.hitResult.getLocation();
-//                minecraft.hitResult = BlockHitResult.miss(pos, Direction.getNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(pos));
-//            }
-//        }
-//
-//        Vec3 vec31 = entity.getViewVector(1.0F);
-//        Vec3 vec32 = vec3.add(vec31.x * d0, vec31.y * d0, vec31.z * d0);
-//        float f = 1.0F;
-//        AABB aabb = entity.getBoundingBox().expandTowards(vec31.scale(d0)).inflate(1.0D, 1.0D, 1.0D);
-//        return ProjectileUtil.getEntityHitResult(entity, vec3, vec32, aabb, (p_234237_) -> {
-//            return !p_234237_.isSpectator() && p_234237_.isPickable();
-//        }, d1);
-//    }
 
     public static double vec3GetYaw(Vec3 vec) {
         return Math.atan2(vec.z, vec.x);
@@ -302,6 +259,7 @@ public class BSFCommonUtil {
         }
         return null;
     }
+
     private static NonNullList<ItemStack>[] getPlayerInventoryList(Player player){
         Inventory inventory = player.getInventory();
         return new NonNullList[]{inventory.items,inventory.armor,inventory.offhand};
