@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.snowball.special;
 
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.RegionData;
+import com.linngdu664.bsf.registry.BlockRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;

@@ -30,6 +30,7 @@ import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
 import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import com.linngdu664.bsf.registry.SoundRegister;

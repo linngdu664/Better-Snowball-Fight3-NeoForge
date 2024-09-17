@@ -6,6 +6,7 @@ import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.network.to_client.ScreenshakePayload;
+import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.SoundRegister;

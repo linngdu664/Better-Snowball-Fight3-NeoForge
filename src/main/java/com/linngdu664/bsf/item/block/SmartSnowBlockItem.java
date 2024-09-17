@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.item.block;
 
+import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
