@@ -4,8 +4,8 @@ import com.linngdu664.bsf.registry.BlockRegister;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Rarity;
 
-public class ZoneControllerItem extends BlockItem {
-    public ZoneControllerItem() {
+public class RegionControllerItem extends BlockItem {
+    public RegionControllerItem() {
         super(BlockRegister.REGION_CONTROLLER.get(), new Properties().rarity(Rarity.UNCOMMON));
     }
 
