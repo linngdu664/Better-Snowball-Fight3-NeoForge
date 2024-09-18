@@ -62,6 +62,6 @@ public class SuspiciousUSBFlashDriveItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive.tooltip", ChatFormatting.GRAY);
         BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive1.tooltip", ChatFormatting.GRAY);
-        BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive2.tooltip", ChatFormatting.DARK_GRAY, Minecraft.getInstance().options.keyUse);
+        BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive2.tooltip", ChatFormatting.DARK_GRAY, Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage());
     }
 }
