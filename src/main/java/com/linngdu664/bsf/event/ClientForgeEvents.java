@@ -4,7 +4,7 @@ import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
 import com.linngdu664.bsf.gui.ScoringGuiHandler;
 import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
-import com.linngdu664.bsf.item.tool.TeamLinkerItem;
+import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;

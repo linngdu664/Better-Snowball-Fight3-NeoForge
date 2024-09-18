@@ -452,7 +452,7 @@
   "scoring_device_cannot_sell.tip": "这台售货机不能回收物品",
   "scoring_device_kill_bonus.tip": "雪晶 +%1$s",
   "scoring_device_death_punishment.tip": "雪晶 -%1$s",
-  "scoring_device_tp_failed1_0.tip": "必须加入一个队伍才能进入区域",
+  "scoring_device_tp_failed1_0.tip": "必须加入%1$s队才能进入区域",
   "scoring_device_tp_failed1_1.tip": "进入区域不能携带【区域限制属性与积分器绑定区域不同的物品】，包括没有区域限制的物品，请检查背包",
   "scoring_device_tp_failed2.tip": "只有在区域内才能传送",
   "goods.tip": "商品",

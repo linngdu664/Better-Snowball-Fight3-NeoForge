@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.item.tool;
+package com.linngdu664.bsf.item.minigame_tool;
 
 import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.registry.DataComponentRegister;
@@ -17,8 +17,8 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 public class ValueAdjustmentTool extends Item {
-    public ValueAdjustmentTool(Properties properties) {
-        super(properties.stacksTo(1).component(DataComponentRegister.SELECTED_INDEX.get(), 0).component(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY));
+    public ValueAdjustmentTool() {
+        super(new Properties().stacksTo(1).component(DataComponentRegister.SELECTED_INDEX.get(), 0).component(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY));
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.linngdu664.bsf.block;
 import com.linngdu664.bsf.block.entity.ZoneControllerEntity;
 import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.item.component.RegionData;
-import com.linngdu664.bsf.item.tool.TeamLinkerItem;
+import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;

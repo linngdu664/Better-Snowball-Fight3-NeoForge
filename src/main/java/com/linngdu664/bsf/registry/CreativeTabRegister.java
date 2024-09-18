@@ -312,6 +312,7 @@ public class CreativeTabRegister {
                 output.accept(ItemRegister.POPSICLE.get());
                 output.accept(ItemRegister.MILK_POPSICLE.get());
                 output.accept(ItemRegister.VODKA.get());
+                output.accept(ItemRegister.SUSPICIOUS_USB_FLASH_DRIVE.get());
 
                 output.accept(ItemRegister.SMART_SNOW_BLOCK.get());
                 output.accept(ItemRegister.SNOW_GOLEM_CONTAINER.get());

@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.item.tool;
+package com.linngdu664.bsf.item.minigame_tool;
 
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
@@ -42,6 +42,7 @@ public class TeamLinkerItem extends Item {
     public static String getColorNameKeyById(int id) {
         return "color.minecraft." + DyeColor.byId(id).getName();
     }
+
     public static String getColorTransNameById(int id){
         return BSFCommonUtil.getTransStr(getColorNameKeyById(id));
     }

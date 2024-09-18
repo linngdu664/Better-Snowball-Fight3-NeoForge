@@ -62,11 +62,6 @@ public class DataComponentRegister {
                     "machine_gun_is_cool_down",
                     builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
             );
-//    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GENERIC_INT_VALUE =
-//            DATA_COMPONENTS.registerComponentType(
-//                    "generic_int_value",
-//                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
-//            );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<IntegerGroupData>> INTEGER_GROUP =
             DATA_COMPONENTS.registerComponentType(
                     "integer_group",
@@ -96,5 +91,10 @@ public class DataComponentRegister {
             DATA_COMPONENTS.registerComponentType(
                     "money",
                     builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Byte>> TEAM =
+            DATA_COMPONENTS.registerComponentType(
+                    "team",
+                    builder -> builder.persistent(Codec.BYTE).networkSynchronized(ByteBufCodecs.BYTE)
             );
 }

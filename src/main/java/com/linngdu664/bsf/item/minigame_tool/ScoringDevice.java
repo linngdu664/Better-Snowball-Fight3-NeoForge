@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.item.tool;
+package com.linngdu664.bsf.item.minigame_tool;
 
 import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.item.component.RegionData;
@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class ScoringDevice extends Item {
-    public ScoringDevice(Properties properties) {
-        super(properties.rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.RANK.get(), 0).component(DataComponentRegister.MONEY.get(), 0));
+    public ScoringDevice() {
+        super(new Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.RANK.get(), 0).component(DataComponentRegister.MONEY.get(), 0));
     }
 
     @Override
@@ -95,11 +95,13 @@ public class ScoringDevice extends Item {
         }
         return InteractionResult.PASS;
     }
+
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         RegionData region = itemStack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
         int rank = itemStack.getOrDefault(DataComponentRegister.RANK.get(), 0);
+        byte team = itemStack.getOrDefault(DataComponentRegister.TEAM.get(), (byte) 0);
         Predicate<ItemStack> predicate = p -> {
             if (p.isEmpty()) {
                 return false;
@@ -110,7 +112,7 @@ public class ScoringDevice extends Item {
             return !p.get(DataComponentRegister.REGION.get()).equals(region);
         };
         if (pLevel.isClientSide) {
-            if (CurrentTeamPayload.currentTeam < 0 || BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
+            if (CurrentTeamPayload.currentTeam != team || BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
                 return InteractionResultHolder.fail(itemStack);
             }
             if (rank < 0 && !region.inRegion(pPlayer.position())) {
@@ -122,15 +124,14 @@ public class ScoringDevice extends Item {
                 pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed2.tip"), false);
                 return InteractionResultHolder.fail(itemStack);
             }
-            if (savedData.getTeam(pPlayer.getUUID()) < 0) {
-                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_0.tip"), false);
+            if (savedData.getTeam(pPlayer.getUUID()) != team) {
+                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_0.tip", TeamLinkerItem.getColorTransNameById(team)), false);
                 return InteractionResultHolder.fail(itemStack);
             }
             if (BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
                 pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_1.tip"), false);
                 return InteractionResultHolder.fail(itemStack);
             }
-
         }
         pPlayer.startUsingItem(pUsedHand);
         return InteractionResultHolder.consume(itemStack);
@@ -142,7 +143,7 @@ public class ScoringDevice extends Item {
             Vec3 color = new Vec3(0.9, 0.9, 0.9);
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(livingEntity.getPosition(1).add(-0.5, 0, -0.5), livingEntity.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 5), BSFParticleType.SPAWN_SNOW.ordinal()));
         }
-            livingEntity.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+        livingEntity.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
     }
 
     @Override
@@ -159,7 +160,7 @@ public class ScoringDevice extends Item {
         Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), livingEntity.getPosition(1));
         livingEntity.moveTo(tpPoint);
         livingEntity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
-        return super.finishUsingItem(stack, level, livingEntity);
+        return stack;
     }
 
     public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {

@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.item.tool;
+package com.linngdu664.bsf.item.minigame_tool;
 
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.DataComponentRegister;
@@ -19,8 +19,8 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 public class RegionTool extends Item {
-    public RegionTool(Properties properties) {
-        super(properties.stacksTo(1).component(DataComponentRegister.REGION, RegionData.EMPTY));
+    public RegionTool() {
+        super(new Properties().stacksTo(1).component(DataComponentRegister.REGION, RegionData.EMPTY));
     }
 
     @Override

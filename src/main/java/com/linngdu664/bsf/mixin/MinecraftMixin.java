@@ -1,6 +1,6 @@
 package com.linngdu664.bsf.mixin;
 
-import com.linngdu664.bsf.item.tool.TeamLinkerItem;
+import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.mojang.blaze3d.platform.WindowEventHandler;
