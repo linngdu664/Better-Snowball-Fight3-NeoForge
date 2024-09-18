@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " D ",
+    "SAS",
+    " F "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:iron_ingot"
+    },
+    "A": {
+      "item": "bsf:suspicious_usb_flash_drive"
+    },
+    "D": {
+      "item": "minecraft:redstone"
+    },
+    "F": {
+      "item": "minecraft:glowstone_dust"
+    }
+  },
+  "result": {
+    "id": "bsf:suspicious_usb_flash_drive",
+    "count": 2
+  }
+}

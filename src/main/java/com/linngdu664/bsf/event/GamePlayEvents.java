@@ -323,6 +323,11 @@ public class GamePlayEvents {
                     .setBonusRolls(ConstantValue.exactly(0.0F))
                     .add(LootItem.lootTableItem(ItemRegister.SNOWBALL_CANNON_UPGRADE_SMITHING_TEMPLATE.get()))
                     .build());
+            lootTable.addPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1.0F))
+                    .setBonusRolls(ConstantValue.exactly(0.0F))
+                    .add(LootItem.lootTableItem(ItemRegister.SUSPICIOUS_USB_FLASH_DRIVE.get()))
+                    .build());
             event.setTable(lootTable);
         } else if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"))) {
             LootTable lootTable = event.getTable();
@@ -330,6 +335,11 @@ public class GamePlayEvents {
                     .setRolls(BinomialDistributionGenerator.binomial(2, 0.4F))
                     .setBonusRolls(ConstantValue.exactly(0.0F))
                     .add(LootItem.lootTableItem(ItemRegister.SNOWBALL_CANNON_UPGRADE_SMITHING_TEMPLATE.get()))
+                    .build());
+            lootTable.addPool(LootPool.lootPool()
+                    .setRolls(BinomialDistributionGenerator.binomial(2, 0.4F))
+                    .setBonusRolls(ConstantValue.exactly(0.0F))
+                    .add(LootItem.lootTableItem(ItemRegister.SUSPICIOUS_USB_FLASH_DRIVE.get()))
                     .build());
             event.setTable(lootTable);
         }
