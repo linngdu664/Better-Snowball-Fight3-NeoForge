@@ -370,14 +370,14 @@
 
   "region_limit.tooltip": "区域限制：此物品仅可在区域 (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s) 内使用",
 
-  "lunch_yes_hand.tooltip": "投掷√",
-  "lunch_yes_cannon.tooltip": "炮击√",
-  "lunch_yes_machine_gun.tooltip": "机枪√",
-  "lunch_yes_shotgun.tooltip": "散弹√",
-  "lunch_no_hand.tooltip": "投掷×",
-  "lunch_no_cannon.tooltip": "炮击×",
-  "lunch_no_machine_gun.tooltip": "机枪×",
-  "lunch_no_shotgun.tooltip": "散弹×",
+  "lunch_yes_hand.tooltip": "投掷✓",
+  "lunch_yes_cannon.tooltip": "炮击✓",
+  "lunch_yes_machine_gun.tooltip": "机枪✓",
+  "lunch_yes_shotgun.tooltip": "散弹✓",
+  "lunch_no_hand.tooltip": "投掷✗",
+  "lunch_no_cannon.tooltip": "炮击✗",
+  "lunch_no_machine_gun.tooltip": "机枪✗",
+  "lunch_no_shotgun.tooltip": "散弹✗",
 
   "advancements.bsf.root.title": "更好的打雪仗",
   "advancements.bsf.root.description": "更好的打雪仗",
@@ -415,6 +415,8 @@
   "advancements.bsf.gravity_snowball_to_monster.description": "获得任意引力/斥力雪球",
   "advancements.bsf.vodka.title": "无畏严寒",
   "advancements.bsf.vodka.description": "饮用伏特加",
+  "advancements.bsf.suspicious_usb_flash_drive_consume.title": "我去这框真帅",
+  "advancements.bsf.suspicious_usb_flash_drive_consume.description": "使用可疑U盘",
 
   "effect.bsf.cold_resistance": "抗寒",
   "effect.bsf.weapon_jam": "武器堵塞",

@@ -7,8 +7,10 @@ import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -25,7 +27,7 @@ import java.util.List;
 
 public class SuspiciousUSBFlashDriveItem extends Item {
     public SuspiciousUSBFlashDriveItem() {
-        super(new Properties().rarity(Rarity.EPIC).stacksTo(1));
+        super(new Properties().rarity(Rarity.EPIC));
     }
 
     @Override
@@ -46,6 +48,10 @@ public class SuspiciousUSBFlashDriveItem extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         livingEntity.addEffect(new MobEffectInstance(EffectRegister.WALLHACK, 2400, 0));
         livingEntity.playSound(SoundEvents.BEACON_ACTIVATE, 3.0F, 1.0F);
+        if (livingEntity instanceof ServerPlayer serverPlayer) {
+            CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, stack);
+        }
+
         stack.consume(1, livingEntity);
         return stack;
     }
