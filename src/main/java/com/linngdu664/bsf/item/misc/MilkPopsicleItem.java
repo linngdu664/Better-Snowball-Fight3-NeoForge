@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.EffectCures;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class MilkPopsicleItem extends Item {
         if (user instanceof Player player) {
             if (!level.isClientSide) {
                 player.setRemainingFireTicks(0);
-                player.removeAllEffects();
+                player.removeEffectsCuredBy(EffectCures.MILK);
                 player.setTicksFrozen(40);
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1));
                 CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, stack);

@@ -160,6 +160,7 @@ public class ScoringDevice extends Item {
         Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), livingEntity.getPosition(1));
         livingEntity.moveTo(tpPoint);
         livingEntity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
+        livingEntity.removeAllEffects();
         return stack;
     }
 
