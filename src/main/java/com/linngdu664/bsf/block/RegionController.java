@@ -1,6 +1,6 @@
 package com.linngdu664.bsf.block;
 
-import com.linngdu664.bsf.block.entity.ZoneControllerEntity;
+import com.linngdu664.bsf.block.entity.RegionControllerEntity;
 import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
@@ -35,31 +35,31 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ZoneController extends Block implements EntityBlock {
+public class RegionController extends Block implements EntityBlock {
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
 
-    public ZoneController() {
+    public RegionController() {
         super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new ZoneControllerEntity(blockPos, blockState);
+        return new RegionControllerEntity(blockPos, blockState);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return blockEntityType == BlockEntityRegister.ZONE_CONTROLLER_ENTITY.get() ? ZoneControllerEntity::tick : null;
+        return blockEntityType == BlockEntityRegister.REGION_CONTROLLER_ENTITY.get() ? RegionControllerEntity::tick : null;
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof ZoneControllerEntity zoneControllerEntity) {
+        if (level.getBlockEntity(pos) instanceof RegionControllerEntity regionControllerEntity) {
             // 空手点击时的逻辑，选择一个雪傀儡出生点传送
             if (!level.isClientSide()) {
-                randomTp(zoneControllerEntity, level, player);
+                randomTp(regionControllerEntity, level, player);
             }
             return InteractionResult.SUCCESS;
         }
@@ -68,16 +68,16 @@ public class ZoneController extends Block implements EntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof ZoneControllerEntity zoneControllerEntity && player.getAbilities().instabuild) {
+        if (level.getBlockEntity(pos) instanceof RegionControllerEntity regionControllerEntity && player.getAbilities().instabuild) {
             if (stack.getItem().equals(ItemRegister.REGION_TOOL.get())) {
                 if (!level.isClientSide()) {
                     RegionData regionData = stack.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                     if (regionData.start().getY() < regionData.end().getY()) {
-                        zoneControllerEntity.setSnowGolemList(regionData);
-                        player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSnowGolemCount() + " golems"), false);
+                        regionControllerEntity.setSnowGolemList(regionData);
+                        player.displayClientMessage(Component.literal("Add " + regionControllerEntity.getSnowGolemCount() + " golems"), false);
                     } else {
-                        zoneControllerEntity.setRegionAndSummon(regionData);
-                        player.displayClientMessage(Component.literal("Add " + zoneControllerEntity.getSummonPosList().size() + " spawn points"), false);
+                        regionControllerEntity.setRegionAndSummon(regionData);
+                        player.displayClientMessage(Component.literal("Add " + regionControllerEntity.getSummonPosList().size() + " spawn points"), false);
                     }
                 }
                 return ItemInteractionResult.SUCCESS;
@@ -85,7 +85,7 @@ public class ZoneController extends Block implements EntityBlock {
             if (stack.getItem() instanceof TeamLinkerItem teamLinkerItem) {
                 if (!level.isClientSide()) {
                     byte teamId = teamLinkerItem.getTeamId();
-                    zoneControllerEntity.setTeamId(teamId);
+                    regionControllerEntity.setTeamId(teamId);
                     level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set controller team to " + DyeColor.byId(teamId).getName()), false);
                 }
@@ -94,11 +94,11 @@ public class ZoneController extends Block implements EntityBlock {
             if (stack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
                 if (!level.isClientSide()) {
                     IntegerGroupData group = stack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY);
-                    zoneControllerEntity.setPlayerMultiplier(group.val1());
-                    zoneControllerEntity.setGolemMultiplier(group.val2());
-                    zoneControllerEntity.setDiffMultiplier(group.val3());
-                    zoneControllerEntity.setLHalf(group.val4());
-                    zoneControllerEntity.setMaxGolem(group.val5());
+                    regionControllerEntity.setPlayerMultiplier(group.val1());
+                    regionControllerEntity.setGolemMultiplier(group.val2());
+                    regionControllerEntity.setDiffMultiplier(group.val3());
+                    regionControllerEntity.setLHalf(group.val4());
+                    regionControllerEntity.setMaxGolem(group.val5());
                     player.displayClientMessage(Component.literal("Set player multiplier to " + group.val1()), false);
                     player.displayClientMessage(Component.literal("Set golem multiplier to " + group.val2()), false);
                     player.displayClientMessage(Component.literal("Set diff multiplier to " + group.val3()), false);
@@ -111,7 +111,7 @@ public class ZoneController extends Block implements EntityBlock {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;     // 传到空手右击的逻辑
     }
 
-    private void randomTp(ZoneControllerEntity entity, Level level, Player player) {
+    private void randomTp(RegionControllerEntity entity, Level level, Player player) {
         List<BlockPos> blockPosList = entity.getSummonPosList();
         if (!blockPosList.isEmpty()) {
             BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));

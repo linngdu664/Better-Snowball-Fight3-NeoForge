@@ -1,7 +1,7 @@
 package com.linngdu664.bsf.gui;
 
 import com.linngdu664.bsf.block.entity.VendingMachineEntity;
-import com.linngdu664.bsf.block.entity.ZoneControllerEntity;
+import com.linngdu664.bsf.block.entity.RegionControllerEntity;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
@@ -207,7 +207,7 @@ public class GuiHandler {
     }
 
     public static void pickBlockEntityZoneController(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, float partialTick) {
-        if (blockEntity instanceof ZoneControllerEntity zoneController) {
+        if (blockEntity instanceof RegionControllerEntity zoneController) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             //显示队伍
@@ -218,8 +218,8 @@ public class GuiHandler {
             }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("zone_controller_strength.tip", String.format("%.2f",zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("zone_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y+10, 0xffffffff);
+            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_strength.tip", String.format("%.2f",zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
+            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y+10, 0xffffffff);
         }
     }
 
