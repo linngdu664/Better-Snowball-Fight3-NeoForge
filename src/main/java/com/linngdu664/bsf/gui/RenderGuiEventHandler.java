@@ -33,27 +33,26 @@ public class RenderGuiEventHandler {
         HitResult pick = instance.hitResult;
         HitResult.Type pickType = pick.getType();
         float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
+        CoordinateConverter converter = new CoordinateConverter(partialTick);
         GuiGraphics guiGraphics = event.getGuiGraphics();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0F, 0F, 4932F);        // 显示在原版gui的上方
 
         //gui队列
-        GuiHandler.specialWallhackUi(guiGraphics,partialTick);
+        GuiHandler.specialWallhackUi(guiGraphics, converter, partialTick);
         GuiHandler.specialScoreText(guiGraphics);
         GuiHandler.itemInHandBSFWeapon(guiGraphics, mainHandItem, offHandItem);
         if (pickType == HitResult.Type.ENTITY) {
             Entity entity1 = ((EntityHitResult) pick).getEntity();
-            GuiHandler.pickEntityBSFSnowGolem(guiGraphics, entity1, partialTick, varMap);
+            GuiHandler.pickEntityBSFSnowGolem(guiGraphics, converter, entity1, partialTick, varMap);
             GuiHandler.pickEntityBSFDummy(guiGraphics, entity1);
         } else if (pickType == HitResult.Type.BLOCK) {
             BlockEntity blockEntity = player.level().getBlockEntity(((BlockHitResult) pick).getBlockPos());
-            GuiHandler.pickBlockEntityVendingMachine(guiGraphics, blockEntity, mainHandItem, partialTick);
-            GuiHandler.pickBlockEntityZoneController(guiGraphics, blockEntity, partialTick);
+            GuiHandler.pickBlockEntityVendingMachine(guiGraphics, converter, blockEntity, mainHandItem, partialTick);
+            GuiHandler.pickBlockEntityZoneController(guiGraphics, converter, blockEntity, partialTick);
         }
         GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varMap);
         GuiHandler.specialModeText(guiGraphics, varMap);
-
-
         guiGraphics.pose().popPose();
     }
 }

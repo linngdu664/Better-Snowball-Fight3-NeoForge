@@ -79,7 +79,7 @@ public class GuiHandler {
         }
     }
 
-    public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, Entity pickEntity, float partialTick, Map<String, Object> varMap) {
+    public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, CoordinateConverter converter, Entity pickEntity, float partialTick, Map<String, Object> varMap) {
         Minecraft instance = Minecraft.getInstance();
         Player player = instance.player;
         if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()) && player.equals(((BSFSnowGolemEntity) pickEntity).getOwner())) {
@@ -116,7 +116,7 @@ public class GuiHandler {
                     renderEquipIntroduced(guiGraphics, v2, v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.7).getVec2(), widthWinRatio(window, 0.12), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_core"));
                 }));
             }
-            calcScreenPosFromWorldPos(list, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, partialTick);
+            converter.convertAndConsume(list, guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示模式
             byte locator = entity.getLocator();
             byte status = entity.getStatus();
@@ -167,15 +167,15 @@ public class GuiHandler {
         }
     }
 
-    public static void pickBlockEntityVendingMachine(GuiGraphics guiGraphics, BlockEntity blockEntity, ItemStack mainHandItem, float partialTick) {
+    public static void pickBlockEntityVendingMachine(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, ItemStack mainHandItem, float partialTick) {
         if (blockEntity instanceof VendingMachineEntity vendingMachine) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             //显示货物
-            calcScreenPosFromWorldPos(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2 -> {
+            converter.convertAndConsume(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.4);
                 renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, BSFCommonUtil.getTransStr("goods.tip"));
-            }), guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, partialTick);
+            }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示价格等级百分比条
             if (mainHandItem.getItem() instanceof ScoringDevice) {
                 V2I barFrame = new V2I(100, 12);
@@ -206,16 +206,16 @@ public class GuiHandler {
         }
     }
 
-    public static void pickBlockEntityZoneController(GuiGraphics guiGraphics, BlockEntity blockEntity, float partialTick) {
+    public static void pickBlockEntityZoneController(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, float partialTick) {
         if (blockEntity instanceof ZoneControllerEntity zoneController) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             //显示队伍
-            calcScreenPosFromWorldPos(new Pair<>(zoneController.getBlockPos().getCenter(), v2 -> {
+            converter.convertAndConsume(new Pair<>(zoneController.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
                 byte teamId = zoneController.getTeamId();
                 renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor()|0xff000000, TeamLinkerItem.getItemStackById(teamId), instance.font, TeamLinkerItem.getColorTransNameById(teamId));
-            }), guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0, 0, partialTick);
+            }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);
             guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("zone_controller_strength.tip", String.format("%.2f",zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
@@ -284,14 +284,14 @@ public class GuiHandler {
         }
     }
 
-    public static void specialWallhackUi(GuiGraphics guiGraphics, float partialTick) {
+    public static void specialWallhackUi(GuiGraphics guiGraphics, CoordinateConverter converter, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player.hasEffect(EffectRegister.WALLHACK)) {
             Window window = mc.getWindow();
             Level level = player.level();
             level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), p -> !TeamMembersPayload.isFriendly(p) && (p instanceof Enemy || p.getType().equals(EntityType.PLAYER) || p.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()))).forEach(livingEntity -> {
-                Vec2 boxBottom = renderHackBox(guiGraphics, window, livingEntity, 0xffff0000, partialTick);
+                Vec2 boxBottom = renderHackBox(guiGraphics, converter, window, livingEntity, 0xffff0000, partialTick);
                 if (boxBottom != null) {
                     renderLineTool(guiGraphics,boxBottom,v2IRatio(window,0.5,1.1).getVec2(),0.5f,0xff0000ff,true,0,0xff0000ff);
                 }
