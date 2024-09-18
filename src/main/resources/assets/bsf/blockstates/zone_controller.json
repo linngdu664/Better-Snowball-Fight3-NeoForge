@@ -1,7 +1,0 @@
-{
-  "variants": {
-    "": {
-      "model": "bsf:block/zone_controller"
-    }
-  }
-}
