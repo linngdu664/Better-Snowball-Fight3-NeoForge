@@ -203,6 +203,10 @@ public class GuiHandler {
                 guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_recycle.tip", vendingMachine.getPrice()), v2I.x, v2I.y + 50, 0xffffffff);
                 guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_sell.tip", instance.options.keyShift.getTranslatedKeyMessage(), instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 60, 0xffffffff);
             }
+            //显示商品名
+            Component displayName = vendingMachine.getGoods().getDisplayName();
+            v2I = v2IRatio(window,instance.font.width(displayName.getString()),0,0.5,0.7);
+            guiGraphics.drawString(instance.font,displayName,v2I.x,v2I.y,0xff41a5ee);
         }
     }
 
