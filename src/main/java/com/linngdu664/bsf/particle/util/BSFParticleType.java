@@ -11,10 +11,12 @@ public enum BSFParticleType {
     SNOW_GOLEM_EQUIP(ParticleRegister.SNOW_GOLEM_EQUIP.get()),
     SPAWN_SNOW(ParticleRegister.SPAWN_SNOW.get());
     private final ParticleOptions particleOptions;
+
     BSFParticleType(ParticleOptions particleOptions) {
         this.particleOptions = particleOptions;
     }
-    public ParticleOptions get(){
+
+    public ParticleOptions get() {
         return particleOptions;
     }
 }

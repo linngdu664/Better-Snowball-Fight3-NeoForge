@@ -55,21 +55,6 @@ public class ObsidianSnowballItem extends AbstractBSFSnowballItem {
         return snowball;
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG;
-//    }
-//
-//    @Override
-//    public double getMachineGunRecoil() {
-//        return 0.17;
-//    }
-//
-//    @Override
-//    public double getShotgunPushRank() {
-//        return 0.18;
-//    }
-
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("obsidian_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

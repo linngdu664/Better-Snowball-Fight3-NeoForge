@@ -155,12 +155,6 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
                 level.setBlock(blockPos, BlockRegister.LOOSE_SNOW_BLOCK.get().defaultBlockState(), 3);
                 allBlock.push(blockPos);
             }
-//            if (map == null) {
-//                data = serverLevel.getDataStorage().computeIfAbsent(SnowDataStorage::new, SnowDataStorage::new, "bsf_snow_data");
-//                map = data.getMap();
-//            }
-//            map.put(SnowDataStorage.posToString(blockPos), this.getUUID());
-//            data.setDirty();
         }
     }
 
@@ -169,7 +163,7 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
         if (!inBlockDuration) {
             Level level = level();
             if (level.isClientSide) {
-                level.addParticle(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), vec3.x, vec3.y+0.1, vec3.z, 0, 0, 0);
+                level.addParticle(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), vec3.x, vec3.y + 0.1, vec3.z, 0, 0, 0);
             }
         }
     }
@@ -183,7 +177,6 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     private void destroyBlock(Level level, BlockPos pos) {
         if (posIsLooseSnow(level, pos)) {
             if (level instanceof ServerLevel) {
-//                BlockState blockState = level.getBlockState(pos);
                 level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 BlockState snow = Blocks.SNOW.defaultBlockState();

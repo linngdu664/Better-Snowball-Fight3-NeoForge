@@ -87,7 +87,7 @@ public class FrozenSnowballEntity extends AbstractBSFSnowballEntity {
                         }
                     }
                 }
-                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(4), p -> !(p instanceof BSFSnowGolemEntity) && !(p instanceof SnowGolem) && !(p instanceof Player player && player.isSpectator()) && distanceToSqr(p) < frozenRange * frozenRange);
+                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location, location).inflate(4), p -> !(p instanceof BSFSnowGolemEntity) && !(p instanceof SnowGolem) && !(p instanceof Player player && player.isSpectator()) && distanceToSqr(p) < frozenRange * frozenRange);
                 for (LivingEntity entity : list) {
                     int frozenTicks = getFrozenTicks();
                     if (frozenTicks > 0) {
@@ -116,21 +116,6 @@ public class FrozenSnowballEntity extends AbstractBSFSnowballEntity {
     protected @NotNull Item getDefaultItem() {
         return ItemRegister.FROZEN_SNOWBALL.get();
     }
-
-//    @Override
-//    public float getBasicDamage() {
-//        return 3;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 8;
-//    }
-//
-//    @Override
-//    public int getBasicFrozenTicks() {
-//        return 60;
-//    }
 
     @Override
     public float getSubspacePower() {

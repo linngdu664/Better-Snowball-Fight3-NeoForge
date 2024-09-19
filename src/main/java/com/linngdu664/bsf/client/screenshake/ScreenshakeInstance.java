@@ -5,8 +5,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
 public class ScreenshakeInstance {
-    public int progress;
     public final int duration;
+    public int progress;
     public float intensity1;
     public float intensity2;
     public float intensity3;
@@ -46,7 +46,7 @@ public class ScreenshakeInstance {
 
     public float updateIntensity(Camera camera, RandomSource random) {
         ++this.progress;
-        float percentage = (float)this.progress / (float)this.duration;
+        float percentage = (float) this.progress / (float) this.duration;
         if (this.intensity2 != this.intensity3) {
             return percentage >= 0.5F ? Mth.lerp(this.intensityCurveEndEasing.ease(percentage - 0.5F, 0.0F, 1.0F, 0.5F), this.intensity2, this.intensity1) : Mth.lerp(this.intensityCurveStartEasing.ease(percentage, 0.0F, 1.0F, 0.5F), this.intensity1, this.intensity2);
         } else {

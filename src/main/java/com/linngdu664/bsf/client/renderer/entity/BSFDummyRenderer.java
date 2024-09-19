@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public class BSFDummyRenderer extends MobRenderer<BSFDummyEntity, BSFDummyModel<BSFDummyEntity>>  {
+public class BSFDummyRenderer extends MobRenderer<BSFDummyEntity, BSFDummyModel<BSFDummyEntity>> {
     public BSFDummyRenderer(EntityRendererProvider.Context context) {
         super(context, new BSFDummyModel<>(context.bakeLayer(BSFSnowGolemModel.LAYER_LOCATION)), 0.7f);
     }

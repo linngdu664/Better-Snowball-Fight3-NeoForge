@@ -17,7 +17,7 @@ public class ScreenshakeHandler {
     }
 
     public static void cameraTick(Camera camera, RandomSource random) {
-        if ((double)intensity >= 0.1) {
+        if ((double) intensity >= 0.1) {
             yawOffset = randomizeOffset(random);
             pitchOffset = randomizeOffset(random);
             camera.setRotation(camera.getYRot() + yawOffset, camera.getXRot() + pitchOffset);
@@ -26,7 +26,7 @@ public class ScreenshakeHandler {
 
     public static void clientTick(Camera camera, RandomSource random) {
         double sum = Math.min(INSTANCES.stream().mapToDouble((i1) -> i1.updateIntensity(camera, random)).sum(), ClientConfig.SCREENSHAKE_INTENSITY.getConfigValue());
-        intensity = (float)Math.pow(sum, 3.0);
+        intensity = (float) Math.pow(sum, 3.0);
         INSTANCES.removeIf((i) -> i.progress >= i.duration);
     }
 

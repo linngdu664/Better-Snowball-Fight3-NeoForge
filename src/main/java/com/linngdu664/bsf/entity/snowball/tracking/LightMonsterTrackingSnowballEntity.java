@@ -20,11 +20,6 @@ public class LightMonsterTrackingSnowballEntity extends AbstractMonsterTrackingS
         super(EntityRegister.LIGHT_MONSTER_TRACKING_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment), false, region);
     }
 
-//    @Override
-//    public boolean isLockFeet() {
-//        return false;
-//    }
-
     @Override
     protected @NotNull Item getDefaultItem() {
         return ItemRegister.LIGHT_MONSTER_TRACKING_SNOWBALL.get();

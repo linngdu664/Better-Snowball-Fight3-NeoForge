@@ -38,7 +38,7 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (!pLevel.isClientSide) {
-            pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p->p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10)
+            pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p -> p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10)
                     .forEach(p -> {
                         p.setDeltaMovement(p.getDeltaMovement().reverse());
                         AABB aabb = p.getBoundingBox();

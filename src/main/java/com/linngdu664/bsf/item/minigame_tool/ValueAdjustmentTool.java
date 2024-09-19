@@ -33,11 +33,21 @@ public class ValueAdjustmentTool extends Item {
                 index++;
             }
             switch (index) {
-                case 0: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1()))); break;
-                case 1: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2()))); break;
-                case 2: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3()))); break;
-                case 3: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4()))); break;
-                default: itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val5: " + group.val5()))); break;
+                case 0:
+                    itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val1: " + group.val1())));
+                    break;
+                case 1:
+                    itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val2: " + group.val2())));
+                    break;
+                case 2:
+                    itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val3: " + group.val3())));
+                    break;
+                case 3:
+                    itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val4: " + group.val4())));
+                    break;
+                default:
+                    itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new PlainTextContents.LiteralContents("val5: " + group.val5())));
+                    break;
             }
             itemStack.set(DataComponentRegister.SELECTED_INDEX.get(), index);
         }

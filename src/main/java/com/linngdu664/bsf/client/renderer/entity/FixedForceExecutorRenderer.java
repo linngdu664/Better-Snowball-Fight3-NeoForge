@@ -19,8 +19,8 @@ import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 
 public class FixedForceExecutorRenderer extends EntityRenderer<AbstractFixedForceExecutor> {
-    private final FixedForceExecutorLayerType layerType;
     private static final float SIN_45 = (float) Math.sin(Math.PI / 4D);
+    private final FixedForceExecutorLayerType layerType;
     private final FixedForceExecutorModel model;
     private final RenderType renderType;
 

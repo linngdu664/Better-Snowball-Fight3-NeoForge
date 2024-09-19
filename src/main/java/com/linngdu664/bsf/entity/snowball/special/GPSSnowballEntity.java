@@ -61,11 +61,6 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
         }
     }
 
-//    @Override
-//    public double getBasicPunch() {
-//        return 1;
-//    }
-
     @Override
     protected @NotNull Item getDefaultItem() {
         return ItemRegister.IRON_SNOWBALL.get();

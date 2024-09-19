@@ -74,7 +74,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                 ServerLevel serverLevel = (ServerLevel) pLevel;
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pPlayer.getId(), SoundRegister.IMPLOSION_SNOWBALL_CANNON.get(), ToggleMovingSoundPayload.PLAY_ONCE));
                 Vec3 eyePosition = pPlayer.getEyePosition();
-                for (double l = 0; l < DISTANCE; l+=0.5) {
+                for (double l = 0; l < DISTANCE; l += 0.5) {
                     Vec3 paPos = eyePosition.add(cameraVec.scale(l));
                     PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ImplosionSnowballCannonParticlesPayload(paPos.x, paPos.y, paPos.z, cameraVec.x, cameraVec.y, cameraVec.z));
                 }
@@ -98,7 +98,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                 ).forEach(p -> {
                     Vec3 pPos = p.getBoundingBox().getCenter();
                     double d = BSFCommonUtil.vec3Projection(pPos.subtract(eyePosition), cameraVec);
-                    if (d<=0){
+                    if (d <= 0) {
                         return;
                     }
 //                    Vec3 projPos = pPos.add(cameraVec.scale(-d));
@@ -124,7 +124,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                 }
 
                 pPlayer.awardStat(Stats.ITEM_USED.get(this));
-            }else{
+            } else {
                 ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(8)).setIntensity(1.5f).setEasing(Easing.BOUNCE_IN));
                 pPlayer.push(-cameraVec.x * RECOIL, -cameraVec.y * RECOIL, -cameraVec.z * RECOIL);
             }
@@ -132,6 +132,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
 
         return InteractionResultHolder.pass(itemStack);
     }
+
     @Override
     public ILaunchAdjustment getLaunchAdjustment(double damageDropRate, Item snowball) {
         return null;
@@ -147,7 +148,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("implosion_snowball_cannon.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("implosion_snowball_cannon1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override

@@ -47,7 +47,7 @@ public class SpectralSnowballEntity extends AbstractBSFSnowballEntity {
             if (!isCaught) {
                 Vec3 location = BSFCommonUtil.getRealHitPosOnMoveVecWithHitResult(this, pResult);
                 ((ServerLevel) level).sendParticles(ParticleTypes.FIREWORK, location.x, location.y, location.z, 60, 0, 0, 0, 0.12);
-                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(4), EntitySelector.NO_SPECTATORS.and(EntitySelector.withinDistance(location.x, location.y, location.z, 3.5)));
+                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location, location).inflate(4), EntitySelector.NO_SPECTATORS.and(EntitySelector.withinDistance(location.x, location.y, location.z, 3.5)));
                 for (LivingEntity livingEntity : list) {
                     livingEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 70, 0));
                 }
@@ -63,7 +63,7 @@ public class SpectralSnowballEntity extends AbstractBSFSnowballEntity {
     @Override
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
-        if (pResult.getEntity() instanceof LivingEntity livingEntity){
+        if (pResult.getEntity() instanceof LivingEntity livingEntity) {
             livingEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 90, 0));
         }
     }

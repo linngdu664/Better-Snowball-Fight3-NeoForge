@@ -24,21 +24,6 @@ public class IceSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.ICE_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(6).basicFrozenTicks(40).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 3;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 6;
-//    }
-//
-//    @Override
-//    public int getBasicFrozenTicks() {
-//        return 60;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 1.2f;

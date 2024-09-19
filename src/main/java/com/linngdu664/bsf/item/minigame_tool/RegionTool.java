@@ -44,10 +44,10 @@ public class RegionTool extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        if (!level.isClientSide && usedHand.equals(InteractionHand.MAIN_HAND)){
+        if (!level.isClientSide && usedHand.equals(InteractionHand.MAIN_HAND)) {
             ItemStack offhandItem = player.getOffhandItem();
             ItemStack mainHandItem = player.getMainHandItem();
-            offhandItem.set(DataComponentRegister.REGION,mainHandItem.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY));
+            offhandItem.set(DataComponentRegister.REGION, mainHandItem.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY));
         }
         return InteractionResultHolder.success(player.getMainHandItem());
     }
@@ -64,6 +64,6 @@ public class RegionTool extends Item {
                 region.end().getY(),
                 region.end().getZ()
         ));
-        tooltipComponents.add(MutableComponent.create(new PlainTextContents.LiteralContents("mode: "+(region.start().getY()>region.end().getY()?"spawn point":"golem"))));
+        tooltipComponents.add(MutableComponent.create(new PlainTextContents.LiteralContents("mode: " + (region.start().getY() > region.end().getY() ? "spawn point" : "golem"))));
     }
 }

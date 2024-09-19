@@ -41,7 +41,7 @@ public class BSFCommonUtil {
      * a向量在b向量方向上的投影
      */
     public static double vec3Projection(Vec3 a, Vec3 b) {
-        return vec3AngleCos(a,b)*a.length();
+        return vec3AngleCos(a, b) * a.length();
     }
 
     // Calculate the square of the modulus(length) of a vector.
@@ -86,7 +86,7 @@ public class BSFCommonUtil {
      * @param r     radius
      * @param theta yaw in radian [0, 2*pi]
      * @param phi   pitch in radian [-pi/2, pi/2]
-     * @return      xyz vector
+     * @return xyz vector
      */
     public static Vec3 radRotationToVector(double r, double theta, double phi) {
         return new Vec3(r * Mth.cos((float) phi) * Mth.cos((float) theta), r * Mth.sin((float) phi), r * Mth.cos((float) phi) * Mth.sin((float) theta));
@@ -132,13 +132,14 @@ public class BSFCommonUtil {
 
     /**
      * 自定义二次函数
-     * @param x x值
+     *
+     * @param x    x值
      * @param maxX x最大值
      * @param maxY y最大值
      * @return y值
      */
     public static double quadraticFunction(double x, double maxX, double maxY) {
-        return 4*x*maxY*(maxX-x)/(maxX*maxX);
+        return 4 * x * maxY * (maxX - x) / (maxX * maxX);
     }
 
     public static boolean pointOnTheFrontConeArea(Vec3 p1v, Vec3 p1, Vec3 p2, double pointToVectorMaxDistance, double pointToVectorNormalPlaneMaxDistance) {
@@ -150,41 +151,45 @@ public class BSFCommonUtil {
 
     /**
      * 在onHit里使用，返回真实击中点位，或者实体的碰撞箱中心点
+     *
      * @return 撞击点位
      */
-    public static Vec3 getRealHitPosOnMoveVecWithHitResult(Entity pProjectile, HitResult pResult){
-        if (pResult.getType()==HitResult.Type.ENTITY){
-            return getRealEntityHitPosOnMoveVecWithHitResult(pProjectile,(EntityHitResult) pResult);
-        }else{
+    public static Vec3 getRealHitPosOnMoveVecWithHitResult(Entity pProjectile, HitResult pResult) {
+        if (pResult.getType() == HitResult.Type.ENTITY) {
+            return getRealEntityHitPosOnMoveVecWithHitResult(pProjectile, (EntityHitResult) pResult);
+        } else {
             return pResult.getLocation();
         }
     }
 
     /**
      * 在onEntityHit里自动判断如果获取真实撞击点位失败则获取EntityHitResult实体的碰撞箱中心点
+     *
      * @return 撞击点位
      */
-    public static Vec3 getRealEntityHitPosOnMoveVecWithHitResult(Entity pProjectile, EntityHitResult pResult){
+    public static Vec3 getRealEntityHitPosOnMoveVecWithHitResult(Entity pProjectile, EntityHitResult pResult) {
         Vec3 vec3 = getRealEntityHitPosOnMoveVec(pProjectile);
         if (vec3 == null) {
-            vec3=pResult.getEntity().getBoundingBox().getCenter();
+            vec3 = pResult.getEntity().getBoundingBox().getCenter();
         }
         return vec3;
     }
 
     /**
      * 直接通过传入实体位置和速度获取实体在当前tick撞击实体的真实点位
+     *
      * @return 撞击点位，有可能为null
      */
     public static Vec3 getRealEntityHitPosOnMoveVec(Entity pProjectile) {
         Vec3 vec3 = pProjectile.getDeltaMovement();
         Level level = pProjectile.level();
         Vec3 vec31 = pProjectile.position();
-        return getRealEntityHitPos(level, pProjectile,vec31, vec3, Entity::canBeHitByProjectile);
+        return getRealEntityHitPos(level, pProjectile, vec31, vec3, Entity::canBeHitByProjectile);
     }
+
     @Nullable
     public static Vec3 getRealEntityHitPos(Level pLevel, Entity pProjectile, Vec3 pStartVec, Vec3 pEndVecOffset, Predicate<Entity> pFilter) {
-        Vec3 pEndVec=pStartVec.add(pEndVecOffset);
+        Vec3 pEndVec = pStartVec.add(pEndVecOffset);
         AABB pBoundingBox = pProjectile.getBoundingBox().expandTowards(pEndVecOffset).inflate(1.0);
         double d0 = Double.MAX_VALUE;
         Vec3 vec3 = null;
@@ -223,21 +228,9 @@ public class BSFCommonUtil {
         pTooltipComponents.add(getTransCp(transKey, format, args));
     }
 
-    public static class TipBuilder{
-        public List<Component> tooltipComponents;
-
-        public TipBuilder(List<Component> tooltipComponents) {
-            this.tooltipComponents = tooltipComponents;
-        }
-        public TipBuilder add(String transKey, ChatFormatting format, Object... args) {
-            BSFCommonUtil.addTrans(this.tooltipComponents, transKey, format, args);
-            return this;
-        }
-    }
-
     public static List<ItemStack> findInventoryItemStacks(Player player, Predicate<ItemStack> filter) {
         NonNullList<ItemStack>[] playerInventoryList = getPlayerInventoryList(player);
-        List<ItemStack> outItemStacks=new ArrayList<>();
+        List<ItemStack> outItemStacks = new ArrayList<>();
         for (NonNullList<ItemStack> inv : playerInventoryList) {
             for (ItemStack itemStack : inv) {
                 if (filter.test(itemStack)) {
@@ -260,8 +253,21 @@ public class BSFCommonUtil {
         return null;
     }
 
-    private static NonNullList<ItemStack>[] getPlayerInventoryList(Player player){
+    private static NonNullList<ItemStack>[] getPlayerInventoryList(Player player) {
         Inventory inventory = player.getInventory();
-        return new NonNullList[]{inventory.items,inventory.armor,inventory.offhand};
+        return new NonNullList[]{inventory.items, inventory.armor, inventory.offhand};
+    }
+
+    public static class TipBuilder {
+        public List<Component> tooltipComponents;
+
+        public TipBuilder(List<Component> tooltipComponents) {
+            this.tooltipComponents = tooltipComponents;
+        }
+
+        public TipBuilder add(String transKey, ChatFormatting format, Object... args) {
+            BSFCommonUtil.addTrans(this.tooltipComponents, transKey, format, args);
+            return this;
+        }
     }
 }

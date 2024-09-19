@@ -9,12 +9,12 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public record CurrentTeamPayload(byte teamId) implements CustomPacketPayload {
-    public static byte currentTeam = -1;
     public static final CustomPacketPayload.Type<CurrentTeamPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("current_team"));
     public static final StreamCodec<ByteBuf, CurrentTeamPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.BYTE, CurrentTeamPayload::teamId,
             CurrentTeamPayload::new
     );
+    public static byte currentTeam = -1;
 
     public static void handleDataInClient(CurrentTeamPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> currentTeam = payload.teamId);

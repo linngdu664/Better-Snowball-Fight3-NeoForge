@@ -5,6 +5,8 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class ServerConfig extends BSFConfig {
+    public static final ServerConfig INSTANCE;
+    public static final ModConfigSpec SPEC;
     public static ConfigValueHolder<Boolean> EXPLOSIVE_DESTROY = new ConfigValueHolder(Main.MODID, "server/explosiveDestroy", (builder) ->
             builder.comment("Whether explosive snowballs can destroy blocks. Default value: true")
                     .define("explosiveDestroy", true));
@@ -36,17 +38,14 @@ public class ServerConfig extends BSFConfig {
             builder.comment("Default value: false.")
                     .define("shootingInertia", false));
 
-    public static final ServerConfig INSTANCE;
-    public static final ModConfigSpec SPEC;
-
-    public ServerConfig(ModConfigSpec.Builder builder) {
-        super(Main.MODID, "server", builder);
-    }
-
     static {
         Pair<ServerConfig, ModConfigSpec> specPair = (new ModConfigSpec.Builder()).configure(ServerConfig::new);
         SPEC = specPair.getRight();
         INSTANCE = specPair.getLeft();
+    }
+
+    public ServerConfig(ModConfigSpec.Builder builder) {
+        super(Main.MODID, "server", builder);
     }
 
 }

@@ -14,9 +14,9 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractTrackingSnowballEntity extends AbstractBSFSnowballEntity {
-    private Entity target;
-    private final boolean isLockFeet;
     protected final double range = 10;
+    private final boolean isLockFeet;
+    private Entity target;
 
     public AbstractTrackingSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel, BSFSnowballEntityProperties pProperties, boolean isLockFeet) {
         super(pEntityType, pLevel, pProperties);
@@ -44,13 +44,7 @@ public abstract class AbstractTrackingSnowballEntity extends AbstractBSFSnowball
         }
     }
 
-//    public double getRange() {
-//        return 10;
-//    }
-
     public abstract Entity getTarget();
-
-//    public abstract boolean isLockFeet();
 
     /**
      * This method is designed for the tracking snowball. If the target is not null,

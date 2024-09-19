@@ -12,7 +12,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
-public class BSFDummyModel <T extends BSFDummyEntity> extends EntityModel<T> {
+public class BSFDummyModel<T extends BSFDummyEntity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("bsf_snow_golem"), "main");
     private final ModelPart middle;

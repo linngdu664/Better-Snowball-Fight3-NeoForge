@@ -34,24 +34,11 @@ import java.util.List;
 public abstract class AbstractBSFSnowballItem extends Item implements ProjectileItem {
     public static final int HAND_TYPE_FLAG = 1;
     private final SnowballProperties snowballProperties;
-//    private final int id;
-//    private final double machineGunRecoil;
-//    private final double shotgunPushRank;
 
     public AbstractBSFSnowballItem(Rarity rarity, SnowballProperties snowballProperties) {
         super(new Properties().stacksTo(16).rarity(rarity));
         this.snowballProperties = snowballProperties;
     }
-
-//    public AbstractBSFSnowballItem(Rarity rarity, int id) {
-//        super(new Properties().stacksTo(16).rarity(rarity));
-//        this.id = id;
-//    }
-//
-//    public AbstractBSFSnowballItem(Rarity rarity, int id, double machineGunRecoil) {
-//        super(new Properties().stacksTo(16).rarity(rarity));
-//        this.id = id;
-//    }
 
     public ILaunchAdjustment getLaunchAdjustment(float playerBadEffectRate) {
         return new ILaunchAdjustment() {
@@ -217,7 +204,7 @@ public abstract class AbstractBSFSnowballItem extends Item implements Projectile
     /**
      * You must override this fucking method if you want to launch the snowball by dispensers.
      *
-     * @param level        Level.
+     * @param level Level.
      * @return The corresponding entity.
      */
     @Override

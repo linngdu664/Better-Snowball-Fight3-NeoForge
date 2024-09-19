@@ -87,7 +87,7 @@ public class SculkSnowballLauncherItem extends AbstractBSFWeaponItem {
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("sculk_snowball_launcher.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("sculk_snowball_launcher1.tooltip", null, new Object[]{Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override

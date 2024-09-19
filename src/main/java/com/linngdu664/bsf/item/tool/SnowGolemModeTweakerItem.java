@@ -21,6 +21,7 @@ public class SnowGolemModeTweakerItem extends Item {
                 .component(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0)
         );
     }
+
     public static String locatorMap(byte lc) {
         return switch (lc) {
             case 0 -> "snow_golem_locator_monster.tip";

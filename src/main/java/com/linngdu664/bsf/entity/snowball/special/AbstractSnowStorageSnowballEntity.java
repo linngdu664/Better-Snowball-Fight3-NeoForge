@@ -45,12 +45,6 @@ public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstruc
                 snowStock--;
                 allBlock.push(blockPos);
             }
-//            if (map == null) {
-//                data = serverLevel.getDataStorage().computeIfAbsent(SnowDataStorage::new, SnowDataStorage::new, "bsf_snow_data");
-//                map = data.getMap();
-//            }
-//            map.put(SnowDataStorage.posToString(blockPos), this.getUUID());
-//            data.setDirty();
         }
     }
 }

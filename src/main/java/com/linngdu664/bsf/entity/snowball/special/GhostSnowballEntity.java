@@ -82,11 +82,6 @@ public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
         }
     }
 
-//    @Override
-//    public boolean canBeCaught() {
-//        return false;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 2;

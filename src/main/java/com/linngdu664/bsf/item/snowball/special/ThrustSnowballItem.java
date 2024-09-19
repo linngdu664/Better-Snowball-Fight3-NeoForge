@@ -33,16 +33,6 @@ public class ThrustSnowballItem extends AbstractBSFSnowballItem {
         return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return SnowballShotgunItem.TYPE_FLAG | ImplosionSnowballCannonItem.TYPE_FLAG;
-//    }
-//
-//    @Override
-//    public double getShotgunPushRank() {
-//        return 0.38;
-//    }
-
     @Override
     public void addUsageTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("thrust_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

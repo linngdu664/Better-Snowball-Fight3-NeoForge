@@ -18,9 +18,9 @@ import java.util.Objects;
 public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     private static final int DEFAULT_RANDOM_INTERVAL = 4;
     private static final int SEARCH_DISTANCE = 50;
+    private final BSFSnowGolemEntity snowGolem;
     @Nullable
     protected LivingEntity target;
-    private final BSFSnowGolemEntity snowGolem;
 
 
     public BSFGolemNearsetAttackableTargetGoal(BSFSnowGolemEntity snowGolem) {
@@ -91,8 +91,6 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
                 });
             }
             target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
-//            targetConditions.selector(p -> !savedData.isSameTeam(snowGolem.getOwner(), p) && !p.isSpectator() && !((Player) p).isCreative());
-//            target = level.getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else {
             if (snowGolem.getOwner() != null) {
                 targetConditions.selector(p -> !(p instanceof Player) && snowGolem.wantsToAttack(p, snowGolem.getOwner()) || p instanceof Player player && !player.isCreative() && !player.isSpectator() && !player.equals(snowGolem.getOwner()));

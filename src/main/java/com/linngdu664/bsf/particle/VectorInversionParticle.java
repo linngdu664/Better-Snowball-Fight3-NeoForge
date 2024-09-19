@@ -71,7 +71,7 @@ public class VectorInversionParticle extends TextureSheetParticle {
             float f = randomSource.nextFloat() * 0.6F + 0.4F;
             double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);
             double phi = Math.acos(BSFCommonUtil.randDouble(randomSource, -1, 1)) - Mth.HALF_PI;
-            return new VectorInversionParticle(pLevel,  new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(10, theta, phi), pXSpeed, pYSpeed, pZSpeed, f * 0.9F, f * 0.3F, f * 0.3F, this.sprite);
+            return new VectorInversionParticle(pLevel, new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(10, theta, phi), pXSpeed, pYSpeed, pZSpeed, f * 0.9F, f * 0.3F, f * 0.3F, this.sprite);
         }
     }
 

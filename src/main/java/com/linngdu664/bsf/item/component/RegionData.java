@@ -12,9 +12,20 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Objects;
 
 public class RegionData {
+    public static final Codec<RegionData> CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    BlockPos.CODEC.fieldOf("start").forGetter(RegionData::start),
+                    BlockPos.CODEC.fieldOf("end").forGetter(RegionData::end)
+            ).apply(instance, RegionData::new)
+    );
+    public static final StreamCodec<ByteBuf, RegionData> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, RegionData::start,
+            BlockPos.STREAM_CODEC, RegionData::end,
+            RegionData::new
+    );
+    public static final RegionData EMPTY = new RegionData(BlockPos.ZERO, BlockPos.ZERO);
     private final BlockPos start, end;
     private final int minX, minY, minZ, maxX, maxY, maxZ;       // prevent replication computation
-
     public RegionData(BlockPos start, BlockPos end) {
         this.start = start;
         this.end = end;
@@ -37,19 +48,16 @@ public class RegionData {
         this.maxZ = another.maxZ;
     }
 
-    public static final Codec<RegionData> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    BlockPos.CODEC.fieldOf("start").forGetter(RegionData::start),
-                    BlockPos.CODEC.fieldOf("end").forGetter(RegionData::end)
-            ).apply(instance, RegionData::new)
-    );
-    public static final StreamCodec<ByteBuf, RegionData> STREAM_CODEC = StreamCodec.composite(
-            BlockPos.STREAM_CODEC, RegionData::start,
-            BlockPos.STREAM_CODEC, RegionData::end,
-            RegionData::new
-    );
-
-    public static final RegionData EMPTY = new RegionData(BlockPos.ZERO, BlockPos.ZERO);
+    public static RegionData loadFromCompoundTag(String key, CompoundTag tag) {
+        if (tag.contains(key + "Start") && tag.contains(key + "End")) {
+            CompoundTag cTag = tag.getCompound(key + "Start");
+            BlockPos start = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
+            cTag = tag.getCompound(key + "End");
+            BlockPos end = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
+            return new RegionData(start, end);
+        }
+        return null;
+    }
 
     public BlockPos start() {
         return start;
@@ -82,17 +90,6 @@ public class RegionData {
         cTag.putInt("y", end.getY());
         cTag.putInt("z", end.getZ());
         tag.put(key + "End", cTag);
-    }
-
-    public static RegionData loadFromCompoundTag(String key, CompoundTag tag) {
-        if (tag.contains(key + "Start") && tag.contains(key + "End")) {
-            CompoundTag cTag = tag.getCompound(key + "Start");
-            BlockPos start = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
-            cTag = tag.getCompound(key + "End");
-            BlockPos end = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
-            return new RegionData(start, end);
-        }
-        return null;
     }
 
     @Override

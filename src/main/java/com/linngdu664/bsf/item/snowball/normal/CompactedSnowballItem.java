@@ -30,7 +30,7 @@ import java.util.List;
 
 public class CompactedSnowballItem extends AbstractBSFSnowballItem {
     public CompactedSnowballItem() {
-        super(Rarity.COMMON,  new SnowballProperties().idForTank(0).allowLaunchTypeFlag(AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG | SculkSnowballLauncherItem.TYPE_FLAG));
+        super(Rarity.COMMON, new SnowballProperties().idForTank(0).allowLaunchTypeFlag(AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG | SculkSnowballLauncherItem.TYPE_FLAG));
         DispenserBlock.registerProjectileBehavior(this);
     }
 
@@ -50,11 +50,6 @@ public class CompactedSnowballItem extends AbstractBSFSnowballItem {
         snowball.setItem(itemStack);
         return snowball;
     }
-
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG | SculkSnowballLauncherItem.TYPE_FLAG;
-//    }
 
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {

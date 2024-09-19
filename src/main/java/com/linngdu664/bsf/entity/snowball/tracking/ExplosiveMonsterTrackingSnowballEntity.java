@@ -30,25 +30,10 @@ public class ExplosiveMonsterTrackingSnowballEntity extends AbstractMonsterTrack
         }
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 3;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 5;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 3.25F;
     }
-
-//    @Override
-//    public boolean isLockFeet() {
-//        return false;
-//    }
 
     @Override
     protected @NotNull Item getDefaultItem() {

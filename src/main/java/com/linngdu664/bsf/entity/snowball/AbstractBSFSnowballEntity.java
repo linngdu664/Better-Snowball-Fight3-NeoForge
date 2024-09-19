@@ -36,12 +36,12 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile implements Absorbable {
+    private final BSFSnowballEntityProperties properties;
     protected float particleGenerationStepSize = 0.5F;
     protected float particleGeneratePointOffset;
     protected Vec3 previousTickPosition = new Vec3(Double.NaN, Double.NaN, Double.NaN);
     protected boolean isCaught = false;
     private RegionData aliveRange = null;
-    private final BSFSnowballEntityProperties properties;
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel, BSFSnowballEntityProperties pProperties) {
         super(pEntityType, pLevel);
@@ -99,7 +99,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         float f1 = -Mth.sin((x + z) * 0.017453292F);
         float f2 = Mth.cos(y * 0.017453292F) * Mth.cos(x * 0.017453292F);
         this.shoot(f, f1, f2, velocity, inaccuracy);
-        Vec3 vec3 = ServerConfig.SHOOTING_INERTIA.getConfigValue()?shooter.getKnownMovement():shooter.getDeltaMovement();
+        Vec3 vec3 = ServerConfig.SHOOTING_INERTIA.getConfigValue() ? shooter.getKnownMovement() : shooter.getDeltaMovement();
         this.setDeltaMovement(this.getDeltaMovement().add(vec3.x, shooter.onGround() ? 0.0 : vec3.y, vec3.z));
     }
 
@@ -138,8 +138,8 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
                 owner.setLastHurtMob(entity);
             }
         }
-        Vec3 location = BSFCommonUtil.getRealEntityHitPosOnMoveVecWithHitResult(this,pResult);
-        spawnBasicParticles(level,location);
+        Vec3 location = BSFCommonUtil.getRealEntityHitPosOnMoveVecWithHitResult(this, pResult);
+        spawnBasicParticles(level, location);
         callTraceParticlesEnd(location);
     }
 
@@ -266,7 +266,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
 
     }
 
-    protected void spawnBasicParticles(Level level,Vec3 location) {
+    protected void spawnBasicParticles(Level level, Vec3 location) {
         if (!level.isClientSide) {
             ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, location.x, location.y, location.z, 8, 0, 0, 0, 0);
             ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, location.x, location.y, location.z, 8, 0, 0, 0, 0.04);
@@ -285,8 +285,16 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         return properties.damage;
     }
 
+    public void setDamage(float damage) {
+        properties.damage = damage;
+    }
+
     public final float getBlazeDamage() {
         return properties.blazeDamage;
+    }
+
+    public void setBlazeDamage(float damage) {
+        properties.blazeDamage = damage;
     }
 
     public final int getWeaknessTicks() {
@@ -303,14 +311,6 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
 
     public final LaunchFrom getLaunchFrom() {
         return properties.launchFrom;
-    }
-
-    public void setDamage(float damage) {
-        properties.damage = damage;
-    }
-
-    public void setBlazeDamage(float damage) {
-        properties.blazeDamage = damage;
     }
 
     @Override

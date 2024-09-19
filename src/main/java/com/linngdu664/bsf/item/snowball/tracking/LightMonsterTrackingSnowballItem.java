@@ -48,11 +48,6 @@ public class LightMonsterTrackingSnowballItem extends AbstractBSFSnowballItem {
         return new LightMonsterTrackingSnowballEntity(livingEntity, level, launchAdjustment, region);
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG;
-//    }
-
     @Override
     public void addUsageTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("LMT_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

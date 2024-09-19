@@ -14,13 +14,13 @@ import java.awt.*;
 
 public class SubspaceSnowballHitParticle extends TextureSheetParticle {
     private final PolarPos2d polarPos2d;
-    private double speed;
     private final double radius;
     private final SpriteSet sprites;
     private final double pDY;
     private final double p0Y;
+    private double speed;
 
-    protected SubspaceSnowballHitParticle(ClientLevel pLevel, double pX, double pY, double pZ, double p0X, double p0Y, double p0Z, float r, float g, float b,double speed, SpriteSet pSprites) {
+    protected SubspaceSnowballHitParticle(ClientLevel pLevel, double pX, double pY, double pZ, double p0X, double p0Y, double p0Z, float r, float g, float b, double speed, SpriteSet pSprites) {
         super(pLevel, p0X, p0Y, p0Z);
         this.polarPos2d = new PolarPos2d(new Vec2d(p0X, p0Z), new Vec2d(pX, pZ));
         this.hasPhysics = false;
@@ -28,8 +28,8 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
         this.friction = 0.9F;
         this.sprites = pSprites;
         this.speed = speed;
-        this.pDY = pY-p0Y;
-        this.p0Y=p0Y;
+        this.pDY = pY - p0Y;
+        this.p0Y = p0Y;
         this.radius = this.polarPos2d.getRadius();
         this.rCol = r;
         this.gCol = g;
@@ -37,6 +37,10 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
         this.quadSize = 0.4F * (this.random.nextFloat() * this.random.nextFloat() * 1.0F + 4.5F);
         this.lifetime = 7;
         this.setSpriteFromAge(pSprites);
+    }
+
+    public static double quadraticFunction(double x, double maxX, double maxY) {
+        return 4 * x * maxY * (maxX - x) / (maxX * maxX);
     }
 
     @Override
@@ -58,7 +62,7 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
             polarPos2d.setRadius(r);
             polarPos2d.rotateLength(speed);
             Vec2d vec2d = polarPos2d.getP();
-            this.setPos(vec2d.x,p0Y+dy,vec2d.y);
+            this.setPos(vec2d.x, p0Y + dy, vec2d.y);
             if (this.speedUpWhenYMotionIsBlocked && this.y == this.yo) {
                 this.speed *= 1.1D;
             }
@@ -69,10 +73,6 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
         }
         this.setSpriteFromAge(this.sprites);
         scale(0.92f);
-    }
-
-    public static double quadraticFunction(double x, double maxX, double maxY) {
-        return 4*x*maxY*(maxX-x)/(maxX*maxX);
     }
 
     /**
@@ -87,8 +87,8 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
 
         public Particle createParticle(SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
             RandomSource random = pLevel.getRandom();
-            Color color = ParticleUtil.hsvColor(random.nextInt(360),BSFCommonUtil.randIntWithInfer(random,40,100),BSFCommonUtil.randIntWithInfer(random,80,100));
-            return new SubspaceSnowballHitParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, (float) color.getRed() /255,(float) color.getGreen() /255,(float) color.getBlue() /255,BSFCommonUtil.randDoubleWithInfer(random,1,5), this.sprite);
+            Color color = ParticleUtil.hsvColor(random.nextInt(360), BSFCommonUtil.randIntWithInfer(random, 40, 100), BSFCommonUtil.randIntWithInfer(random, 80, 100));
+            return new SubspaceSnowballHitParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, (float) color.getRed() / 255, (float) color.getGreen() / 255, (float) color.getBlue() / 255, BSFCommonUtil.randDoubleWithInfer(random, 1, 5), this.sprite);
         }
     }
 

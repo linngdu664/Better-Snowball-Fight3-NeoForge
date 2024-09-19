@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 public abstract class Easing {
     public static final HashMap<String, Easing> EASINGS = new HashMap<>();
-    public final String name;
     public static final Easing LINEAR = new Easing("linear") {
         public float ease(float t, float b, float c, float d) {
             return c * t / d + b;
@@ -72,27 +71,27 @@ public abstract class Easing {
     };
     public static final Easing SINE_IN = new Easing("sineIn") {
         public float ease(float t, float b, float c, float d) {
-            return -c * (float)Math.cos((double)(t / d) * 1.5707963267948966) + c + b;
+            return -c * (float) Math.cos((double) (t / d) * 1.5707963267948966) + c + b;
         }
     };
     public static final Easing SINE_OUT = new Easing("sineOut") {
         public float ease(float t, float b, float c, float d) {
-            return c * (float)Math.sin((double)(t / d) * 1.5707963267948966) + b;
+            return c * (float) Math.sin((double) (t / d) * 1.5707963267948966) + b;
         }
     };
     public static final Easing SINE_IN_OUT = new Easing("sineInOut") {
         public float ease(float t, float b, float c, float d) {
-            return -c / 2.0F * ((float)Math.cos(Math.PI * (double)t / (double)d) - 1.0F) + b;
+            return -c / 2.0F * ((float) Math.cos(Math.PI * (double) t / (double) d) - 1.0F) + b;
         }
     };
     public static final Easing EXPO_IN = new Easing("expoIn") {
         public float ease(float t, float b, float c, float d) {
-            return t == 0.0F ? b : c * (float)Math.pow(2.0, 10.0F * (t / d - 1.0F)) + b;
+            return t == 0.0F ? b : c * (float) Math.pow(2.0, 10.0F * (t / d - 1.0F)) + b;
         }
     };
     public static final Easing EXPO_OUT = new Easing("expoOut") {
         public float ease(float t, float b, float c, float d) {
-            return t == d ? b + c : c * (-((float)Math.pow(2.0, -10.0F * t / d)) + 1.0F) + b;
+            return t == d ? b + c : c * (-((float) Math.pow(2.0, -10.0F * t / d)) + 1.0F) + b;
         }
     };
     public static final Easing EXPO_IN_OUT = new Easing("expoInOut") {
@@ -102,23 +101,23 @@ public abstract class Easing {
             } else if (t == d) {
                 return b + c;
             } else {
-                return (t /= d / 2.0F) < 1.0F ? c / 2.0F * (float)Math.pow(2.0, 10.0F * (t - 1.0F)) + b : c / 2.0F * (-((float)Math.pow(2.0, -10.0F * --t)) + 2.0F) + b;
+                return (t /= d / 2.0F) < 1.0F ? c / 2.0F * (float) Math.pow(2.0, 10.0F * (t - 1.0F)) + b : c / 2.0F * (-((float) Math.pow(2.0, -10.0F * --t)) + 2.0F) + b;
             }
         }
     };
     public static final Easing CIRC_IN = new Easing("circIn") {
         public float ease(float t, float b, float c, float d) {
-            return -c * ((float)Math.sqrt(1.0F - (t /= d) * t) - 1.0F) + b;
+            return -c * ((float) Math.sqrt(1.0F - (t /= d) * t) - 1.0F) + b;
         }
     };
     public static final Easing CIRC_OUT = new Easing("circOut") {
         public float ease(float t, float b, float c, float d) {
-            return c * (float)Math.sqrt(1.0F - (t = t / d - 1.0F) * t) + b;
+            return c * (float) Math.sqrt(1.0F - (t = t / d - 1.0F) * t) + b;
         }
     };
     public static final Easing CIRC_IN_OUT = new Easing("circInOut") {
         public float ease(float t, float b, float c, float d) {
-            return (t /= d / 2.0F) < 1.0F ? -c / 2.0F * ((float)Math.sqrt(1.0F - t * t) - 1.0F) + b : c / 2.0F * ((float)Math.sqrt(1.0F - (t -= 2.0F) * t) + 1.0F) + b;
+            return (t /= d / 2.0F) < 1.0F ? -c / 2.0F * ((float) Math.sqrt(1.0F - t * t) - 1.0F) + b : c / 2.0F * ((float) Math.sqrt(1.0F - (t -= 2.0F) * t) + 1.0F) + b;
         }
     };
     public static final Easing.Elastic ELASTIC_IN = new Easing.ElasticIn();
@@ -127,11 +126,6 @@ public abstract class Easing {
     public static final Easing.Back BACK_IN = new Easing.BackIn();
     public static final Easing.Back BACK_OUT = new Easing.BackOut();
     public static final Easing.Back BACK_IN_OUT = new Easing.BackInOut();
-    public static final Easing BOUNCE_IN = new Easing("bounceIn") {
-        public float ease(float t, float b, float c, float d) {
-            return c - Easing.BOUNCE_OUT.ease(d - t, 0.0F, c, d) + b;
-        }
-    };
     public static final Easing BOUNCE_OUT = new Easing("bounceOut") {
         public float ease(float t, float b, float c, float d) {
             if ((t /= d) < 0.36363637F) {
@@ -143,11 +137,17 @@ public abstract class Easing {
             }
         }
     };
+    public static final Easing BOUNCE_IN = new Easing("bounceIn") {
+        public float ease(float t, float b, float c, float d) {
+            return c - Easing.BOUNCE_OUT.ease(d - t, 0.0F, c, d) + b;
+        }
+    };
     public static final Easing BOUNCE_IN_OUT = new Easing("bounceInOut") {
         public float ease(float t, float b, float c, float d) {
             return t < d / 2.0F ? Easing.BOUNCE_IN.ease(t * 2.0F, 0.0F, c, d) * 0.5F + b : Easing.BOUNCE_OUT.ease(t * 2.0F - d, 0.0F, c, d) * 0.5F + c * 0.5F + b;
         }
     };
+    public final String name;
 
     public Easing(String name) {
         this.name = name;
@@ -186,10 +186,10 @@ public abstract class Easing {
                     a = c;
                     s = p / 4.0F;
                 } else {
-                    s = p / 6.2831855F * (float)Math.asin(c / a);
+                    s = p / 6.2831855F * (float) Math.asin(c / a);
                 }
 
-                return -(a * (float)Math.pow(2.0, 10.0F * --t) * (float)Math.sin((double)(t * d - s) * 6.283185307179586 / (double)p)) + b;
+                return -(a * (float) Math.pow(2.0, 10.0F * --t) * (float) Math.sin((double) (t * d - s) * 6.283185307179586 / (double) p)) + b;
             }
         }
     }
@@ -251,10 +251,10 @@ public abstract class Easing {
                     a = c;
                     s = p / 4.0F;
                 } else {
-                    s = p / 6.2831855F * (float)Math.asin(c / a);
+                    s = p / 6.2831855F * (float) Math.asin(c / a);
                 }
 
-                return a * (float)Math.pow(2.0, -10.0F * t) * (float)Math.sin((double)(t * d - s) * 6.283185307179586 / (double)p) + c + b;
+                return a * (float) Math.pow(2.0, -10.0F * t) * (float) Math.sin((double) (t * d - s) * 6.283185307179586 / (double) p) + c + b;
             }
         }
     }
@@ -285,10 +285,10 @@ public abstract class Easing {
                     a = c;
                     s = p / 4.0F;
                 } else {
-                    s = p / 6.2831855F * (float)Math.asin(c / a);
+                    s = p / 6.2831855F * (float) Math.asin(c / a);
                 }
 
-                return t < 1.0F ? -0.5F * a * (float)Math.pow(2.0, 10.0F * --t) * (float)Math.sin((double)(t * d - s) * 6.283185307179586 / (double)p) + b : a * (float)Math.pow(2.0, -10.0F * --t) * (float)Math.sin((double)(t * d - s) * 6.283185307179586 / (double)p) * 0.5F + c + b;
+                return t < 1.0F ? -0.5F * a * (float) Math.pow(2.0, 10.0F * --t) * (float) Math.sin((double) (t * d - s) * 6.283185307179586 / (double) p) + b : a * (float) Math.pow(2.0, -10.0F * --t) * (float) Math.sin((double) (t * d - s) * 6.283185307179586 / (double) p) * 0.5F + c + b;
             }
         }
     }
@@ -321,12 +321,12 @@ public abstract class Easing {
             this.overshoot = overshoot;
         }
 
-        public void setOvershoot(float overshoot) {
-            this.overshoot = overshoot;
-        }
-
         public float getOvershoot() {
             return this.overshoot;
+        }
+
+        public void setOvershoot(float overshoot) {
+            this.overshoot = overshoot;
         }
     }
 
@@ -356,7 +356,7 @@ public abstract class Easing {
 
         public float ease(float t, float b, float c, float d) {
             float s = this.getOvershoot();
-            return (t /= d / 2.0F) < 1.0F ? c / 2.0F * t * t * (((s = (float)((double)s * 1.525)) + 1.0F) * t - s) + b : c / 2.0F * ((t -= 2.0F) * t * (((s = (float)((double)s * 1.525)) + 1.0F) * t + s) + 2.0F) + b;
+            return (t /= d / 2.0F) < 1.0F ? c / 2.0F * t * t * (((s = (float) ((double) s * 1.525)) + 1.0F) * t - s) + b : c / 2.0F * ((t -= 2.0F) * t * (((s = (float) ((double) s * 1.525)) + 1.0F) * t + s) + 2.0F) + b;
         }
     }
 }

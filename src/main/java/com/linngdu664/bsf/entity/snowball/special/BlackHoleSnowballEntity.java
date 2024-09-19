@@ -82,19 +82,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
         if (!level.isClientSide) {
             if (timer == startTime) {
                 startBlackHole();
-//                Vec3 vec3 = this.getDeltaMovement();
-//                this.push(vec3.x * -0.75, vec3.y * -0.75, vec3.z * -0.75);
-//                ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY(), this.getZ(), 200, 0, 0, 0, 0.32);
-//                this.playSound(SoundRegister.BLACK_HOLE_START.get(), 3.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }
-//            if (timer > startTime) {
-//                forceEffect(this, level.getEntitiesOfClass(Entity.class, getBoundingBox().inflate(30), EntitySelector.NO_CREATIVE_OR_SPECTATOR), 8, 8);
-//                ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0.12);
-//            }
-//            if (timer == endTime) {
-//                handleExplosion(6.0F);
-//                this.discard();
-//            }
         }
         timer++;
     }
@@ -109,24 +97,8 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
         ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY(), this.getZ(), 200, 0, 0, 0, 0.32);
         playSound(SoundRegister.BLACK_HOLE_START.get(), 3.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         playSound(SoundRegister.BLACK_HOLE_AMBIENCE.get(), 12.0F, 1.0F);
-//        Vector3f shaft = vec3.cross(new Vec3(0, 1, 0)).normalize().add(0,BSFMthUtil.SQRT_3,0).normalize().toVector3f();
         level.addFreshEntity(new BlackHoleExecutor(EntityRegister.BLACK_HOLE_EXECUTOR.get(), getX(), getY(), getZ(), level(), getDeltaMovement(), endTime - startTime, getRegion()));
     }
-
-//    @Override
-//    public boolean canBeCaught() {
-//        return false;
-//    }
-//
-//    @Override
-//    public float getBasicDamage() {
-//        return 4;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 6;
-//    }
 
     @Override
     public float getSubspacePower() {

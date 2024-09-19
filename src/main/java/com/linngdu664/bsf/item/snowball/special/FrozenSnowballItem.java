@@ -53,16 +53,6 @@ public class FrozenSnowballItem extends AbstractBSFSnowballItem {
         return snowball;
     }
 
-    //    @Override
-//    public double getShotgunPushRank() {
-//        return 0.12;
-//    }
-//
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG;
-//    }
-
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("frozen_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

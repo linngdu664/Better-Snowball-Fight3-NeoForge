@@ -43,8 +43,29 @@ public class TeamLinkerItem extends Item {
         return "color.minecraft." + DyeColor.byId(id).getName();
     }
 
-    public static String getColorTransNameById(int id){
+    public static String getColorTransNameById(int id) {
         return BSFCommonUtil.getTransStr(getColorNameKeyById(id));
+    }
+
+    public static ItemStack getItemStackById(byte id) {
+        return switch (id) {
+            case 0 -> ItemRegister.WHITE_TEAM_LINKER.toStack();
+            case 1 -> ItemRegister.ORANGE_TEAM_LINKER.toStack();
+            case 2 -> ItemRegister.MAGENTA_TEAM_LINKER.toStack();
+            case 3 -> ItemRegister.LIGHT_BLUE_TEAM_LINKER.toStack();
+            case 4 -> ItemRegister.YELLOW_TEAM_LINKER.toStack();
+            case 5 -> ItemRegister.LIME_TEAM_LINKER.toStack();
+            case 6 -> ItemRegister.PINK_TEAM_LINKER.toStack();
+            case 7 -> ItemRegister.GRAY_TEAM_LINKER.toStack();
+            case 8 -> ItemRegister.LIGHT_GRAY_TEAM_LINKER.toStack();
+            case 9 -> ItemRegister.CYAN_TEAM_LINKER.toStack();
+            case 10 -> ItemRegister.PURPLE_TEAM_LINKER.toStack();
+            case 11 -> ItemRegister.BLUE_TEAM_LINKER.toStack();
+            case 12 -> ItemRegister.BROWN_TEAM_LINKER.toStack();
+            case 13 -> ItemRegister.GREEN_TEAM_LINKER.toStack();
+            case 14 -> ItemRegister.RED_TEAM_LINKER.toStack();
+            default -> ItemRegister.BLACK_TEAM_LINKER.toStack();
+        };
     }
 
     @Override
@@ -103,32 +124,11 @@ public class TeamLinkerItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Options options = Minecraft.getInstance().options;
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("team_linker.tooltip", null, new Object[]{options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("team_linker1.tooltip", null, new Object[]{options.keyShift.getTranslatedKeyMessage(),options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("team_linker1.tooltip", null, new Object[]{options.keyShift.getTranslatedKeyMessage(), options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     public byte getTeamId() {
         return (byte) teamId;
-    }
-
-    public static ItemStack getItemStackById(byte id) {
-        return switch (id) {
-            case 0 -> ItemRegister.WHITE_TEAM_LINKER.toStack();
-            case 1 -> ItemRegister.ORANGE_TEAM_LINKER.toStack();
-            case 2 -> ItemRegister.MAGENTA_TEAM_LINKER.toStack();
-            case 3 -> ItemRegister.LIGHT_BLUE_TEAM_LINKER.toStack();
-            case 4 -> ItemRegister.YELLOW_TEAM_LINKER.toStack();
-            case 5 -> ItemRegister.LIME_TEAM_LINKER.toStack();
-            case 6 -> ItemRegister.PINK_TEAM_LINKER.toStack();
-            case 7 -> ItemRegister.GRAY_TEAM_LINKER.toStack();
-            case 8 -> ItemRegister.LIGHT_GRAY_TEAM_LINKER.toStack();
-            case 9 -> ItemRegister.CYAN_TEAM_LINKER.toStack();
-            case 10 -> ItemRegister.PURPLE_TEAM_LINKER.toStack();
-            case 11 -> ItemRegister.BLUE_TEAM_LINKER.toStack();
-            case 12 -> ItemRegister.BROWN_TEAM_LINKER.toStack();
-            case 13 -> ItemRegister.GREEN_TEAM_LINKER.toStack();
-            case 14 -> ItemRegister.RED_TEAM_LINKER.toStack();
-            default -> ItemRegister.BLACK_TEAM_LINKER.toStack();
-        };
     }
 
 }

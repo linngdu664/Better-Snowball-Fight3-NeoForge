@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class VendingMachine extends Block implements EntityBlock {
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 15.0, 16.0);
+
     public VendingMachine() {
         super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
     }
@@ -62,6 +63,7 @@ public class VendingMachine extends Block implements EntityBlock {
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
+
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;

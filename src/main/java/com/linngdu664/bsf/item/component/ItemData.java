@@ -20,6 +20,7 @@ public record ItemData(Item item) {
             ByteBufCodecs.STRING_UTF8, ItemData::getItemResLoc,
             ItemData::new
     );
+    public static final ItemData EMPTY = new ItemData(Items.AIR);
 
     private ItemData(String itemName) {
         this(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemName)));
@@ -28,7 +29,5 @@ public record ItemData(Item item) {
     private String getItemResLoc() {
         return BuiltInRegistries.ITEM.getKey(item).toString();
     }
-
-    public static final ItemData EMPTY = new ItemData(Items.AIR);
 
 }

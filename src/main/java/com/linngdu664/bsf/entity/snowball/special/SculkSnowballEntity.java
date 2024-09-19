@@ -62,11 +62,6 @@ public class SculkSnowballEntity extends AbstractBSFSnowballEntity {
         }
     }
 
-//    @Override
-//    public double getBasicPunch() {
-//        return 2;
-//    }
-
     @Override
     protected @NotNull Item getDefaultItem() {
         return ItemRegister.COMPACTED_SNOWBALL.get();

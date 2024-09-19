@@ -24,16 +24,6 @@ public class StoneSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.STONE_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(2).basicBlazeDamage(4).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 2;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 4;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 1.1f;

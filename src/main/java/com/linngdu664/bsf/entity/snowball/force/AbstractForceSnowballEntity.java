@@ -28,14 +28,10 @@ public abstract class AbstractForceSnowballEntity extends AbstractBSFSnowballEnt
     protected void onHitBlock(@NotNull BlockHitResult p_37258_) {
         super.onHitBlock(p_37258_);
         Level level = level();
-        if (!level.isClientSide){
+        if (!level.isClientSide) {
             playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
             level.addFreshEntity(getExecutor());
             discard();
-//        isStart = true;
-//        this.fixLocation = new Vec3(this.getX(), this.getY(), this.getZ());
-//        stopTheSnowball();
-//        this.setNoGravity(true);
         }
     }
 

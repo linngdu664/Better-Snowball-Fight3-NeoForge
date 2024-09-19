@@ -54,6 +54,6 @@ public class SnowFallBootsItem extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_fall_boots.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_fall_boots1.tooltip", null, new Object[]{MutableComponent.create(new TranslatableContents("enchantment.bsf.kinetic_energy_storage",null,new Object[0])).getString()})).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_fall_boots1.tooltip", null, new Object[]{MutableComponent.create(new TranslatableContents("enchantment.bsf.kinetic_energy_storage", null, new Object[0]))})).withStyle(ChatFormatting.GRAY));
     }
 }

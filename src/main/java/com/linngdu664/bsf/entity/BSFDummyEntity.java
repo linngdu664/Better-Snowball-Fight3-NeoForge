@@ -24,11 +24,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class BSFDummyEntity extends Mob {
-    private float damage = 0F;
-    private final float[] damages = new float[20];
-    private int ptr = 0;
     private static final EntityDataAccessor<Float> DPS = SynchedEntityData.defineId(BSFDummyEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Byte> STYLE = SynchedEntityData.defineId(BSFDummyEntity.class, EntityDataSerializers.BYTE);
+    private final float[] damages = new float[20];
+    private float damage = 0F;
+    private int ptr = 0;
 
     public BSFDummyEntity(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);

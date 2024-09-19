@@ -20,15 +20,15 @@ public record UuidData(UUID uuid) {
             UuidData::new
     );
 
+    private UuidData(long high, long low) {
+        this(new UUID(high, low));
+    }
+
     private long getUuidHigh() {
         return uuid.getMostSignificantBits();
     }
 
     private long getUuidLow() {
         return uuid.getLeastSignificantBits();
-    }
-
-    private UuidData(long high, long low) {
-        this(new UUID(high, low));
     }
 }

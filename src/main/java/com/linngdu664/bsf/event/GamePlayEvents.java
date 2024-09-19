@@ -69,6 +69,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
     public static final int CAPTURE_POINTS = 10;
+    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), 0.15, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
         LivingEntity deathEntity = event.getEntity();
@@ -118,14 +121,6 @@ public class GamePlayEvents {
 
     @SubscribeEvent
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
-//        if (event.getEntity() instanceof Player player1 && event.getSource().getEntity() instanceof Player player2) {
-//            BSFTeamSavedData savedData = player1.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-//            int id = savedData.getTeam(player1.getUUID());
-//            String msgId = event.getSource().getMsgId();
-//            if (id >= 0 && id == savedData.getTeam(player2.getUUID()) && msgId.equals("thrown") && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
-//                event.setNewDamage(0);
-//            }
-//        }
         Entity targetEntity = event.getEntity();
         DamageSource damageSource = event.getSource();
         if (!targetEntity.level().isClientSide && damageSource.is(DamageTypes.THROWN) && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
@@ -344,9 +339,6 @@ public class GamePlayEvents {
             event.setTable(lootTable);
         }
     }
-
-    private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), 0.15, AttributeModifier.Operation.ADD_VALUE);
-    private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {

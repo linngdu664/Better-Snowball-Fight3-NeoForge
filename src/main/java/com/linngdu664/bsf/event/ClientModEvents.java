@@ -49,7 +49,7 @@ public class ClientModEvents {
                     ResourceLocation.withDefaultNamespace("cooling"), (itemStack, world, livingEntity, num) -> {
                         if (livingEntity instanceof Player player) {
                             return player.getCooldowns().getCooldownPercent(itemStack.getItem(), 1);
-                        }else{
+                        } else {
                             return 0;
                         }
                     });
@@ -106,42 +106,6 @@ public class ClientModEvents {
         });
     }
     // current max id for tank is 31 (icicle snowball)
-
-//    private static float getSnowballId(Item item) {
-//        if (item instanceof CompactedSnowballItem) return 0;
-//        if (item instanceof CherryBlossomSnowballItem) return 1;
-//        if (item instanceof StoneSnowballItem) return 2;
-//        if (item instanceof GlassSnowballItem) return 3;
-//        if (item instanceof IceSnowballItem) return 4;
-//        if (item instanceof IronSnowballItem) return 5;
-//        if (item instanceof GoldSnowballItem) return 6;
-//        if (item instanceof ObsidianSnowballItem) return 7;
-//        if (item instanceof ExplosiveSnowballItem) return 8;
-//        if (item instanceof SpectralSnowballItem) return 9;
-//        if (item instanceof PowderSnowballItem) return 10;
-//        if (item instanceof FrozenSnowballItem) return 11;
-//        if (item instanceof CriticalFrozenSnowballItem) return 12;
-//        if (item instanceof EnderSnowballItem) return 13;
-//        if (item instanceof ThrustSnowballItem) return 14;
-//        if (item instanceof SubspaceSnowballItem) return 15;
-//        if (item instanceof GhostSnowballItem) return 16;
-//        if (item instanceof ExpansionSnowballItem) return 17;
-//        if (item instanceof ReconstructSnowballItem) return 18;
-//        if (item instanceof ImpulseSnowballItem) return 19;
-//        if (item instanceof BlackHoleSnowballItem) return 20;
-//        if (item instanceof MonsterGravitySnowballItem) return 21;
-//        if (item instanceof MonsterRepulsionSnowballItem) return 22;
-//        if (item instanceof ProjectileGravitySnowballItem) return 23;
-//        if (item instanceof ProjectileRepulsionSnowballItem) return 24;
-//        if (item instanceof LightMonsterTrackingSnowballItem) return 25;
-//        if (item instanceof HeavyMonsterTrackingSnowballItem) return 26;
-//        if (item instanceof ExplosiveMonsterTrackingSnowballItem) return 27;
-//        if (item instanceof LightPlayerTrackingSnowballItem) return 28;
-//        if (item instanceof HeavyPlayerTrackingSnowballItem) return 29;
-//        if (item instanceof ExplosivePlayerTrackingSnowballItem) return 30;
-//        if (item instanceof IcicleSnowballItem) return 31;
-//        return -1;
-//    }
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {

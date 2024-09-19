@@ -20,9 +20,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.NotNull;
 
 public class PowderSnowballEntity extends AbstractBSFSnowballEntity {
-//    private boolean isStart = false;
-//    private int timer = 0;
-
     public PowderSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties());
     }
@@ -35,20 +32,6 @@ public class PowderSnowballEntity extends AbstractBSFSnowballEntity {
         super(EntityRegister.POWDER_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-//        super.addAdditionalSaveData(pCompound);
-//        pCompound.putInt("Timer", timer);
-//        pCompound.putBoolean("IsStart", isStart);
-//    }
-//
-//    @Override
-//    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-//        super.readAdditionalSaveData(pCompound);
-//        timer = pCompound.getInt("Timer");
-//        isStart = pCompound.getBoolean("IsStart");
-//    }
-
     @Override
     protected void onHitBlock(@NotNull BlockHitResult p_37258_) {
         super.onHitBlock(p_37258_);
@@ -59,30 +42,7 @@ public class PowderSnowballEntity extends AbstractBSFSnowballEntity {
             level.addFreshEntity(new PowderExecutor(EntityRegister.POWDER_EXECUTOR.get(), getX(), getY(), getZ(), level(), getRegion()));
         }
         discard();
-//        isStart = true;
-//        if (!level.isClientSide) {
-//            this.fixLocation = new Vec3(this.getX(), this.getY(), this.getZ());
-//            stopTheSnowball();
-//            this.setNoGravity(true);
-//        }
     }
-
-
-//    @Override
-//    public void tick() {
-//        Level level = level();
-//        if (!level.isClientSide) {
-//            if (isStart) {
-//                stopTheSnowball();
-//                ((ServerLevel) level).sendParticles(ParticleRegister.BIG_LONG_TIME_SNOWFLAKE.get(), this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0.2);
-//                if (timer > 200) {
-//                    this.discard();
-//                }
-//            }
-//        }
-//        timer++;
-//        super.tick();
-//    }
 
     @Override
     protected void onHitEntity(EntityHitResult pResult) {

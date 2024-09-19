@@ -21,7 +21,7 @@ public class SpawnSnowParticle extends TextureSheetParticle {
         this.yd += ySpeed;
         this.zd += zSpeed;
         this.quadSize *= 0.75F * sizeMultiplier;
-        this.lifetime = (int)(5.0F / Mth.randomBetween(this.random, 0.5F, 1.0F) * sizeMultiplier);
+        this.lifetime = (int) (5.0F / Mth.randomBetween(this.random, 0.5F, 1.0F) * sizeMultiplier);
         this.lifetime = Math.max(this.lifetime, 1);
         this.setSpriteFromAge(sprites);
         this.hasPhysics = true;
@@ -45,7 +45,7 @@ public class SpawnSnowParticle extends TextureSheetParticle {
     }
 
     public float getQuadSize(float scaleFactor) {
-        return this.quadSize * Mth.clamp(((float)this.age + scaleFactor) / (float)this.lifetime * 32.0F, 0.0F, 1.0F);
+        return this.quadSize * Mth.clamp(((float) this.age + scaleFactor) / (float) this.lifetime * 32.0F, 0.0F, 1.0F);
     }
 
 

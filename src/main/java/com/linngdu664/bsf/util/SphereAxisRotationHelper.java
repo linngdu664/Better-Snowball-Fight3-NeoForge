@@ -10,8 +10,9 @@ public class SphereAxisRotationHelper {
 
 
     public SphereAxisRotationHelper(Vec3 offset, double axisYaw, double axisPitch) {
-        this(offset,BSFCommonUtil.radRotationToVector(1, axisYaw, axisPitch));
+        this(offset, BSFCommonUtil.radRotationToVector(1, axisYaw, axisPitch));
     }
+
     public SphereAxisRotationHelper(Vec3 offset, Vec3 axis) {
         Vec3 vec33 = axis.scale(offset.length() * BSFCommonUtil.vec3AngleCos(offset, axis));
         circle1 = offset.subtract(vec33);

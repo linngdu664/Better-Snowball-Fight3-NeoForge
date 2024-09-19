@@ -4,6 +4,7 @@ public class Vec2d {
     public static final Vec2d ZERO = new Vec2d(0, 0);
     public final double x;
     public final double y;
+
     public Vec2d(Vec2d vec2d) {
         this.x = vec2d.x;
         this.y = vec2d.y;
@@ -13,6 +14,7 @@ public class Vec2d {
         this.x = x;
         this.y = y;
     }
+
     public Vec2d scale(double pFactor) {
         return new Vec2d(this.x * pFactor, this.y * pFactor);
     }

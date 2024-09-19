@@ -54,21 +54,6 @@ public class ExplosiveMonsterTrackingSnowballItem extends AbstractBSFSnowballIte
         return new ExplosiveMonsterTrackingSnowballEntity(livingEntity, level, launchAdjustment, region);
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG;
-//    }
-//
-//    @Override
-//    public double getMachineGunRecoil() {
-//        return 0.12;
-//    }
-//
-//    @Override
-//    public double getShotgunPushRank() {
-//        return 0.42;
-//    }
-
     @Override
     public void addUsageTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("EMT_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

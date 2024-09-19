@@ -33,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class SmartSnowBlock extends HorizontalDirectionalBlock {
-    public static final MapCodec<SmartSnowBlock> CODEC = simpleCodec(SmartSnowBlock::new);
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final MapCodec<SmartSnowBlock> CODEC = simpleCodec(SmartSnowBlock::new);
     private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
     private static final Predicate<BlockState> PUMPKINS_PREDICATE = (p_51396_) -> p_51396_ != null && p_51396_.is(BlockRegister.SMART_SNOW_BLOCK.get());
     private BlockPattern snowGolemFull;
@@ -51,7 +51,6 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
         return SHAPE;

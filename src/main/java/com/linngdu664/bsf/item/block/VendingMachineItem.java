@@ -8,6 +8,4 @@ public class VendingMachineItem extends BlockItem {
     public VendingMachineItem() {
         super(BlockRegister.VENDING_MACHINE.get(), new Properties().rarity(Rarity.UNCOMMON));
     }
-
-
 }

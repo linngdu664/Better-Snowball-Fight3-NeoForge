@@ -10,7 +10,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record SubspaceSnowballReleaseTraceParticlesPayload(double px, double py, double pz, double dx, double dy, double dz) implements CustomPacketPayload {
+public record SubspaceSnowballReleaseTraceParticlesPayload(double px, double py, double pz, double dx, double dy,
+                                                           double dz) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<SubspaceSnowballReleaseTraceParticlesPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("subspace_snowball_release_trace_particles"));
     public static final StreamCodec<ByteBuf, SubspaceSnowballReleaseTraceParticlesPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.DOUBLE, SubspaceSnowballReleaseTraceParticlesPayload::px,

@@ -81,7 +81,8 @@ public class ColdCompressionJetEngineItem extends Item {
                 pLivingEntity.push(aVec.x, aVec.y, aVec.z);
             }
         } else {
-            pStack.hurtAndBreak(1, (ServerLevel) pLevel, pLivingEntity, p -> {});
+            pStack.hurtAndBreak(1, (ServerLevel) pLevel, pLivingEntity, p -> {
+            });
             if (i == 0) {
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP1.get(), ToggleMovingSoundPayload.PLAY_ONCE));
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.PLAY_LOOP));
@@ -111,54 +112,6 @@ public class ColdCompressionJetEngineItem extends Item {
             }
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse(), 2F, 60, 0.5F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
         }
-        /*
-        Vec3 vec3 = Vec3.directionFromRotation(pLivingEntity.getXRot(), pLivingEntity.getYRot());
-        Vec3 particlesPos = pLivingEntity.getEyePosition();
-        if (!pLevel.isClientSide) {
-            if (i == 0) {
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP1.get(), ToggleMovingSoundPayload.PLAY_ONCE));
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.PLAY_LOOP));
-            }
-            pStack.hurtAndBreak(1, (ServerLevel) pLevel, pLivingEntity, p -> {});
-        }
-        if (i < STARTUP_DURATION) {
-            if (!pLevel.isClientSide) {
-                Vec3 newPos = particlesPos.add(vec3.reverse());
-                ((ServerLevel) pLevel).sendParticles(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), newPos.x, newPos.y, newPos.z, 1, 0, 0, 0, 0.04);
-            }
-            return;
-        }
-        if (i == STARTUP_DURATION) {
-            Vec3 aVec = vec3.scale(2);
-            pLivingEntity.push(aVec.x, aVec.y, aVec.z);
-            if (!pLevel.isClientSide) {
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.PLAY_LOOP));
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP3.get(), ToggleMovingSoundPayload.PLAY_ONCE));
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP4.get(), ToggleMovingSoundPayload.PLAY_LOOP));
-                PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse().scale(0.5), 5F, 10, 0.2F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
-            } else {
-                ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(6)).setIntensity(0.6f).setEasing(Easing.EXPO_IN_OUT));
-            }
-        } else {
-            Vec3 aVec = vec3.scale(0.2);
-            pLivingEntity.push(aVec.x, aVec.y, aVec.z);
-            List<LivingEntity> list = pLevel.getEntitiesOfClass(LivingEntity.class, pLivingEntity.getBoundingBox().inflate(2), p -> !pLivingEntity.equals(p));
-            for (LivingEntity entity : list) {
-                if (entity.getTicksFrozen() < 100) {
-                    entity.setTicksFrozen(100);
-                }
-                if (pLivingEntity instanceof Player player) {
-                    entity.hurt(pLevel.damageSources().playerAttack(player), Float.MIN_NORMAL);
-                }
-            }
-            if (vec3.y > 0) {
-                pLivingEntity.resetFallDistance();
-            }
-        }
-        if (!pLevel.isClientSide) {
-            PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse(), 2F, 60, 0.5F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
-        }
-        */
     }
 
     @Override

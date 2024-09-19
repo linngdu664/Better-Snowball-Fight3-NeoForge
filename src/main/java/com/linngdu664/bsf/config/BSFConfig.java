@@ -24,15 +24,19 @@ public class BSFConfig {
                 s = (Pair) next.getKey();
             } while (!s.getFirst().equals(modId + "/" + configType));
 
-            builder.push(List.of(((ConfigPath)s.getSecond()).strings));
+            builder.push(List.of(((ConfigPath) s.getSecond()).strings));
             ArrayList<ConfigValueHolder> h = (ArrayList) next.getValue();
 
             for (ConfigValueHolder configValueHolder : h) {
                 configValueHolder.setConfig(builder);
             }
 
-            builder.pop(((ConfigPath)s.getSecond()).strings.length);
+            builder.pop(((ConfigPath) s.getSecond()).strings.length);
         }
+    }
+
+    public interface BuilderSupplier<T> {
+        ModConfigSpec.ConfigValue<T> createBuilder(ModConfigSpec.Builder var1);
     }
 
     public static record ConfigPath(String... strings) {
@@ -44,7 +48,7 @@ public class BSFConfig {
             if (this == o) {
                 return true;
             } else if (o != null && this.getClass() == o.getClass()) {
-                ConfigPath otherPath = (ConfigPath)o;
+                ConfigPath otherPath = (ConfigPath) o;
                 return Arrays.equals(this.strings, otherPath.strings);
             } else {
                 return false;
@@ -71,24 +75,20 @@ public class BSFConfig {
             VALUE_HOLDERS.computeIfAbsent(Pair.of(configType, new ConfigPath(entirePath.toArray(new String[0]))), (s) -> new ArrayList()).add(this);
         }
 
-        public void setConfig(ModConfigSpec.Builder builder) {
-            this.config = this.valueSupplier.createBuilder(builder);
-        }
-
-        public void setConfigValue(T t) {
-            this.config.set(t);
-        }
-
         public ModConfigSpec.ConfigValue<T> getConfig() {
             return this.config;
+        }
+
+        public void setConfig(ModConfigSpec.Builder builder) {
+            this.config = this.valueSupplier.createBuilder(builder);
         }
 
         public T getConfigValue() {
             return this.config.get();
         }
-    }
 
-    public interface BuilderSupplier<T> {
-        ModConfigSpec.ConfigValue<T> createBuilder(ModConfigSpec.Builder var1);
+        public void setConfigValue(T t) {
+            this.config.set(t);
+        }
     }
 }

@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
 public class CameraMixin {
-    @Inject(method = {"setup"}, at = {@At("RETURN")})
+    @Inject(method = "setup", at = @At("RETURN"))
     private void bsf$Screenshake(BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
         if (ClientConfig.SCREENSHAKE_INTENSITY.getConfigValue() > 0.0) {
-            ScreenshakeHandler.cameraTick((Camera)(Object) this, ClientForgeEvents.BSF_RANDOM_SOURCE);
+            ScreenshakeHandler.cameraTick((Camera) (Object) this, ClientForgeEvents.BSF_RANDOM_SOURCE);
         }
     }
 }

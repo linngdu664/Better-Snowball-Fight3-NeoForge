@@ -32,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-@SuppressWarnings("deprecation")
 public class SnowTrap extends Block {
     public SnowTrap() {
         super(Properties.ofLegacyCopy(Blocks.SNOW).noLootTable().randomTicks());

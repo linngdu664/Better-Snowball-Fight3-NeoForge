@@ -136,48 +136,11 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
             pStack.set(DataComponentRegister.MACHINE_GUN_TIMER, isExplosive ? timer + 6 : timer + 3);
         }
     }
-/*
-    @Override
-    public void onUseTick(@NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, @NotNull ItemStack pStack, int pRemainingUseDuration) {
-        if (pRemainingUseDuration == 1 || ammo == null || ammo.isEmpty() || !ammo.getOrCreateTag().contains("Snowball") || pLivingEntity.hasEffect(EffectRegister.WEAPON_JAM.get())) {
-            this.releaseUsing(pStack, pLevel, pLivingEntity, pRemainingUseDuration);
-            return;
-        }
-        Player player = (Player) pLivingEntity;
-        float pitch = player.getXRot();
-        float yaw = player.getYRot();
-        if (pRemainingUseDuration % 3 == 2 && (!isExplosive || pRemainingUseDuration % 6 == 5)) {
-            Vec3 cameraVec = Vec3.directionFromRotation(pitch, yaw);
-            if (pLevel.isClientSide()) {
-                // add push
-                player.push(-cameraVec.x * recoil * 0.25, -cameraVec.y * recoil * 0.25, -cameraVec.z * recoil * 0.25);
-            } else {
-                AbstractBSFSnowballEntity snowballEntity = ItemToEntity(ammo, player, pLevel, getLaunchAdjustment(1, ammo.getItem()));
-                BSFShootFromRotation(snowballEntity, pitch, yaw, 2.6F, 1.0F);
-                pLevel.addFreshEntity(snowballEntity);
-                pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.SNOWBALL_MACHINE_GUN_SHOOT.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                // add particles
-                ((ServerLevel) pLevel).sendParticles(ParticleTypes.SNOWFLAKE, player.getX() + cameraVec.x, player.getEyeY() + cameraVec.y, player.getZ() + cameraVec.z, 4, 0, 0, 0, 0.32);
-                // handle ammo consume and damage weapon.
-                consumeAmmo(ammo, player);
-                pStack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
-            }
-        }
-        // set pitch according to recoil.
-        if (pitch > -90.0F && pLevel.isClientSide() && (!isExplosive || pRemainingUseDuration % 6 < 3)) {
-            player.setXRot(pitch - (float) recoil);
-        }
-    }*/
 
     @Override
     public void releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, int pTimeCharged) {
         if (pLivingEntity instanceof Player player) {
             player.stopUsingItem();
-//            if (isExplosive) {
-//                player.getCooldowns().addCooldown(this, (getUseDuration(pStack) - pTimeCharged) * 3 + 10);
-//            } else {
-//                player.getCooldowns().addCooldown(this, (int) ((getUseDuration(pStack) - pTimeCharged) * 1.5 + 10));
-//            }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
@@ -211,10 +174,6 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     @Override
     public int getUseDuration(@NotNull ItemStack pStack, LivingEntity livingEntity) {
         return 72000;
-//        if (isExplosive) {
-//            return 60;
-//        }
-//        return 120;
     }
 
     @Override
@@ -226,6 +185,6 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_machine_gun1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_machine_gun2.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(),CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(MutableComponent.create(new TranslatableContents("guns2.tooltip", null, new Object[]{CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

@@ -146,14 +146,15 @@ public class ParticleUtil {
         }
     }
 
-    public static void spawnSnowParticles(Level level, Vec3 pos,double height, int num) {
+    public static void spawnSnowParticles(Level level, Vec3 pos, double height, int num) {
         RandomSource random = level.getRandom();
         for (int i = 0; i < num; i++) {
-            level.addParticle(ParticleRegister.SPAWN_SNOW.get(), pos.x, pos.y + BSFCommonUtil.randDouble(random,0,height), pos.z,0,0,0);
+            level.addParticle(ParticleRegister.SPAWN_SNOW.get(), pos.x, pos.y + BSFCommonUtil.randDouble(random, 0, height), pos.z, 0, 0, 0);
         }
     }
-    public static Color hsvColor(int hue, int saturation, int brightness){
-        int rgb=Mth.hsvToRgb((float) hue /360, (float) saturation /100, (float) brightness /100);
-        return new Color((rgb >> 16) & 0xFF,(rgb >> 8) & 0xFF,(rgb) & 0xFF);
+
+    public static Color hsvColor(int hue, int saturation, int brightness) {
+        int rgb = Mth.hsvToRgb((float) hue / 360, (float) saturation / 100, (float) brightness / 100);
+        return new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb) & 0xFF);
     }
 }

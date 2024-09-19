@@ -32,19 +32,9 @@ public class ExplosiveSnowballEntity extends AbstractNormalSnowballEntity {
         super.onHit(pResult);
         if (!level().isClientSide && !isCaught) {
             Vec3 location = BSFCommonUtil.getRealHitPosOnMoveVecWithHitResult(this, pResult);
-            handleExplosion(1.5F,location);
+            handleExplosion(1.5F, location);
         }
     }
-
-//    @Override
-//    public float getBasicDamage() {
-//        return 3;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 5;
-//    }
 
     @Override
     public float getSubspacePower() {

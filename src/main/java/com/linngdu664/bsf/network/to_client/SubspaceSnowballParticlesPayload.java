@@ -11,7 +11,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record SubspaceSnowballParticlesPayload(double px, double py, double pz, double range, int num) implements CustomPacketPayload {
+public record SubspaceSnowballParticlesPayload(double px, double py, double pz, double range,
+                                               int num) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<SubspaceSnowballParticlesPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("subspace_snowball_particles"));
     public static final StreamCodec<ByteBuf, SubspaceSnowballParticlesPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.DOUBLE, SubspaceSnowballParticlesPayload::px,

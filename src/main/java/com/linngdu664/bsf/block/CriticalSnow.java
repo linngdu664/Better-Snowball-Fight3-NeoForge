@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-@SuppressWarnings("deprecation")
 public class CriticalSnow extends Block implements EntityBlock {
     public CriticalSnow() {
         super(Properties.ofLegacyCopy(Blocks.SNOW).speedFactor(0.2F).jumpFactor(0.2F).noLootTable());

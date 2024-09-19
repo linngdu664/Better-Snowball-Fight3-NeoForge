@@ -20,25 +20,10 @@ public class HeavyPlayerTrackingSnowballEntity extends AbstractPlayerTrackingSno
         super(EntityRegister.HEAVY_PLAYER_TRACKING_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6).applyAdjustment(launchAdjustment), false, region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 4;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 6;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 1.5F;
     }
-
-//    @Override
-//    public boolean isLockFeet() {
-//        return false;
-//    }
 
     @Override
     protected @NotNull Item getDefaultItem() {

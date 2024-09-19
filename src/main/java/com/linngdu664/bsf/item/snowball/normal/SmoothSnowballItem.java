@@ -65,11 +65,6 @@ public class SmoothSnowballItem extends AbstractBSFSnowballItem {
         return snowball;
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG;
-//    }
-
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("smooth_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

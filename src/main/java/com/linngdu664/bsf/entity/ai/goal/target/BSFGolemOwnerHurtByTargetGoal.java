@@ -19,7 +19,7 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
         this.setFlags(EnumSet.of(Flag.TARGET));
     }
 
-//     0: monster
+    //     0: monster
 //     1: target locator
 //     2: enemy player
 //     3: all

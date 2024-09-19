@@ -52,11 +52,6 @@ public class MonsterRepulsionSnowballItem extends AbstractBSFSnowballItem {
         return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG;
-//    }
-
     @Override
     public void addUsageTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("monster_repulsion_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

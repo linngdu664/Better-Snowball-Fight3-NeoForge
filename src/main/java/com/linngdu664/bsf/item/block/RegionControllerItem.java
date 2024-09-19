@@ -8,6 +8,4 @@ public class RegionControllerItem extends BlockItem {
     public RegionControllerItem() {
         super(BlockRegister.REGION_CONTROLLER.get(), new Properties().rarity(Rarity.UNCOMMON));
     }
-
-
 }

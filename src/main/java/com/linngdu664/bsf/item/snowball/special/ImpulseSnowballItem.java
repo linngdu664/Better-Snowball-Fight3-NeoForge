@@ -36,11 +36,6 @@ public class ImpulseSnowballItem extends AbstractBSFSnowballItem {
         return new ImpulseSnowballEntity(livingEntity, level, launchAdjustment, region);
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG;
-//    }
-
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("impulse_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

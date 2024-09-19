@@ -13,7 +13,7 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
         this.snowGolem = snowGolem;
     }
 
-//     0: monster
+    //     0: monster
 //     1: target locator
 //     2: enemy player
 //     3: all
@@ -43,20 +43,5 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
             }
             default -> false;
         };
-
-
-//        if (snowGolem.getLocator()==1 && snowGolem.getTarget() != null && !snowGolem.getTarget().isRemoved()) {
-//            return false;
-//        }
-//        LivingEntity owner = snowGolem.getOwner();
-//        LivingEntity livingEntity = snowGolem.getLastHurtByMob();
-//        if (livingEntity instanceof OwnableEntity ownableEntity && owner != null && owner.equals(ownableEntity.getOwner())) {
-//            return false;
-//        }
-//        BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData::new, BSFTeamSavedData::new, "bsf_team");
-//        if (savedData.isSameTeam(owner, livingEntity)) {
-//            return false;
-//        }
-//        return super.canUse();
     }
 }

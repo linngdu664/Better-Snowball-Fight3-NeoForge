@@ -10,7 +10,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record ImplosionSnowballCannonParticlesPayload(double px, double py, double pz, double dx, double dy, double dz) implements CustomPacketPayload {
+public record ImplosionSnowballCannonParticlesPayload(double px, double py, double pz, double dx, double dy,
+                                                      double dz) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ImplosionSnowballCannonParticlesPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("implosion_snowball_cannon_particles"));
     public static final StreamCodec<ByteBuf, ImplosionSnowballCannonParticlesPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.DOUBLE, ImplosionSnowballCannonParticlesPayload::px,

@@ -1,9 +1,9 @@
 package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
+import com.linngdu664.bsf.item.block.RegionControllerItem;
 import com.linngdu664.bsf.item.block.SmartSnowBlockItem;
 import com.linngdu664.bsf.item.block.VendingMachineItem;
-import com.linngdu664.bsf.item.block.RegionControllerItem;
 import com.linngdu664.bsf.item.minigame_tool.RegionTool;
 import com.linngdu664.bsf.item.minigame_tool.ScoringDevice;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;

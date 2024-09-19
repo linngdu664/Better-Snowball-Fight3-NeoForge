@@ -24,11 +24,6 @@ public class CompactedSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.COMPACTED_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicPunch(2).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public double getBasicPunch() {
-//        return 2;
-//    }
-
     @Override
     protected @NotNull Item getDefaultItem() {
         return ItemRegister.COMPACTED_SNOWBALL.get();

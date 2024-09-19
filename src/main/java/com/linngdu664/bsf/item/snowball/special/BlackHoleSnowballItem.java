@@ -48,11 +48,6 @@ public class BlackHoleSnowballItem extends AbstractBSFSnowballItem {
         return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG;
-//    }
-
     @Override
     public void addUsageTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("black_hole_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.OBFUSCATED));

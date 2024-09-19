@@ -3,8 +3,8 @@ package com.linngdu664.bsf.event;
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
 import com.linngdu664.bsf.gui.ScoringGuiHandler;
-import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
+import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;
@@ -35,9 +35,8 @@ import java.util.LinkedHashSet;
 
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientForgeEvents {
-    public static int tickCount = 0;
-
     public static final RandomSource BSF_RANDOM_SOURCE = RandomSource.create();
+    public static int tickCount = 0;
 
     @SubscribeEvent
     public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
@@ -98,7 +97,7 @@ public class ClientForgeEvents {
     public static void onComputeFovModifier(ComputeFovModifierEvent event) {
         Player player = event.getPlayer();
         ItemStack itemStack = player.getUseItem();
-        if (player.isUsingItem()){
+        if (player.isUsingItem()) {
             if (itemStack.getItem() instanceof SnowballCannonItem) {
                 int i = player.getTicksUsingItem();
                 float f = event.getFovModifier();

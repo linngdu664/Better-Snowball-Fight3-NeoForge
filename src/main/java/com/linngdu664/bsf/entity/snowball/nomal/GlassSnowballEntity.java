@@ -24,16 +24,6 @@ public class GlassSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.GLASS_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(5).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 3;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 5;
-//    }
-
     @Override
     protected @NotNull Item getDefaultItem() {
         return ItemRegister.GLASS_SNOWBALL.get();

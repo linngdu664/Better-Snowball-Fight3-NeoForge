@@ -11,7 +11,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record VectorInversionParticlesPayload(double px, double py, double pz, double range, double v, int num) implements CustomPacketPayload {
+public record VectorInversionParticlesPayload(double px, double py, double pz, double range, double v,
+                                              int num) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<VectorInversionParticlesPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("vector_inversion_particles"));
     public static final StreamCodec<ByteBuf, VectorInversionParticlesPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.DOUBLE, VectorInversionParticlesPayload::px,

@@ -1,13 +1,13 @@
 package com.linngdu664.bsf.gui;
 
-import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.block.entity.RegionControllerEntity;
+import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.minigame_tool.ScoringDevice;
-import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
+import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
+import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
@@ -20,7 +20,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -183,13 +185,13 @@ public class GuiHandler {
                 V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
                 int deviceMoney = mainHandItem.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                 float v = (float) deviceMoney / vendingMachine.getPrice();
-                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffffd96d, v >1?1: v);
+                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffffd96d, v > 1 ? 1 : v);
                 String moneyTransStr = BSFCommonUtil.getTransStr("scoring_device_money.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
                 guiGraphics.drawString(instance.font, moneyTransStr, barPos.x + ((barFrame.x - instance.font.width(moneyTransStr)) / 2), barPos.y + padding, 0xffffffff);
                 barPos.y += 25;
                 int deviceRank = mainHandItem.getOrDefault(DataComponentRegister.RANK.get(), 0);
                 v = (float) deviceRank / vendingMachine.getMinRank();
-                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff84e800, v >1?1: v);
+                renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff84e800, v > 1 ? 1 : v);
                 String rankTransStr = BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", deviceRank + "/" + vendingMachine.getMinRank());
                 guiGraphics.drawString(instance.font, rankTransStr, barPos.x + ((barFrame.x - instance.font.width(rankTransStr)) / 2), barPos.y + padding, 0xffffffff);
             }
@@ -205,8 +207,8 @@ public class GuiHandler {
             }
             //显示商品名
             Component displayName = vendingMachine.getGoods().getDisplayName();
-            v2I = v2IRatio(window,instance.font.width(displayName.getString()),0,0.5,0.7);
-            guiGraphics.drawString(instance.font,displayName,v2I.x,v2I.y,0xff41a5ee);
+            v2I = v2IRatio(window, instance.font.width(displayName.getString()), 0, 0.5, 0.7);
+            guiGraphics.drawString(instance.font, displayName, v2I.x, v2I.y, 0xff41a5ee);
         }
     }
 
@@ -218,12 +220,12 @@ public class GuiHandler {
             converter.convertAndConsume(new Pair<>(zoneController.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
                 byte teamId = zoneController.getTeamId();
-                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor()|0xff000000, TeamLinkerItem.getItemStackById(teamId), instance.font, TeamLinkerItem.getColorTransNameById(teamId));
+                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor() | 0xff000000, TeamLinkerItem.getItemStackById(teamId), instance.font, TeamLinkerItem.getColorTransNameById(teamId));
             }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_strength.tip", String.format("%.2f",zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y+10, 0xffffffff);
+            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_strength.tip", String.format("%.2f", zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
+            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 10, 0xffffffff);
         }
     }
 
@@ -277,13 +279,13 @@ public class GuiHandler {
     }
 
     public static void specialScoreText(GuiGraphics guiGraphics) {
-        if (ScoringGuiHandler.hourMeter>0){
+        if (ScoringGuiHandler.hourMeter > 0) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             V2I v2I = v2IRatio(window, 0.9, 0.4);
-            String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score>=0?"scoring_device_kill_bonus.tip":"scoring_device_death_punishment.tip",String.valueOf(ScoringGuiHandler.score));
+            String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score >= 0 ? "scoring_device_kill_bonus.tip" : "scoring_device_death_punishment.tip", String.valueOf(ScoringGuiHandler.score));
             RenderSystem.enableBlend();
-            guiGraphics.drawString(instance.font, scoreStr, v2I.x-instance.font.width(scoreStr), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
+            guiGraphics.drawString(instance.font, scoreStr, v2I.x - instance.font.width(scoreStr), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
             RenderSystem.disableBlend();
         }
     }
@@ -297,7 +299,7 @@ public class GuiHandler {
             level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), p -> !TeamMembersPayload.isFriendly(p) && (p instanceof Enemy || p.getType().equals(EntityType.PLAYER) || p.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()))).forEach(livingEntity -> {
                 Vec2 boxBottom = renderHackBox(guiGraphics, converter, window, livingEntity, 0xffff0000, partialTick);
                 if (boxBottom != null) {
-                    renderLineTool(guiGraphics,boxBottom,v2IRatio(window,0.5,1.1).getVec2(),0.5f,0xff0000ff,true,0,0xff0000ff);
+                    renderLineTool(guiGraphics, boxBottom, v2IRatio(window, 0.5, 1.1).getVec2(), 0.5f, 0xff0000ff, true, 0, 0xff0000ff);
                 }
             });
         }

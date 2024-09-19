@@ -40,19 +40,17 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
     private static final int TRY_SUMMON_ICICLE_MAX_TIMES = 20;
     private static final int ICICLE_MAX_NUM = 15;
     private static final int TRY_SUMMON_ICICLE_DETECTION_RADIUS = 3;
-//    private static final double FREEZE_PERCENTAGE = BSFCommonUtil.staticRandDouble(0.6, 0.9);
-//    private static final int FREEZE_TIME = BSFCommonUtil.staticRandInt(40, 50);
     private static final float FREEZE_PROPAGATION_RATE = 0.1f;
     private final Icicle[] icicles = new Icicle[ICICLE_MAX_NUM];
     private final ArrayDeque<BlockPos> tmpFreezingBlocks = new ArrayDeque<>();
+    private final double freezePrecentage;
+    private final int freezeTime;
     private boolean isBuildingIcicle = false;
     private boolean isFreezing = false;
     private int iciclesNum = 0;
     private int initSnowStock = 0;
     private int freezingCount = 0;
     private BlockPos impactPoint;
-    private final double freezePrecentage;
-    private final int freezeTime;
 
     public IcicleSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, ServerConfig.ICICLE_SNOWBALL_DURATION.getConfigValue());
@@ -202,11 +200,6 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
 
         }
     }
-
-//    @Override
-//    public boolean canBeCaught() {
-//        return false;
-//    }
 
     @Override
     public float getSubspacePower() {

@@ -41,16 +41,6 @@ public class EnderSnowballItem extends AbstractBSFSnowballItem {
         return new EnderSnowballEntity(livingEntity, level, launchAdjustment, region);
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG;
-//    }
-
-//    @Override
-//    public double getShotgunPushRank() {
-//        return 0.12;
-//    }
-
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("ender_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

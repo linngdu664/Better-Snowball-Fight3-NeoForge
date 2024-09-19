@@ -24,16 +24,6 @@ public class GoldSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.GOLD_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 5;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 7;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 1.5f;

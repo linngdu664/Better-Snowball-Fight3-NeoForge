@@ -29,11 +29,8 @@ public class SubspaceSnowballAttackTraceParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-//        this.xd *= 0.95F;
-//        this.yd *= 0.9F;
-//        this.zd *= 0.95F;
-        this.bCol*=0.95f;
-        this.quadSize*=0.95f;
+        this.bCol *= 0.95f;
+        this.quadSize *= 0.95f;
 
     }
 

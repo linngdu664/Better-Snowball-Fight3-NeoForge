@@ -41,11 +41,6 @@ public class CriticalFrozenSnowballItem extends AbstractBSFSnowballItem {
         return throwOrStorage(pPlayer, pLevel, pUsedHand, 1.125F, 30);
     }
 
-//    @Override
-//    public double getShotgunPushRank() {
-//        return 0.12;
-//    }
-
     @Override
     public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment, RegionData region) {
         return new CriticalFrozenSnowballEntity(livingEntity, level, launchAdjustment, region);
@@ -57,11 +52,6 @@ public class CriticalFrozenSnowballItem extends AbstractBSFSnowballItem {
         snowball.setItem(itemStack);
         return snowball;
     }
-
-    //    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG;
-//    }
 
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {

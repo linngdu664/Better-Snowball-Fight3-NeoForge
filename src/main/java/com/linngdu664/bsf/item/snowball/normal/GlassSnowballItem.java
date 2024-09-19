@@ -56,21 +56,6 @@ public class GlassSnowballItem extends AbstractBSFSnowballItem {
         return snowball;
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG | SnowballCannonItem.TYPE_FLAG | SnowballShotgunItem.TYPE_FLAG | SnowballMachineGunItem.TYPE_FLAG;
-//    }
-//
-//    @Override
-//    public double getMachineGunRecoil() {
-//        return 0.1;
-//    }
-//
-//    @Override
-//    public double getShotgunPushRank() {
-//        return 0.12;
-//    }
-
     @Override
     public void addLastTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("glass_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

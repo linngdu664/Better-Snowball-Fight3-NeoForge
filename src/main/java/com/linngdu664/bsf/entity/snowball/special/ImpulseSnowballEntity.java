@@ -46,8 +46,8 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
         if (!level.isClientSide) {
             if (!isCaught) {
                 Vec3 location = BSFCommonUtil.getRealHitPosOnMoveVecWithHitResult(this, pResult);
-                List<Entity> list = level.getEntitiesOfClass(Entity.class, new AABB(location,location).inflate(4), EntitySelector.NO_SPECTATORS);
-                impulseForceEffect(list,location);
+                List<Entity> list = level.getEntitiesOfClass(Entity.class, new AABB(location, location).inflate(4), EntitySelector.NO_SPECTATORS);
+                impulseForceEffect(list, location);
                 ((ServerLevel) level).sendParticles(ParticleRegister.IMPULSE.get(), location.x, location.y, location.z, 1, 0, 0, 0, 0);
                 level.playSound(null, location.x, location.y, location.z, SoundRegister.MEME[1].get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
             }
@@ -63,7 +63,7 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
             List<Projectile> list = level.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(2), p -> !this.equals(p));
             if (!list.isEmpty()) {
                 List<Entity> list1 = level.getEntitiesOfClass(Entity.class, getBoundingBox().inflate(4), EntitySelector.NO_SPECTATORS);
-                impulseForceEffect(list1,getPosition(1));
+                impulseForceEffect(list1, getPosition(1));
                 discard();
                 ((ServerLevel) level).sendParticles(ParticleRegister.IMPULSE.get(), this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
                 level.playSound(null, getX(), getY(), getZ(), SoundRegister.MEME[1].get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
@@ -71,7 +71,7 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
         }
     }
 
-    private void impulseForceEffect(List<? extends Entity> list,Vec3 pos) {
+    private void impulseForceEffect(List<? extends Entity> list, Vec3 pos) {
         for (Entity entity : list) {
             Vec3 rVec = new Vec3(entity.getX(), (entity.getY() + entity.getEyeY()) * 0.5, entity.getZ()).add(pos.reverse());
             if (rVec.length() < 4) {

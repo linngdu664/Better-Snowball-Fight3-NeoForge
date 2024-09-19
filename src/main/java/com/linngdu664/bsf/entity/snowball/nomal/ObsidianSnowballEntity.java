@@ -24,16 +24,6 @@ public class ObsidianSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.OBSIDIAN_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(6).basicBlazeDamage(8).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 6;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 8;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 2.25f;

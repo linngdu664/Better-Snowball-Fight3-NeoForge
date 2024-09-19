@@ -33,6 +33,13 @@ import java.util.List;
 public class RegionControllerEntity extends BlockEntity {
     private static final float LN2 = 0.69314718F;
     private static final float[] LN_TABLE = new float[256];
+
+    static {
+        for (int i = 0; i < 256; i++) {
+            LN_TABLE[i] = (float) Math.log(1.0 + (double) i / 256.0);
+        }
+    }
+
     private ArrayList<CompoundTag> snowGolemList = new ArrayList<>();
     private ArrayList<BlockPos> summonPosList = new ArrayList<>();
     private RegionData region = RegionData.EMPTY;
@@ -89,23 +96,15 @@ public class RegionControllerEntity extends BlockEntity {
                     int size = be.snowGolemList.size();
                     float[] cumulativeDistribution = new float[size];
                     float total = 0;
-//                    System.out.println("team " + TeamLinkerItem.getColorTransNameById(be.teamId) + ":");
-//                    System.out.println("strength: " + be.currentStrength);
-//                    System.out.println("l half: " + be.lHalf);
-//                    System.out.println("rank:");
                     for (int i = 0; i < size; i++) {
                         float rank = be.snowGolemList.get(i).getInt("Rank");
                         float val = Math.max(0, -Mth.abs(mu - rank) / be.lHalf + 1);
                         cumulativeDistribution[i] = val;
                         total += val;
-//                        System.out.print(" " + rank);
                     }
-//                    System.out.println();
                     for (int i = 0; i < size; i++) {
                         cumulativeDistribution[i] /= total;
-//                        System.out.print(" " + cumulativeDistribution[i]);
                     }
-//                    System.out.println();
                     for (int i = 1; i < size; i++) {
                         cumulativeDistribution[i] += cumulativeDistribution[i - 1];
                     }
@@ -143,6 +142,14 @@ public class RegionControllerEntity extends BlockEntity {
                 be.timer--;
             }
         }
+    }
+
+    private static float lnRank(int rank) {
+        if (rank <= 0) {
+            return 0F;
+        }
+        int fRank = Float.floatToIntBits((float) rank);
+        return (float) ((fRank >> 23) - 127) * LN2 + LN_TABLE[(fRank >> 15) & 0xff];
     }
 
     @Override
@@ -251,13 +258,13 @@ public class RegionControllerEntity extends BlockEntity {
         setChanged();
     }
 
+    public byte getTeamId() {
+        return teamId;
+    }
+
     public void setTeamId(byte teamId) {
         this.teamId = teamId;
         setChanged();
-    }
-
-    public byte getTeamId() {
-        return teamId;
     }
 
     public ArrayList<BlockPos> getSummonPosList() {
@@ -295,19 +302,5 @@ public class RegionControllerEntity extends BlockEntity {
     public void setMaxGolem(int maxGolem) {
         this.maxGolem = maxGolem;
         setChanged();
-    }
-
-    private static float lnRank(int rank) {
-        if (rank <= 0) {
-            return 0F;
-        }
-        int fRank = Float.floatToIntBits((float) rank);
-        return (float) ((fRank >> 23) - 127) * LN2 + LN_TABLE[(fRank >> 15) & 0xff];
-    }
-
-    static {
-        for (int i = 0; i < 256; i++) {
-            LN_TABLE[i] = (float) Math.log(1.0 + (double) i / 256.0);
-        }
     }
 }

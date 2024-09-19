@@ -28,17 +28,16 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class BlackHoleExecutor extends AbstractForceExecutor {
-    private int tmpRank;        //client only
     public static final int SPINNING_SPEED = 30;
     public static final int OBLIQUITY_RANGE = 30;
     private static final EntityDataAccessor<Integer> RANK = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.INT);
-
     //The following EntityDataAccessor they are all for client rendering, only needs to be initialized.
     private static final EntityDataAccessor<Float> ANGLE1 = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Vector3f> AXIS = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Vector3f> PROJECTION = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Vector3f> SHAFT = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Float> OBLIQUITY = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.FLOAT);
+    private int tmpRank;        //client only
 
 
     public BlackHoleExecutor(EntityType<?> pEntityType, Level pLevel) {

@@ -4,7 +4,6 @@ import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.EffectRegister;
-import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -36,6 +35,7 @@ public class SuspiciousUSBFlashDriveItem extends Item {
         player.startUsingItem(usedHand);
         return InteractionResultHolder.consume(itemStack);
     }
+
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
         if (!level.isClientSide) {
@@ -66,8 +66,8 @@ public class SuspiciousUSBFlashDriveItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive.tooltip", ChatFormatting.GRAY);
-        BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive1.tooltip", ChatFormatting.GRAY);
-        BSFCommonUtil.addTrans(tooltipComponents,"suspicious_usb_flash_drive2.tooltip", ChatFormatting.DARK_GRAY, Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage());
+        BSFCommonUtil.addTrans(tooltipComponents, "suspicious_usb_flash_drive.tooltip", ChatFormatting.GRAY);
+        BSFCommonUtil.addTrans(tooltipComponents, "suspicious_usb_flash_drive1.tooltip", ChatFormatting.GRAY);
+        BSFCommonUtil.addTrans(tooltipComponents, "suspicious_usb_flash_drive2.tooltip", ChatFormatting.DARK_GRAY, Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage());
     }
 }

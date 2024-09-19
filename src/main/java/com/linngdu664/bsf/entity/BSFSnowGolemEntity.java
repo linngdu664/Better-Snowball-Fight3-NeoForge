@@ -29,11 +29,7 @@ import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
 import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
-import com.linngdu664.bsf.registry.DataComponentRegister;
-import com.linngdu664.bsf.registry.BlockRegister;
-import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.registry.ParticleRegister;
-import com.linngdu664.bsf.registry.SoundRegister;
+import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.core.BlockPos;
@@ -111,7 +107,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private double shootZ;
     private int rank;                    // 等级，配合积分器使用
     private boolean dropEquipment;
-//    private AABB aliveRange;
     private RegionData aliveRange;
     /*
      status flag:
@@ -141,8 +136,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         builder.define(CORE, ItemStack.EMPTY);
         builder.define(WEAPON_ANG, 0);
         builder.define(STYLE, (byte) 0);
-        builder.define(STATUS_FLAG, (byte)0);
-        builder.define(LOCATOR_FLAG, (byte)0);
+        builder.define(STATUS_FLAG, (byte) 0);
+        builder.define(LOCATOR_FLAG, (byte) 0);
         builder.define(POTION_SICKNESS, 0);
         builder.define(ENHANCE, false);
         builder.define(CORE_COOL_DOWN, 0);
@@ -204,19 +199,19 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         return entityData.get(STATUS_FLAG);
     }
 
-    public void setStatus(byte status){
-        entityData.set(STATUS_FLAG,status);
+    public void setStatus(byte status) {
+        entityData.set(STATUS_FLAG, status);
     }
 
     public byte getLocator() {
         return entityData.get(LOCATOR_FLAG);
     }
 
-    public void setLocator(byte locator){
-        entityData.set(LOCATOR_FLAG,locator);
+    public void setLocator(byte locator) {
+        entityData.set(LOCATOR_FLAG, locator);
     }
 
-    public Optional<Component> getTargetName(){
+    public Optional<Component> getTargetName() {
         return entityData.get(TARGET_NAME);
     }
 
@@ -285,7 +280,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     public void setCoreCoolDown(int coolDown) {
-        entityData.set(CORE_COOL_DOWN,coolDown);
+        entityData.set(CORE_COOL_DOWN, coolDown);
     }
 
     public int getPotionSickness() {
@@ -293,7 +288,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     public void setPotionSickness(int sickness) {
-        entityData.set(POTION_SICKNESS,sickness);
+        entityData.set(POTION_SICKNESS, sickness);
     }
 
     public boolean getEnhance() {
@@ -301,19 +296,19 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     public void setEnhance(boolean enhance0) {
-        entityData.set(ENHANCE,enhance0);
+        entityData.set(ENHANCE, enhance0);
     }
 
     public void setDropEquipment(boolean b) {
         this.dropEquipment = b;
     }
 
-    public void setFixedTeamId(byte teamId) {
-        entityData.set(FIXED_TEAM_ID, teamId);
-    }
-
     public byte getFixedTeamId() {
         return entityData.get(FIXED_TEAM_ID);
+    }
+
+    public void setFixedTeamId(byte teamId) {
+        entityData.set(FIXED_TEAM_ID, teamId);
     }
 
     public int getRank() {
@@ -543,7 +538,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
             }
             if (getPotionSickness() > 0) {
-                setPotionSickness(getPotionSickness()-1);
+                setPotionSickness(getPotionSickness() - 1);
             }
             if (getWeaponAng() > 0) {
                 setWeaponAng(getWeaponAng() - 60);
@@ -553,7 +548,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 2, 0));
             }
             if (getCoreCoolDown() > 0) {
-                setCoreCoolDown(getCoreCoolDown()-1);
+                setCoreCoolDown(getCoreCoolDown() - 1);
             } else if (getCoreCoolDown() == 0) {
                 if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
                     this.heal(0.05f);
@@ -628,7 +623,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
             AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment, aliveRange);
             snowball.shoot(shootX, shootY, shootZ, launchVelocity, launchAccuracy);
             level.addFreshEntity(snowball);
-            if (!getEnhance() && getOwner()!=null) {
+            if (!getEnhance() && getOwner() != null) {
                 ammo.setDamageValue(ammo.getDamageValue() + 1);
                 if (ammo.getDamageValue() == ammo.getMaxDamage()) {
                     ItemStack empty;
@@ -838,8 +833,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         playSound(SoundEvents.ENDERMAN_TELEPORT);
         resetCoreCoolDown();
     }
-    public Vec3 getMiddleModelForward(float partialTicks,double degreeOffset) {
-        return BSFCommonUtil.radRotationToVector(1, (Mth.lerp(partialTicks, this.yBodyRotO+((this.yHeadRotO - this.yBodyRotO)* 0.25), this.yBodyRot+((this.yHeadRot - this.yBodyRot)* 0.25)) + 90 + degreeOffset)* Mth.DEG_TO_RAD, 0);
 
+    public Vec3 getMiddleModelForward(float partialTicks, double degreeOffset) {
+        return BSFCommonUtil.radRotationToVector(1, (Mth.lerp(partialTicks, this.yBodyRotO + ((this.yHeadRotO - this.yBodyRotO) * 0.25), this.yBodyRot + ((this.yHeadRot - this.yBodyRot) * 0.25)) + 90 + degreeOffset) * Mth.DEG_TO_RAD, 0);
     }
 }

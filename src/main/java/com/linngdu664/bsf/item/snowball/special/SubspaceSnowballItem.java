@@ -45,11 +45,6 @@ public class SubspaceSnowballItem extends AbstractBSFSnowballItem {
         return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
     }
 
-//    @Override
-//    public int getTypeFlag() {
-//        return AbstractBSFSnowballItem.HAND_TYPE_FLAG;
-//    }
-
     @Override
     public void addUsageTips(List<Component> pTooltipComponents) {
         pTooltipComponents.add(MutableComponent.create(new TranslatableContents("subspace_snowball1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));

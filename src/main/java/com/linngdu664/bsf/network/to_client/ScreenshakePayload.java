@@ -13,6 +13,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class ScreenshakePayload implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ScreenshakePayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("screen_shake"));
+    public static final StreamCodec<ByteBuf, ScreenshakePayload> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, ScreenshakePayload::getDuration,
+            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity1,
+            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity2,
+            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity3,
+            ByteBufCodecs.STRING_UTF8, ScreenshakePayload::getIntensityCurveStartEasing,
+            ByteBufCodecs.STRING_UTF8, ScreenshakePayload::getIntensityCurveEndEasing,
+            ScreenshakePayload::new
+    );
     public final int duration;
     public float intensity1;
     public float intensity2;
@@ -24,6 +33,19 @@ public class ScreenshakePayload implements CustomPacketPayload {
         this.intensityCurveStartEasing = Easing.LINEAR;
         this.intensityCurveEndEasing = Easing.LINEAR;
         this.duration = duration;
+    }
+
+    private ScreenshakePayload(int duration, float intensity1, float intensity2, float intensity3, String intensityCurveStartEasing, String intensityCurveEndEasing) {
+        this.duration = duration;
+        this.intensity1 = intensity1;
+        this.intensity2 = intensity2;
+        this.intensity3 = intensity3;
+        this.intensityCurveStartEasing = Easing.valueOf(intensityCurveStartEasing);
+        this.intensityCurveEndEasing = Easing.valueOf(intensityCurveEndEasing);
+    }
+
+    public static void handleDataInClient(ScreenshakePayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(payload.duration)).setIntensity(payload.intensity1, payload.intensity2, payload.intensity3).setEasing(payload.intensityCurveStartEasing, payload.intensityCurveEndEasing)));
     }
 
     public ScreenshakePayload setIntensity(float intensity) {
@@ -53,16 +75,6 @@ public class ScreenshakePayload implements CustomPacketPayload {
         return this;
     }
 
-    public static final StreamCodec<ByteBuf, ScreenshakePayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, ScreenshakePayload::getDuration,
-            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity1,
-            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity2,
-            ByteBufCodecs.FLOAT, ScreenshakePayload::getIntensity3,
-            ByteBufCodecs.STRING_UTF8, ScreenshakePayload::getIntensityCurveStartEasing,
-            ByteBufCodecs.STRING_UTF8, ScreenshakePayload::getIntensityCurveEndEasing,
-            ScreenshakePayload::new
-    );
-
     private int getDuration() {
         return duration;
     }
@@ -85,19 +97,6 @@ public class ScreenshakePayload implements CustomPacketPayload {
 
     private String getIntensityCurveEndEasing() {
         return intensityCurveEndEasing.name;
-    }
-
-    private ScreenshakePayload(int duration, float intensity1, float intensity2, float intensity3, String intensityCurveStartEasing, String intensityCurveEndEasing) {
-        this.duration = duration;
-        this.intensity1 = intensity1;
-        this.intensity2 = intensity2;
-        this.intensity3 = intensity3;
-        this.intensityCurveStartEasing = Easing.valueOf(intensityCurveStartEasing);
-        this.intensityCurveEndEasing = Easing.valueOf(intensityCurveEndEasing);
-    }
-
-    public static void handleDataInClient(ScreenshakePayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(payload.duration)).setIntensity(payload.intensity1, payload.intensity2, payload.intensity3).setEasing(payload.intensityCurveStartEasing, payload.intensityCurveEndEasing)));
     }
 
     @Override

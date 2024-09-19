@@ -28,7 +28,6 @@ public class LooseSnowBlock extends Block {
         this.registerDefaultState(this.stateDefinition.any().setValue(FROZEN, 0));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public @NotNull VoxelShape getBlockSupportShape(@NotNull BlockState pState, @NotNull BlockGetter pReader, @NotNull BlockPos pPos) {
         return Shapes.empty();

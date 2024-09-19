@@ -28,10 +28,6 @@ public record AmmoTypePayload(Item ammo, int slot) implements CustomPacketPayloa
         this(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemName)), slot);
     }
 
-    private String getItemName() {
-        return BuiltInRegistries.ITEM.getKey(ammo).toString();
-    }
-
     public static void handleDataInServer(AmmoTypePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             Player sender = context.player();
@@ -40,6 +36,10 @@ public record AmmoTypePayload(Item ammo, int slot) implements CustomPacketPayloa
                 itemStack.set(DataComponentRegister.AMMO_ITEM, new ItemData(payload.ammo));
             }
         });
+    }
+
+    private String getItemName() {
+        return BuiltInRegistries.ITEM.getKey(ammo).toString();
     }
 
     @Override

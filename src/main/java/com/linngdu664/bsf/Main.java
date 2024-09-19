@@ -13,10 +13,6 @@ import net.neoforged.fml.config.ModConfig;
 public class Main {
     public static final String MODID = "bsf";
 
-    public static ResourceLocation makeResLoc(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
-    }
-
     public Main(IEventBus modEventBus, ModContainer modContainer) {
         BlockRegister.BLOCKS.register(modEventBus);
         BlockEntityRegister.BLOCK_ENTITIES.register(modEventBus);
@@ -32,5 +28,9 @@ public class Main {
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+    }
+
+    public static ResourceLocation makeResLoc(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }

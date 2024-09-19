@@ -16,6 +16,7 @@ public class VendingMachineEntityRenderer implements BlockEntityRenderer<Vending
     public VendingMachineEntityRenderer(BlockEntityRendererProvider.Context context) {
         // No-op
     }
+
     @Override
     public void render(VendingMachineEntity vendingMachineEntity, float partialTick, PoseStack transform, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         ItemStack goods = vendingMachineEntity.getGoods();
@@ -25,7 +26,7 @@ public class VendingMachineEntityRenderer implements BlockEntityRenderer<Vending
             transform.translate(0.5, 1.2, 0.5);
             transform.scale(0.625F, 0.625F, 0.625F);
             transform.mulPose(Axis.YP.rotationDegrees(rotation));
-            Minecraft.getInstance().getItemRenderer().renderStatic(goods, ItemDisplayContext.GROUND, LightTexture.FULL_BRIGHT, packedOverlay, transform, bufferSource, vendingMachineEntity.getLevel (), (int) vendingMachineEntity.getBlockPos().asLong());
+            Minecraft.getInstance().getItemRenderer().renderStatic(goods, ItemDisplayContext.GROUND, LightTexture.FULL_BRIGHT, packedOverlay, transform, bufferSource, vendingMachineEntity.getLevel(), (int) vendingMachineEntity.getBlockPos().asLong());
             transform.popPose();
         }
     }

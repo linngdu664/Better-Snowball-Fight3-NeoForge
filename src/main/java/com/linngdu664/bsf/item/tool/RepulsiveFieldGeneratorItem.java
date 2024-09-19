@@ -83,7 +83,7 @@ public class RepulsiveFieldGeneratorItem extends AbstractBSFEnhanceableToolItem 
                 projectileVector.add(projectile);
                 Vec3 dvVec = projectile.getDeltaMovement().scale(-0.8);
                 projectile.push(dvVec.x, dvVec.y, dvVec.z);
-                if (!pLevel.isClientSide){
+                if (!pLevel.isClientSide) {
                     ((ServerLevel) pLevel).sendParticles(ParticleRegister.GENERATOR_FIX.get(), projectile.getX(), projectile.getY(), projectile.getZ(), 1, 0, 0, 0, 0);
                 }
             }

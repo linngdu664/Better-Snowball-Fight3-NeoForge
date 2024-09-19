@@ -1,10 +1,9 @@
 package com.linngdu664.bsf.registry;
 
-
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.block.entity.CriticalSnowEntity;
-import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import com.linngdu664.bsf.block.entity.RegionControllerEntity;
+import com.linngdu664.bsf.block.entity.VendingMachineEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;

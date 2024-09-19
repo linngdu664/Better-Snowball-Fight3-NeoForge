@@ -24,16 +24,6 @@ public class IronSnowballEntity extends AbstractNormalSnowballEntity {
         super(EntityRegister.IRON_SNOWBALL.get(), pShooter, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6).applyAdjustment(launchAdjustment), region);
     }
 
-//    @Override
-//    public float getBasicDamage() {
-//        return 4;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return 6;
-//    }
-
     @Override
     public float getSubspacePower() {
         return 1.4f;
