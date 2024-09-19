@@ -174,6 +174,8 @@
   "item.bsf.black_team_linker": "組隊器：黑",
   "item.bsf.scoring_device": "積分器",
   "item.bsf.suspicious_usb_flash_drive": "可疑U盤",
+  "item.bsf.region_tool": "選區工具",
+  "item.bsf.value_adjustment_tool": "數值調整工具",
 
   "entity.bsf.bsf_snow_golem": "高級雪傀儡",
   "entity.bsf.monster_gravity_executor": "怪物引力場髮生器",
@@ -417,6 +419,8 @@
   "advancements.bsf.vodka.description": "飲用伏特加",
   "advancements.bsf.suspicious_usb_flash_drive_consume.title": "我去這框真帥",
   "advancements.bsf.suspicious_usb_flash_drive_consume.description": "使用可疑U盤",
+  "advancements.bsf.advancements.bsf.subspace_damage.title": "致命一擊",
+  "advancements.bsf.advancements.bsf.subspace_damage.description": "使用亞空雪球對生物造成超過40的傷害",
 
   "effect.bsf.cold_resistance": "抗寒",
   "effect.bsf.weapon_jam": "武器堵塞",

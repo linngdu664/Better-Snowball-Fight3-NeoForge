@@ -356,10 +356,10 @@ public class CreativeTabRegister {
                 output.accept(ItemRegister.RED_TEAM_LINKER.get());
                 output.accept(ItemRegister.BLACK_TEAM_LINKER.get());
 
-                output.accept(ItemRegister.REGION_CONTROLLER.get());
-                output.accept(ItemRegister.VENDING_MACHINE.get());
-                output.accept(ItemRegister.SCORING_DEVICE.get());
-                output.accept(ItemRegister.REGION_TOOL.get());
-                output.accept(ItemRegister.VALUE_ADJUSTMENT_TOOL.get());
+//                output.accept(ItemRegister.REGION_CONTROLLER.get());
+//                output.accept(ItemRegister.VENDING_MACHINE.get());
+//                output.accept(ItemRegister.SCORING_DEVICE.get());
+//                output.accept(ItemRegister.REGION_TOOL.get());
+//                output.accept(ItemRegister.VALUE_ADJUSTMENT_TOOL.get());
             }).build());
 }
