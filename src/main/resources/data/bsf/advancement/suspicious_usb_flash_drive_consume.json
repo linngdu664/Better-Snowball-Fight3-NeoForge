@@ -2,7 +2,8 @@
   "parent": "bsf:root",
   "display": {
     "icon": {
-      "id": "bsf:suspicious_usb_flash_drive"
+      "id": "bsf:suspicious_usb_flash_drive",
+      "count": 1
     },
     "title": {
       "translate": "advancements.bsf.suspicious_usb_flash_drive_consume.title"
@@ -10,10 +11,10 @@
     "description": {
       "translate": "advancements.bsf.suspicious_usb_flash_drive_consume.description"
     },
-    "frame": "task",
+    "frame": "challenge",
     "show_toast": true,
     "annouce_to_chat": true,
-    "hidden": false
+    "hidden": true
   },
   "criteria": {
     "consume_suspicious_usb_flash_drive": {

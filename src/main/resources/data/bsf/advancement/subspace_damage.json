@@ -1,0 +1,35 @@
+{
+  "parent": "bsf:unstable_core_craft",
+  "display": {
+    "icon": {
+      "id": "bsf:subspace_snowball"
+    },
+    "title": {
+      "translate": "advancements.bsf.subspace_damage.title"
+    },
+    "description": {
+      "translate": "advancements.bsf.subspace_damage.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "annouce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "subspace_deal_greater_than_40": {
+      "trigger": "minecraft:player_hurt_entity",
+      "conditions": {
+        "damage": {
+          "direct_entity": {
+            "type": "bsf:subspace_snowball"
+          },
+          "dealt": {
+            "max": 3e38,
+            "min": 40
+          }
+        }
+      }
+    }
+  },
+  "requirements": [["subspace_deal_greater_than_40"]]
+}
