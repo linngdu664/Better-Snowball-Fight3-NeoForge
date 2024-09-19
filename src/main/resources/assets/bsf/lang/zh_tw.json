@@ -419,8 +419,8 @@
   "advancements.bsf.vodka.description": "飲用伏特加",
   "advancements.bsf.suspicious_usb_flash_drive_consume.title": "我去這框真帥",
   "advancements.bsf.suspicious_usb_flash_drive_consume.description": "使用可疑U盤",
-  "advancements.bsf.advancements.bsf.subspace_damage.title": "致命一擊",
-  "advancements.bsf.advancements.bsf.subspace_damage.description": "使用亞空雪球對生物造成超過40的傷害",
+  "advancements.bsf.subspace_damage.title": "致命一擊",
+  "advancements.bsf.subspace_damage.description": "使用亞空雪球對生物造成超過40的傷害",
 
   "effect.bsf.cold_resistance": "抗寒",
   "effect.bsf.weapon_jam": "武器堵塞",

@@ -419,8 +419,8 @@
   "advancements.bsf.vodka.description": "Drink Vodka",
   "advancements.bsf.suspicious_usb_flash_drive_consume.title": "Nice game sense, bro!",
   "advancements.bsf.suspicious_usb_flash_drive_consume.description": "Use suspicious USB flash drive",
-  "advancements.bsf.advancements.bsf.subspace_damage.title": "Fatal Blow",
-  "advancements.bsf.advancements.bsf.subspace_damage.description": "Use Subspace Snowball to deal over 40 damage to a creature",
+  "advancements.bsf.subspace_damage.title": "Fatal Blow",
+  "advancements.bsf.subspace_damage.description": "Use Subspace Snowball to deal over 40 damage to a creature",
 
   "effect.bsf.cold_resistance": "Cold Resistance",
   "effect.bsf.weapon_jam": "Weapon Jam",
