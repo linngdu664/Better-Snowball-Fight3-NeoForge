@@ -90,7 +90,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             level.getEntities(this, aabb, p -> p instanceof Absorbable).forEach(p -> {
                 Absorbable absorbable = (Absorbable) p;
                 if (release) {
-//                    itemStackArrayList.add(absorbable.getSnowballItem());
                     Item item = absorbable.getSnowballItem().getItem();
                     snowballCount.put(item, snowballCount.getOrDefault(item, 0) + 1);
                 }
@@ -101,9 +100,11 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                     this.discard();
                 }
                 if (!release) {
-                    float damage = getDamage();
-                    setDamage(damage + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
-                    setBlazeDamage(getBlazeDamage() + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
+//                    float damage = getDamage();
+//                    setDamage(damage + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
+//                    setBlazeDamage(getBlazeDamage() + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
+                    setDamage(getDamage() + absorbable.getSubspacePower());
+                    setBlazeDamage(getBlazeDamage() + absorbable.getSubspacePower());
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);
                     this.push(vec3.x, vec3.y, vec3.z);
                 }
@@ -111,26 +112,21 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             });
             level.getEntitiesOfClass(Snowball.class, aabb, p -> true).forEach(p -> {
                 if (release) {
-//                    itemStackArrayList.add(p.getItem());
                     Item item = p.getItem().getItem();
                     snowballCount.put(item, snowballCount.getOrDefault(item, 0) + 1);
                 }
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, p.getX(), p.getY(), p.getZ(), 8, 0, 0, 0, 0.05);
                 p.discard();
                 if (!release) {
-                    float damage = getDamage();
-                    setDamage(damage + (damage < 15 ? 1 : 15 / damage));
-                    setBlazeDamage(getBlazeDamage() + (damage < 15 ? 1 : 15 / damage));
+//                    float damage = getDamage();
+//                    setDamage(damage + (damage < 15 ? 1 : 15 / damage));
+                    setDamage(getDamage() + 1);
+                    setBlazeDamage(getBlazeDamage() + 1);
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);
                     this.push(vec3.x, vec3.y, vec3.z);
                 }
             });
             if (timer == 150) {
-//                for (ItemStack itemStack : itemStackArrayList) {
-//                    ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), itemStack);
-//                    itemEntity.setDefaultPickUpDelay();
-//                    level.addFreshEntity(itemEntity);
-//                }
                 generateItemEntities();
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 16, 0, 0, 0, 0.05);
                 this.discard();
@@ -157,19 +153,9 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         Vec3 location = pResult.getLocation();
         Level level = level();
         if (!level.isClientSide) {
-//            for (ItemStack itemStack : itemStackArrayList) {
-//                ItemEntity itemEntity = new ItemEntity(level, getX(), getY(), getZ(), itemStack);
-//                itemEntity.setDefaultPickUpDelay();
-//                level.addFreshEntity(itemEntity);
-//            }
             generateItemEntities();
             if(!release){
                 subspaceRangeDamage(location);
-//                float damage = getDamage();
-//                float r = damage < 5 ? 2 : damage / 5 + 1;
-//                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable()));
-//                damageList(list,damage,r,location);
-//                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r,(int) (25 * r)));
             }
             level.playSound(null, location.x,location.y,location.z, SoundRegister.SUBSPACE_SNOWBALL_ATTACK.get(), SoundSource.PLAYERS, 1.3F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             this.discard();
@@ -184,11 +170,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         if (!level.isClientSide){
             if (!release) {
                 subspaceRangeDamage(location);
-//                float damage = getDamage();
-//                float r = damage < 5 ? 2 : damage / 5 + 1;
-//                List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(location,location).inflate(r+3), EntitySelector.NO_CREATIVE_OR_SPECTATOR.and(p -> !p.isInvulnerable()));
-//                damageList(list,damage,r,location);
-//                PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
                 this.discard();
             }
             level.playSound(null, location.x,location.y,location.z, SoundRegister.SUBSPACE_SNOWBALL_ATTACK.get(), SoundSource.PLAYERS, 0.7F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
@@ -204,7 +185,7 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             Vec3 rVec = new Vec3(entity.getX(), (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) * 0.5, entity.getZ()).add(location.reverse());
             float len = (float) rVec.length();
             if (len < r) {
-                entity.hurt(level.damageSources().fellOutOfWorld(), damage / len);
+                entity.hurt(level.damageSources().explosion(this, getOwner()), damage / len);
             }
         }
         PacketDistributor.sendToPlayersTrackingEntity(this, new SubspaceSnowballParticlesPayload(location.x, location.y, location.z, r, (int) (25 * r)));
@@ -234,31 +215,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
             level.addFreshEntity(itemEntity);
         }
     }
-
-
-//    private void damageList(List<? extends LivingEntity> list, float damage,float range,Vec3 location) {
-//        for (LivingEntity entity : list) {
-//            Vec3 rVec = new Vec3(entity.getX(), (entity.getBoundingBox().minY + entity.getBoundingBox().maxY) * 0.5, entity.getZ()).add(location.reverse());
-//            if (rVec.length() < range) {
-//                entity.hurt(level().damageSources().fellOutOfWorld(), (float) (damage/rVec.length()));
-//            }
-//        }
-//    }
-
-//    @Override
-//    public boolean canBeCaught() {
-//        return false;
-//    }
-//
-//    @Override
-//    public float getBasicDamage() {
-//        return damage;
-//    }
-//
-//    @Override
-//    public float getBasicBlazeDamage() {
-//        return blazeDamage;
-//    }
 
     @Override
     protected @NotNull Item getDefaultItem() {
