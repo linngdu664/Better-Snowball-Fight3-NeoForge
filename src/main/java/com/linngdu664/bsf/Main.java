@@ -24,6 +24,7 @@ public class Main {
         EffectRegister.EFFECTS.register(modEventBus);
         EntityRegister.ENTITY_TYPES.register(modEventBus);
         CreativeTabRegister.CREATIVE_TABS.register(modEventBus);
+        TriggerTypeRegister.TRIGGER_TYPES.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);

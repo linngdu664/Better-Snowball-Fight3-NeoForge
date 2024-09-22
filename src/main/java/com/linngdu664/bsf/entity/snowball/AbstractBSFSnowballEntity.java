@@ -9,10 +9,12 @@ import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.tool.GloveItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
+import com.linngdu664.bsf.registry.TriggerTypeRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -88,7 +90,11 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         properties.punch = pCompound.getDouble("Punch");
         properties.canBeCaught = pCompound.getBoolean("CanBeCaught");
         properties.launchFrom = LaunchFrom.values()[pCompound.getInt("LaunchFrom")];
-        particleGenerationStepSize = pCompound.getFloat("ParticleGenerationStepSize");
+        if (pCompound.contains("ParticleGenerationStepSize")) {
+            particleGenerationStepSize = pCompound.getFloat("ParticleGenerationStepSize");
+        } else {
+            particleGenerationStepSize = 0.5F;      // command summoned fallback
+        }
         particleGeneratePointOffset = pCompound.getFloat("ParticleGenerationPointOffset");
         aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
     }
@@ -134,8 +140,12 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
             // Push entity
             Vec3 vec3d = this.getDeltaMovement().multiply(0.1 * properties.punch, 0.0, 0.1 * properties.punch);
             entity.push(vec3d.x, 0.0, vec3d.z);
+
             if (getOwner() instanceof LivingEntity owner) {
                 owner.setLastHurtMob(entity);
+                if (owner instanceof ServerPlayer serverPlayer) {
+                    TriggerTypeRegister.SNOWBALL_DAMAGE_TRIGGER.get().trigger(serverPlayer, this, hurt);
+                }
             }
         }
         Vec3 location = BSFCommonUtil.getRealEntityHitPosOnMoveVecWithHitResult(this, pResult);
