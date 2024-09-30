@@ -30,7 +30,7 @@ public class SpawnSnowParticle extends TextureSheetParticle {
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
-
+    @Override
     public int getLightColor(float partialTick) {
         return 240;
     }

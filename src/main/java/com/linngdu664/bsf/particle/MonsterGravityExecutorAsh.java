@@ -29,6 +29,10 @@ public class MonsterGravityExecutorAsh extends TextureSheetParticle {
     public @NotNull ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
+    @Override
+    public int getLightColor(float partialTick) {
+        return super.getLightColor(partialTick)|112;
+    }
 
     @Override
     public void tick() {

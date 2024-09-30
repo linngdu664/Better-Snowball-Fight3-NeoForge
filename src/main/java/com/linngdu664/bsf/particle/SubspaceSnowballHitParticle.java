@@ -42,6 +42,10 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
     public static double quadraticFunction(double x, double maxX, double maxY) {
         return 4 * x * maxY * (maxX - x) / (maxX * maxX);
     }
+    @Override
+    public int getLightColor(float partialTick) {
+        return super.getLightColor(partialTick)|112;
+    }
 
     @Override
     public @NotNull ParticleRenderType getRenderType() {

@@ -1034,6 +1034,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [4.5, 13.725, 4.5],
 			"to": [11.5, 13.725, 11.5],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 12.225, 8]},
