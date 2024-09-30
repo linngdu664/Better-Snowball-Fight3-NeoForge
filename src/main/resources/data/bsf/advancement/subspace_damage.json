@@ -17,16 +17,11 @@
   },
   "criteria": {
     "subspace_deal_greater_than_40": {
-      "trigger": "minecraft:player_hurt_entity",
+      "trigger": "bsf:snowball_damage_trigger",
       "conditions": {
-        "damage": {
-          "direct_entity": {
-            "type": "bsf:subspace_snowball"
-          },
-          "dealt": {
-            "max": 3e38,
-            "min": 40
-          }
+        "snowball": "bsf:subspace_snowball",
+        "dealt": {
+          "min": 40
         }
       }
     }

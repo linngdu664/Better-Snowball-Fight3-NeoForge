@@ -107,6 +107,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private double shootZ;
     private int rank;                    // 等级，配合积分器使用
     private boolean dropEquipment;
+    private boolean dropSnowball;
     private RegionData aliveRange;
     /*
      status flag:
@@ -158,6 +159,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         pCompound.putInt("PotionSickness", getPotionSickness());
         pCompound.putInt("CoreCoolDown", getCoreCoolDown());
         pCompound.putBoolean("DropEquipment", dropEquipment);
+        pCompound.putBoolean("DropSnowball", dropSnowball);
         pCompound.putByte("FixedTeamId", getFixedTeamId());
         pCompound.putInt("Rank", rank);
         if (aliveRange != null) {
@@ -182,17 +184,13 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         setPotionSickness(pCompound.getInt("PotionSickness"));
         setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
         dropEquipment = pCompound.getBoolean("DropEquipment");
+        dropSnowball = pCompound.getBoolean("DropSnowball");
         setFixedTeamId(pCompound.getByte("FixedTeamId"));
         rank = pCompound.getInt("Rank");
         aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
         if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
             setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
         }
-    }
-
-    @Override
-    public boolean isFood(ItemStack itemStack) {
-        return false;
     }
 
     public byte getStatus() {
@@ -303,6 +301,10 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         this.dropEquipment = b;
     }
 
+    public void setDropSnowball(boolean b) {
+        this.dropSnowball = b;
+    }
+
     public byte getFixedTeamId() {
         return entityData.get(FIXED_TEAM_ID);
     }
@@ -332,6 +334,11 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         targetSelector.addGoal(2, new BSFGolemOwnerHurtByTargetGoal(this));
         targetSelector.addGoal(3, new BSFGolemOwnerHurtEnemyTeamGoal(this));
         targetSelector.addGoal(4, new BSFGolemNearsetAttackableTargetGoal(this));
+    }
+
+    @Override
+    public boolean isFood(ItemStack itemStack) {
+        return false;
     }
 
     @Override
@@ -671,7 +678,9 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 spawnAtLocation(getCore());
             }
-            spawnAtLocation(new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
+            if (dropSnowball) {
+                spawnAtLocation(new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
+            }
         }
     }
 

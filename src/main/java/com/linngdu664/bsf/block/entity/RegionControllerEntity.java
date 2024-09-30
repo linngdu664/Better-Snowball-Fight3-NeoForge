@@ -97,8 +97,9 @@ public class RegionControllerEntity extends BlockEntity {
                     float[] cumulativeDistribution = new float[size];
                     float total = 0;
                     for (int i = 0; i < size; i++) {
-                        float rank = be.snowGolemList.get(i).getInt("Rank");
-                        float val = Math.max(0, -Mth.abs(mu - rank) / be.lHalf + 1);
+                        float f = (be.snowGolemList.get(i).getInt("Rank") - mu) / be.lHalf;
+                        float val = (float) Math.exp(f * f * -0.5F);
+//                        float val = Math.max(0, -Mth.abs(mu - rank) / be.lHalf + 1);
                         cumulativeDistribution[i] = val;
                         total += val;
                     }
@@ -126,6 +127,7 @@ public class RegionControllerEntity extends BlockEntity {
                                 snowGolem.setLocator((byte) 2);
                                 snowGolem.setStatus((byte) 3);
                                 snowGolem.setDropEquipment(false);
+                                snowGolem.setDropSnowball(false);
                                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                                 level.addFreshEntity(snowGolem);
                                 Vec3 color = new Vec3(0.9, 0.9, 0.9);
