@@ -51,14 +51,14 @@ public class SnowballTankItem extends Item {
                 }
                 for (int i = 0; i < k / 16; i++) {
                     ItemStack stack = new ItemStack(item, 16);
-                    if (itemStack.has(DataComponentRegister.REGION.get())) {
-                        stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                    if (itemStack.has(DataComponentRegister.REGION)) {
+                        stack.set(DataComponentRegister.REGION, itemStack.get(DataComponentRegister.REGION));
                     }
                     inventory.placeItemBackInInventory(stack, true);
                 }
                 ItemStack stack = new ItemStack(item, k % 16);
-                if (itemStack.has(DataComponentRegister.REGION.get())) {
-                    stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                if (itemStack.has(DataComponentRegister.REGION)) {
+                    stack.set(DataComponentRegister.REGION, itemStack.get(DataComponentRegister.REGION));
                 }
                 inventory.placeItemBackInInventory(stack, true);
             } else {
@@ -66,8 +66,8 @@ public class SnowballTankItem extends Item {
                     itemStack.setDamageValue(damageValue + 16);
                 }
                 ItemStack stack = new ItemStack(item, 16);
-                if (itemStack.has(DataComponentRegister.REGION.get())) {
-                    stack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+                if (itemStack.has(DataComponentRegister.REGION)) {
+                    stack.set(DataComponentRegister.REGION, itemStack.get(DataComponentRegister.REGION));
                 }
                 inventory.placeItemBackInInventory(stack, true);
             }

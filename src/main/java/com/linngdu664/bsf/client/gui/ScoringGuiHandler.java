@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.gui;
+package com.linngdu664.bsf.client.gui;
 
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;

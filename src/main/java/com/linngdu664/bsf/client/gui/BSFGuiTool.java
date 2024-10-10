@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.gui;
+package com.linngdu664.bsf.client.gui;
 
 import com.linngdu664.bsf.Main;
 import com.mojang.blaze3d.platform.Window;

@@ -1,7 +1,7 @@
 package com.linngdu664.bsf.network.to_client;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.gui.ScoringGuiHandler;
+import com.linngdu664.bsf.client.gui.ScoringGuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

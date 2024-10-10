@@ -32,6 +32,7 @@ public class BSFDummyEntity extends Mob {
 
     public BSFDummyEntity(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
+        setPersistenceRequired();
     }
 
     @Override

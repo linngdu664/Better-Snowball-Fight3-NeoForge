@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.gui;
+package com.linngdu664.bsf.client.gui;
 
 import com.linngdu664.bsf.block.entity.RegionControllerEntity;
 import com.linngdu664.bsf.block.entity.VendingMachineEntity;
@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.linngdu664.bsf.gui.BSFGuiTool.*;
+import static com.linngdu664.bsf.client.gui.BSFGuiTool.*;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiHandler {

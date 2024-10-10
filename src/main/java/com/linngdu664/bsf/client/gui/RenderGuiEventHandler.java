@@ -1,4 +1,4 @@
-package com.linngdu664.bsf.gui;
+package com.linngdu664.bsf.client.gui;
 
 import com.linngdu664.bsf.Main;
 import net.minecraft.client.Minecraft;

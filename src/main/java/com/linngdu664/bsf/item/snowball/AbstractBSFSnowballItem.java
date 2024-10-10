@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AbstractBSFSnowballItem extends Item implements ProjectileItem {
     public static final int HAND_TYPE_FLAG = 1;
@@ -84,29 +85,37 @@ public abstract class AbstractBSFSnowballItem extends Item implements Projectile
         ItemStack offhand = pPlayer.getOffhandItem();
         ItemStack mainHand = pPlayer.getMainHandItem();
         int count = mainHand.getCount();
-        if (offhand.getItem() instanceof SnowballTankItem) {
-            Item item = offhand.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
-            int offHandDamage = offhand.getDamageValue();
-            int offHandMaxDamage = offhand.getMaxDamage();
-            if ((this.equals(item) && offHandDamage != 0) || offHandDamage == offHandMaxDamage) {
-                if (offHandDamage == offHandMaxDamage) {
-                    offhand.set(DataComponentRegister.AMMO_ITEM, new ItemData(this));
-                }
-                if (offHandDamage < count) {
-                    if (!pPlayer.getAbilities().instabuild) {
-                        mainHand.shrink(offHandDamage);
-                    }
-                    offhand.setDamageValue(0);
-                } else {
-                    if (!pPlayer.getAbilities().instabuild) {
-                        mainHand.shrink(count);
-                    }
-                    offhand.setDamageValue(offHandDamage - count);
-                }
-                return true;
+        if (!(offhand.getItem() instanceof SnowballTankItem)) {
+            return false;
+        }
+        Item item = offhand.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
+        int offHandDamage = offhand.getDamageValue();
+        int offHandMaxDamage = offhand.getMaxDamage();
+        RegionData mainHandRegion = mainHand.get(DataComponentRegister.REGION);
+        RegionData offHandRegion = offhand.get(DataComponentRegister.REGION);
+        if (!(this.equals(item) && offHandDamage != 0 && Objects.equals(mainHandRegion, offHandRegion)) && offHandDamage != offHandMaxDamage) {
+            return false;
+        }
+        if (offHandDamage == offHandMaxDamage) {
+            offhand.set(DataComponentRegister.AMMO_ITEM, new ItemData(this));
+            if (mainHandRegion != null) {
+                offhand.set(DataComponentRegister.REGION, mainHandRegion);
+            } else {
+                offhand.remove(DataComponentRegister.REGION);
             }
         }
-        return false;
+        if (offHandDamage < count) {
+            if (!pPlayer.getAbilities().instabuild) {
+                mainHand.shrink(offHandDamage);
+            }
+            offhand.setDamageValue(0);
+        } else {
+            if (!pPlayer.getAbilities().instabuild) {
+                mainHand.shrink(count);
+            }
+            offhand.setDamageValue(offHandDamage - count);
+        }
+        return true;
     }
 
     public InteractionResultHolder<ItemStack> throwOrStorage(Player pPlayer, Level pLevel, InteractionHand pUsedHand, float velocity, int coolDown) {
