@@ -33,6 +33,10 @@ public class SubspaceSnowballAttackTraceParticle extends TextureSheetParticle {
         this.quadSize *= 0.95f;
 
     }
+    @Override
+    public int getLightColor(float partialTick) {
+        return 240;
+    }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;

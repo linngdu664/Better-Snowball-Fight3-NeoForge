@@ -36,6 +36,10 @@ public class ProjectileGravityExecutorAsh extends TextureSheetParticle {
         this.setSpriteFromAge(this.sprites);
         scale(0.98f);
     }
+    @Override
+    public int getLightColor(float partialTick) {
+        return super.getLightColor(partialTick)|112;
+    }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;

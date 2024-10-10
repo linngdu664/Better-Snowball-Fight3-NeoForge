@@ -42,7 +42,7 @@ public class BlackHoleExecutorCRenderer extends EntityRenderer<BlackHoleExecutor
         pPoseStack.mulPose(new Quaternionf(new AxisAngle4f(pEntity.getObliquity(), pEntity.getProjection())));
         pPoseStack.mulPose(new Quaternionf(new AxisAngle4f(((pEntity.getTimer() + pPartialTick) * BlackHoleExecutor.SPINNING_SPEED) % 360 * Mth.DEG_TO_RAD, 0, 1, 0)));
 
-        model.getPlate().render(pPoseStack, vertexconsumer, pPackedLight, i);
+        model.getPlate().render(pPoseStack, vertexconsumer, pPackedLight|240, i);
         pPoseStack.scale(0.6f, 0.6f, 0.6f);
 //        pPoseStack.mulPose(new Quaternionf(new AxisAngle4f(((pEntity.getTimer() + pPartialTick) * 10) % 360 * Mth.DEG_TO_RAD, SIN_30, 0F, SIN_60)));
         model.getBody().render(pPoseStack, vertexconsumer, pPackedLight, i);

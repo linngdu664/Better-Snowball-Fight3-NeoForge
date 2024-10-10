@@ -48,7 +48,7 @@ public class FixedForceExecutorRenderer extends EntityRenderer<AbstractFixedForc
         model.getCircle2().render(pPoseStack, vertexconsumer, pPackedLight, i);
 
         pPoseStack.mulPose(new Quaternionf(new AxisAngle4f(((pEntity.getModelTicker() + pPartialTick) * 30) % 360 * Mth.DEG_TO_RAD, SIN_45, 0F, -SIN_45)));
-        model.getBb_main().render(pPoseStack, vertexconsumer, pPackedLight, i);
+        model.getBb_main().render(pPoseStack, vertexconsumer, pPackedLight|240, i);
 
         pPoseStack.popPose();
 

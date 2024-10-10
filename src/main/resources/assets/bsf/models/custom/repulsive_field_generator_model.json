@@ -11,6 +11,11 @@
 	},
 	"elements": [
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [7.6, 2.6, 3.1],
 			"to": [9.4, 4.4, 4.9],
 			"rotation": {"angle": 0, "axis": "z", "origin": [8.5, 3.5, 0]},
@@ -24,6 +29,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [7.6, 2.6, 3.1],
 			"to": [9.4, 4.4, 4.9],
 			"rotation": {"angle": 22.5, "axis": "z", "origin": [8.5, 3.5, 0]},
@@ -37,6 +47,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [7.6, 2.6, 3.1],
 			"to": [9.4, 4.4, 4.9],
 			"rotation": {"angle": 45, "axis": "z", "origin": [8.5, 3.5, 0]},
@@ -50,6 +65,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [7.6, 2.6, 3.1],
 			"to": [9.4, 4.4, 4.9],
 			"rotation": {"angle": -22.5, "axis": "z", "origin": [8.5, 3.5, 0]},

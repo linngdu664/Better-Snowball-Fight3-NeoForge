@@ -51,6 +51,10 @@ public class SubspaceSnowballReleaseTraceParticle extends TextureSheetParticle {
         this.setSpriteFromAge(this.sprites);
         scale(0.92f);
     }
+    @Override
+    public int getLightColor(float partialTick) {
+        return super.getLightColor(partialTick)|112;
+    }
 
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {

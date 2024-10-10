@@ -2,6 +2,8 @@ package com.linngdu664.bsf.particle;
 
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.SphereAxisRotationHelper;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -73,6 +75,12 @@ public class VectorInversionParticle extends TextureSheetParticle {
             double phi = Math.acos(BSFCommonUtil.randDouble(randomSource, -1, 1)) - Mth.HALF_PI;
             return new VectorInversionParticle(pLevel, new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(10, theta, phi), pXSpeed, pYSpeed, pZSpeed, f * 0.9F, f * 0.3F, f * 0.3F, this.sprite);
         }
+    }
+
+
+    @Override
+    public int getLightColor(float partialTick) {
+        return super.getLightColor(partialTick)|112;
     }
 
     public static class ProviderPurple implements ParticleProvider<SimpleParticleType> {

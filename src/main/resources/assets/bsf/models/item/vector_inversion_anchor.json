@@ -4375,6 +4375,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [11.57734, 23.57734, 7.4],
 			"to": [12.47734, 24.47734, 8.6],
 			"rotation": {"angle": 0, "axis": "y", "origin": [11.57916, 22.5448, 8.1]},
@@ -4388,6 +4393,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [11.28244, 22.0948, 7.4],
 			"to": [12.18244, 22.9948, 8.6],
 			"rotation": {"angle": -22.5, "axis": "z", "origin": [11.57916, 22.5448, 8.1]},
@@ -4401,6 +4411,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [10.51185, 23.78928, 7.4],
 			"to": [11.41185, 24.68928, 8.6],
 			"rotation": {"angle": 22.5, "axis": "z", "origin": [8, 26.81161, 8.1]},
@@ -4414,6 +4429,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [9.51877, 28.42017, 7.4],
 			"to": [10.41877, 29.32017, 8.6],
 			"rotation": {"angle": -45, "axis": "z", "origin": [8, 26.81161, 8.1]},
@@ -4427,6 +4447,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [8.61549, 27.81662, 7.4],
 			"to": [9.51549, 28.71662, 8.6],
 			"rotation": {"angle": -22.5, "axis": "z", "origin": [8, 26.81161, 8.1]},
@@ -4440,6 +4465,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [7.55, 27.60468, 7.4],
 			"to": [8.45, 28.50468, 8.6],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 26.81161, 8.1]},
@@ -4453,6 +4483,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [5.49144, 24.39283, 7.4],
 			"to": [6.39144, 25.29283, 8.6],
 			"rotation": {"angle": -45, "axis": "z", "origin": [8, 26.81161, 8.1]},
@@ -4466,6 +4501,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [9.64663, 21.64663, 7.4],
 			"to": [10.54663, 22.54663, 8.6],
 			"rotation": {"angle": 45, "axis": "z", "origin": [11.57916, 22.5448, 8.1]},
@@ -4479,6 +4519,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [7.55, 19.55, 7.4],
 			"to": [8.45, 20.45, 8.6],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 20, 8.1]},
@@ -4492,6 +4537,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [9.0912, 19.85656, 7.4],
 			"to": [9.9912, 20.75656, 8.6],
 			"rotation": {"angle": 22.5, "axis": "z", "origin": [9.5412, 20.30656, 8.1]},
@@ -4505,6 +4555,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [6.0088, 19.85656, 7.4],
 			"to": [6.9088, 20.75656, 8.6],
 			"rotation": {"angle": -22.5, "axis": "z", "origin": [6.4588, 20.30656, 8.1]},
@@ -4518,6 +4573,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [5.45337, 21.64663, 7.4],
 			"to": [6.35337, 22.54663, 8.6],
 			"rotation": {"angle": -45, "axis": "z", "origin": [4.42084, 22.5448, 8.1]},
@@ -4531,6 +4591,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [3.81756, 22.0948, 7.4],
 			"to": [4.71756, 22.9948, 8.6],
 			"rotation": {"angle": 22.5, "axis": "z", "origin": [4.42084, 22.5448, 8.1]},
@@ -4544,6 +4609,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [3.52266, 23.57734, 7.4],
 			"to": [4.42266, 24.47734, 8.6],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4.42084, 22.5448, 8.1]},
@@ -4557,6 +4627,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [4.58815, 23.78928, 7.4],
 			"to": [5.48815, 24.68928, 8.6],
 			"rotation": {"angle": -22.5, "axis": "z", "origin": [8, 26.81161, 8.1]},
@@ -4570,6 +4645,11 @@
 			}
 		},
 		{
+			"neoforge_data": {
+				"block_light": 15,
+				"sky_light": 15,
+				"ambient_occlusion": false
+			},
 			"from": [6.48451, 27.81662, 7.4],
 			"to": [7.38451, 28.71662, 8.6],
 			"rotation": {"angle": 22.5, "axis": "z", "origin": [8, 26.81161, 8.1]},

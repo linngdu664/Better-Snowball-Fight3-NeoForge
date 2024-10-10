@@ -15,7 +15,10 @@ public class GeneratorFix extends HugeExplosionParticle {
         this.quadSize = 0.3f;
         this.setSpriteFromAge(pSprites);
     }
-
+    @Override
+    public int getLightColor(float partialTick) {
+        return 240;
+    }
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
 
