@@ -173,12 +173,9 @@ public class GamePlayEvents {
     public static void onLivingUseItemTick(LivingEntityUseItemEvent.Tick event) {
         LivingEntity livingEntity = event.getEntity();
         ItemStack itemStack = event.getItem();
-        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get())) {
-            RegionData region = itemStack.get(DataComponentRegister.REGION.get());
-            if (!region.inRegion(event.getEntity().position())) {
-                event.setCanceled(true);
-                return;
-            }
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && !itemStack.get(DataComponentRegister.REGION.get()).inRegion(event.getEntity().getOnPos())) {
+            event.setCanceled(true);
+            return;
         }
         if (EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(livingEntity, BSFEnchantmentHelper.FLOATING_SHOOTING), itemStack) > 0) {
             double vy = livingEntity.getDeltaMovement().y;
@@ -192,22 +189,17 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get())) {
-            RegionData region = itemStack.get(DataComponentRegister.REGION.get());
-            if (!region.inRegion(event.getEntity().position())) {
-                event.setCanceled(true);
-            }
+        Item item = itemStack.getItem();
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !item.equals(ItemRegister.SCORING_DEVICE.get()) && !item.equals(ItemRegister.REGION_TOOL.get()) && !itemStack.get(DataComponentRegister.REGION.get()).inRegion(event.getEntity().position())) {
+            event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.REGION_TOOL.get())) {
-            RegionData region = itemStack.get(DataComponentRegister.REGION.get());
-            if (!region.inRegion(event.getHitVec().getLocation())) {
-                event.setCanceled(true);
-            }
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.REGION_TOOL.get()) && !itemStack.get(DataComponentRegister.REGION.get()).inRegion(event.getHitVec().getLocation())) {
+            event.setCanceled(true);
         }
     }
 
