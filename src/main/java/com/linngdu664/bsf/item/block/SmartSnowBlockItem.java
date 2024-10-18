@@ -1,10 +1,12 @@
 package com.linngdu664.bsf.item.block;
 
 import com.linngdu664.bsf.registry.BlockRegister;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -14,6 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -46,5 +50,18 @@ public class SmartSnowBlockItem extends BlockItem {
         } else {
             BSFCommonUtil.addTrans(tooltipComponents, "show_detail.tip", ChatFormatting.DARK_GRAY, "Ctrl");
         }
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos blockPos = context.getClickedPos();
+        BlockPos blockPos1 = context.getClickedPos().below();
+        ItemStack itemStack = context.getPlayer().getItemInHand(context.getHand());
+        // 保证有了区域限制后只有能召唤出雪傀儡时才能放置
+        if (itemStack.has(DataComponentRegister.REGION) && (!level.getBlockState(blockPos).getBlock().equals(Blocks.SNOW_BLOCK) || !level.getBlockState(blockPos1).getBlock().equals(Blocks.SNOW_BLOCK))) {
+            return InteractionResult.FAIL;
+        }
+        return super.useOn(context);
     }
 }
