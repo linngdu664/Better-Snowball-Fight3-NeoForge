@@ -237,7 +237,7 @@ public class RegionControllerEntity extends BlockEntity {
     }
 
     public void setRegionAndSummon(RegionData region) {
-        this.region = new RegionData(region);       // copy
+        this.region = RegionData.copy(region);       // copy
         summonPosList = new ArrayList<>();
         BlockPos.betweenClosedStream(region.start(), region.end())
                 .forEach(p -> {

@@ -318,7 +318,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     public void setAliveRange(RegionData region) {
-        aliveRange = new RegionData(region);
+        aliveRange = RegionData.copy(region);
     }
 
     @Override

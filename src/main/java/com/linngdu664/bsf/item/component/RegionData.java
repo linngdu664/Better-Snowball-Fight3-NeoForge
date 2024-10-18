@@ -24,6 +24,7 @@ public class RegionData {
             RegionData::new
     );
     public static final RegionData EMPTY = new RegionData(BlockPos.ZERO, BlockPos.ZERO);
+
     private final BlockPos start, end;
     private final int minX, minY, minZ, maxX, maxY, maxZ;       // prevent replication computation
     public RegionData(BlockPos start, BlockPos end) {
@@ -37,7 +38,7 @@ public class RegionData {
         this.maxZ = Math.max(start.getZ(), end.getZ());
     }
 
-    public RegionData(RegionData another) {
+    private RegionData(RegionData another) {
         this.start = another.start;
         this.end = another.end;
         this.minX = another.minX;
@@ -46,6 +47,10 @@ public class RegionData {
         this.maxX = another.maxX;
         this.maxY = another.maxY;
         this.maxZ = another.maxZ;
+    }
+
+    public static RegionData copy(RegionData another) {
+        return another == null ? null : new RegionData(another);
     }
 
     public static RegionData loadFromCompoundTag(String key, CompoundTag tag) {
