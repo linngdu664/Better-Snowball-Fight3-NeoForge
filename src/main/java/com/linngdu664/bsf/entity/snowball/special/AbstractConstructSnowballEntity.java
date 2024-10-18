@@ -1,6 +1,5 @@
 package com.linngdu664.bsf.entity.snowball.special;
 
-import com.linngdu664.bsf.block.LooseSnowBlock;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.BlockRegister;
@@ -24,8 +23,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowballEntity {
     private static final EntityDataAccessor<Boolean> INVISIBLE = SynchedEntityData.defineId(AbstractConstructSnowballEntity.class, EntityDataSerializers.BOOLEAN);
@@ -60,14 +57,13 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
         pCompound.putFloat("DestroyStepSize", destroyStepSize);
         pCompound.putBoolean("InBlockDuration", inBlockDuration);
         pCompound.putBoolean("InDestroying", inDestroying);
-
-        List<Integer> tmpList = new ArrayList<>();
+        long[] tmpArray = new long[allBlock.size()];
+        int i = 0;
         for (BlockPos blockPos : allBlock) {
-            tmpList.add(blockPos.getX());
-            tmpList.add(blockPos.getY());
-            tmpList.add(blockPos.getZ());
+            tmpArray[i] = blockPos.asLong();
+            i++;
         }
-        pCompound.putIntArray("AllBlock", tmpList);
+        pCompound.putLongArray("AllBlock", tmpArray);
     }
 
     @Override
@@ -78,11 +74,9 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
         destroyStepSize = pCompound.getFloat("DestroyStepSize");
         inBlockDuration = pCompound.getBoolean("InBlockDuration");
         inDestroying = pCompound.getBoolean("InDestroying");
-        int[] tmpArr = pCompound.getIntArray("AllBlock");
-        if (tmpArr.length % 3 == 0) {
-            for (int i = tmpArr.length - 1; i > 0; i -= 3) {
-                allBlock.push(new BlockPos(tmpArr[i - 2], tmpArr[i - 1], tmpArr[i]));
-            }
+        long[] tmpArr = pCompound.getLongArray("AllBlock");
+        for (int i = tmpArr.length - 1; i >= 0; i--) {
+            allBlock.push(BlockPos.of(tmpArr[i]));
         }
     }
 
@@ -105,7 +99,6 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
                 startDestroyBlock();
             }
             this.setDeltaMovement(0, 0, 0);
-            //stopTheSnowball();
         } else if (inDestroying) {
             Level level = level();
             if (!level.isClientSide) {
@@ -118,7 +111,6 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
                 }
             }
             this.setDeltaMovement(0, 0, 0);
-            //stopTheSnowball();
         }
         super.tick();
     }
@@ -175,23 +167,20 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     }
 
     private void destroyBlock(Level level, BlockPos pos) {
-        if (posIsLooseSnow(level, pos)) {
-            if (level instanceof ServerLevel) {
-                level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                BlockState snow = Blocks.SNOW.defaultBlockState();
-                if (snow.canSurvive(level, pos) && !posIsLooseSnow(level, pos.below())) {
-                    level.setBlockAndUpdate(pos, snow);
-                }
-                ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, pos.getX(), pos.getY(), pos.getZ(), 5, 0, 0, 0, 0.12);
+        if (posIsLooseSnow(level, pos) && !level.isClientSide) {
+            level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            BlockState snow = Blocks.SNOW.defaultBlockState();
+            if (snow.canSurvive(level, pos) && !posIsLooseSnow(level, pos.below())) {
+                level.setBlockAndUpdate(pos, snow);
             }
-
+            ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, pos.getX(), pos.getY(), pos.getZ(), 5, 0, 0, 0, 0.12);
         }
     }
 
 
     protected boolean posIsLooseSnow(Level level, BlockPos pos) {
-        return level.getBlockState(pos).getBlock() instanceof LooseSnowBlock;
+        return level.getBlockState(pos).getBlock().equals(BlockRegister.LOOSE_SNOW_BLOCK.get());
     }
 
 }

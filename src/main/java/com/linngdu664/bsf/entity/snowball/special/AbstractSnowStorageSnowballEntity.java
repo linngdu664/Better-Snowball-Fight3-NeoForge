@@ -38,13 +38,10 @@ public abstract class AbstractSnowStorageSnowballEntity extends AbstractConstruc
 
     @Override
     protected void placeAndRecordBlock(Level level, BlockPos blockPos) {
-        if (!level.isClientSide && (getRegion() == null || getRegion().inRegion(blockPos))) {
-
-            if (level.getBlockState(blockPos).canBeReplaced()) {
-                level.setBlock(blockPos, BlockRegister.LOOSE_SNOW_BLOCK.get().defaultBlockState(), 3);
-                snowStock--;
-                allBlock.push(blockPos);
-            }
+        if (!level.isClientSide && (getRegion() == null || getRegion().inRegion(blockPos)) && level.getBlockState(blockPos).canBeReplaced()) {
+            level.setBlock(blockPos, BlockRegister.LOOSE_SNOW_BLOCK.get().defaultBlockState(), 3);
+            snowStock--;
+            allBlock.push(blockPos);
         }
     }
 }

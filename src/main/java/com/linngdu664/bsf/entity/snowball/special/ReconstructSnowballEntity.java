@@ -18,10 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity {
     private static final int GENERATING_DISTANCE = 1;
     private static final int POS_NUM = 10 + GENERATING_DISTANCE;
@@ -44,24 +40,20 @@ public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt("Timer", timer);
-        List<Integer> tmpList = new ArrayList<>();
+        long[] tmpArr = new long[POS_NUM];
         for (int i = 0; i < POS_NUM && passingPosArr[i] != null; i++) {
-            tmpList.add(passingPosArr[i].getX());
-            tmpList.add(passingPosArr[i].getY());
-            tmpList.add(passingPosArr[i].getZ());
+            tmpArr[i] = passingPosArr[i].asLong();
         }
-        pCompound.putIntArray("PassingPosArr", tmpList);
+        pCompound.putLongArray("PassingPosArr", tmpArr);
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         timer = pCompound.getInt("Timer");
-        int[] tmpArr = pCompound.getIntArray("PassingPosArr");
-        if (tmpArr.length % 3 == 0) {
-            for (int i = 0; i < tmpArr.length; i += 3) {
-                allBlock.push(new BlockPos(tmpArr[i], tmpArr[i + 1], tmpArr[i + 2]));
-            }
+        long[] tmpArr = pCompound.getLongArray("PassingPosArr");
+        for (long l : tmpArr) {
+            allBlock.push(BlockPos.of(l));
         }
     }
 

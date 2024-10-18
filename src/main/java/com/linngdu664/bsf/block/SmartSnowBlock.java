@@ -49,30 +49,28 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
     public void setPlacedBy(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState, @Nullable LivingEntity pPlacer, @NotNull ItemStack pStack) {
         if (pPlacer instanceof Player player) {
             BlockPattern.BlockPatternMatch blockPatternMatch = getOrCreateSnowGolemFull().find(pLevel, pPos);
-            if (blockPatternMatch != null) {
-                for (int i = 0; i < getOrCreateSnowGolemFull().getHeight(); ++i) {
-                    BlockInWorld blockInWorld = blockPatternMatch.getBlock(0, i, 0);
-                    pLevel.setBlock(blockInWorld.getPos(), Blocks.AIR.defaultBlockState(), 2);
-                    pLevel.levelEvent(2001, blockInWorld.getPos(), Block.getId(blockInWorld.getState()));
-                }
-                BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(pLevel);
-                snowGolem.setTame(true, false);
-                snowGolem.setOwnerUUID(player.getUUID());
-                snowGolem.setOrderedToSit(true);
-                snowGolem.setDropEquipment(true);
-                snowGolem.setDropSnowball(true);
-                snowGolem.setAliveRange(pStack.get(DataComponentRegister.REGION));
-                snowGolem.setStyle((byte) (pLevel.getRandom().nextInt(0, BSFSnowGolemEntity.STYLE_NUM)));
-                BlockPos blockPos = blockPatternMatch.getBlock(0, 2, 0).getPos();
-                snowGolem.moveTo(blockPos.getX() + 0.5D, blockPos.getY() + 0.05D, blockPos.getZ() + 0.5D, 0.0F, 0.0F);
-                pLevel.addFreshEntity(snowGolem);
-                for (ServerPlayer serverplayer : pLevel.getEntitiesOfClass(ServerPlayer.class, snowGolem.getBoundingBox().inflate(5.0D))) {
-                    CriteriaTriggers.SUMMONED_ENTITY.trigger(serverplayer, snowGolem);
-                }
-                for (int l = 0; l < getOrCreateSnowGolemFull().getHeight(); ++l) {
-                    BlockInWorld blockInWorld = blockPatternMatch.getBlock(0, l, 0);
-                    pLevel.blockUpdated(blockInWorld.getPos(), Blocks.AIR);
-                }
+            for (int i = 0; i < getOrCreateSnowGolemFull().getHeight(); ++i) {
+                BlockInWorld blockInWorld = blockPatternMatch.getBlock(0, i, 0);
+                pLevel.setBlock(blockInWorld.getPos(), Blocks.AIR.defaultBlockState(), 2);
+                pLevel.levelEvent(2001, blockInWorld.getPos(), Block.getId(blockInWorld.getState()));
+            }
+            BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(pLevel);
+            snowGolem.setTame(true, false);
+            snowGolem.setOwnerUUID(player.getUUID());
+            snowGolem.setOrderedToSit(true);
+            snowGolem.setDropEquipment(true);
+            snowGolem.setDropSnowball(true);
+            snowGolem.setAliveRange(pStack.get(DataComponentRegister.REGION));
+            snowGolem.setStyle((byte) (pLevel.getRandom().nextInt(0, BSFSnowGolemEntity.STYLE_NUM)));
+            BlockPos blockPos = blockPatternMatch.getBlock(0, 2, 0).getPos();
+            snowGolem.moveTo(blockPos.getX() + 0.5D, blockPos.getY() + 0.05D, blockPos.getZ() + 0.5D, 0.0F, 0.0F);
+            pLevel.addFreshEntity(snowGolem);
+            for (ServerPlayer serverplayer : pLevel.getEntitiesOfClass(ServerPlayer.class, snowGolem.getBoundingBox().inflate(5.0D))) {
+                CriteriaTriggers.SUMMONED_ENTITY.trigger(serverplayer, snowGolem);
+            }
+            for (int l = 0; l < getOrCreateSnowGolemFull().getHeight(); ++l) {
+                BlockInWorld blockInWorld = blockPatternMatch.getBlock(0, l, 0);
+                pLevel.blockUpdated(blockInWorld.getPos(), Blocks.AIR);
             }
         }
     }
