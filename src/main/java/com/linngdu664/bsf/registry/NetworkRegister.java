@@ -24,6 +24,7 @@ public class NetworkRegister {
         registrar.playToClient(ToggleMovingSoundPayload.TYPE, ToggleMovingSoundPayload.STREAM_CODEC, ToggleMovingSoundPayload::handleDataInClient);
         registrar.playToClient(VectorInversionParticlesPayload.TYPE, VectorInversionParticlesPayload.STREAM_CODEC, VectorInversionParticlesPayload::handleDataInClient);
         registrar.playToClient(UpdateScorePayload.TYPE, UpdateScorePayload.STREAM_CODEC, UpdateScorePayload::handleDataInClient);
+        registrar.playToClient(VelocityInversePayload.TYPE, VelocityInversePayload.STREAM_CODEC, VelocityInversePayload::handleDataInClient);
 
         registrar.playToServer(AmmoTypePayload.TYPE, AmmoTypePayload.STREAM_CODEC, AmmoTypePayload::handleDataInServer);
         registrar.playToServer(SculkSnowballLauncherSwitchSoundPayload.TYPE, SculkSnowballLauncherSwitchSoundPayload.STREAM_CODEC, SculkSnowballLauncherSwitchSoundPayload::handleDataInServer);
