@@ -39,8 +39,8 @@ public class RegionData {
     }
 
     private RegionData(RegionData another) {
-        this.start = another.start;
-        this.end = another.end;
+        this.start = new BlockPos(another.start.getX(), another.start.getY(), another.start.getZ());
+        this.end = new BlockPos(another.end.getX(), another.end.getY(), another.end.getZ());
         this.minX = another.minX;
         this.minY = another.minY;
         this.minZ = another.minZ;
@@ -55,13 +55,16 @@ public class RegionData {
 
     public static RegionData loadFromCompoundTag(String key, CompoundTag tag) {
         if (tag.contains(key + "Start") && tag.contains(key + "End")) {
-            CompoundTag cTag = tag.getCompound(key + "Start");
-            BlockPos start = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
-            cTag = tag.getCompound(key + "End");
-            BlockPos end = new BlockPos(cTag.getInt("x"), cTag.getInt("y"), cTag.getInt("z"));
+            BlockPos start = BlockPos.of(tag.getLong(key + "Start"));
+            BlockPos end = BlockPos.of(tag.getLong(key + "End"));
             return new RegionData(start, end);
         }
         return null;
+    }
+
+    public void saveToCompoundTag(String key, CompoundTag tag) {
+        tag.putLong(key + "Start", start.asLong());
+        tag.putLong(key + "End", end.asLong());
     }
 
     public BlockPos start() {
@@ -82,19 +85,6 @@ public class RegionData {
 
     public AABB toBoundingBox() {
         return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
-    }
-
-    public void saveToCompoundTag(String key, CompoundTag tag) {
-        CompoundTag cTag = new CompoundTag();
-        cTag.putInt("x", start.getX());
-        cTag.putInt("y", start.getY());
-        cTag.putInt("z", start.getZ());
-        tag.put(key + "Start", cTag);
-        cTag = new CompoundTag();
-        cTag.putInt("x", end.getX());
-        cTag.putInt("y", end.getY());
-        cTag.putInt("z", end.getZ());
-        tag.put(key + "End", cTag);
     }
 
     @Override
