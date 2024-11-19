@@ -38,7 +38,12 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     }
 
     protected AABB getTargetSearchArea() {
-        return this.mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
+        if (this.snowGolem.getOwnerUUID()==null){
+            return this.mob.getBoundingBox().inflate(SEARCH_DISTANCE+SEARCH_DISTANCE, SEARCH_DISTANCE+SEARCH_DISTANCE, SEARCH_DISTANCE+SEARCH_DISTANCE);
+        }else{
+            return this.mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
+        }
+
     }
 
     protected void findTarget() {
