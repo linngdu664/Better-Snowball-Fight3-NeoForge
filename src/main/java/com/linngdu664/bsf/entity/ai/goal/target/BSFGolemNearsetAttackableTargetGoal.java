@@ -43,7 +43,6 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
         }else{
             return this.mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
         }
-
     }
 
     protected void findTarget() {
@@ -51,7 +50,7 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
             target = null;
             return;
         }
-        TargetingConditions targetConditions = TargetingConditions.forCombat().range(SEARCH_DISTANCE);
+        TargetingConditions targetConditions = this.snowGolem.getOwnerUUID()==null?TargetingConditions.forCombat().range(SEARCH_DISTANCE+SEARCH_DISTANCE):TargetingConditions.forCombat().range(SEARCH_DISTANCE);
         Level level = snowGolem.level();
         if (snowGolem.getLocator() == 0) {
             targetConditions.selector(p -> p instanceof Enemy);
