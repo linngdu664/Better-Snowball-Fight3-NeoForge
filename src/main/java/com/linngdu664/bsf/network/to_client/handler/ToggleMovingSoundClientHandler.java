@@ -1,6 +1,7 @@
-package com.linngdu664.bsf.network.to_client;
+package com.linngdu664.bsf.network.to_client.handler;
 
 import com.linngdu664.bsf.client.resources.sounds.MovingSoundInstance;
+import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.entity.Entity;

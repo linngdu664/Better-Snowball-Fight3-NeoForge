@@ -1,9 +1,8 @@
 package com.linngdu664.bsf.network.to_client;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.network.CustomStreamCodecs;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.particle.util.ParticleUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -16,7 +15,7 @@ public record ForwardConeParticlesPayload(ForwardConeParticlesParas paras,
                                           int particleType) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ForwardConeParticlesPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("forward_cone_particles"));
     public static final StreamCodec<ByteBuf, ForwardConeParticlesPayload> STREAM_CODEC = StreamCodec.composite(
-            CustomStreamCodecs.FORWARD_CONE_PARTICLES_PARAS_STREAM_CODEC, ForwardConeParticlesPayload::paras,
+            ForwardConeParticlesParas.STREAM_CODEC, ForwardConeParticlesPayload::paras,
             ByteBufCodecs.VAR_INT, ForwardConeParticlesPayload::particleType,
             ForwardConeParticlesPayload::new
     );

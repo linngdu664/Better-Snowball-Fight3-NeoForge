@@ -1,12 +1,11 @@
 package com.linngdu664.bsf.block;
 
-import com.linngdu664.bsf.block.entity.VendingMachineEntity;
-import com.linngdu664.bsf.item.component.IntegerGroupData;
-import com.linngdu664.bsf.registry.DataComponentRegister;
-import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.block.entity.VendingMachineBlockEntity;
+import com.linngdu664.bsf.client.gui.screen.VendingMachineScreenShower;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -23,40 +22,37 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class VendingMachine extends Block implements EntityBlock {
+public class VendingMachineBlock extends Block implements EntityBlock {
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 15.0, 16.0);
 
-    public VendingMachine() {
+    public VendingMachineBlock() {
         super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new VendingMachineEntity(blockPos, blockState);
+        return new VendingMachineBlockEntity(blockPos, blockState);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide && player.isCreative() && player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty() && level.getBlockEntity(pos) instanceof VendingMachineBlockEntity be) {
+            // 因为客户端能拿到数据，所以直接显示gui，但是需要避免意外的类加载
+            VendingMachineScreenShower.show(pos, be.getMinRank(), be.getPrice(), be.isCanSell());
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.PASS;
     }
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof VendingMachineEntity be && player.getAbilities().instabuild) {
-            if (hand == InteractionHand.OFF_HAND && !stack.isEmpty() && !stack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get()) && player.getMainHandItem().isEmpty()) {
+        if (player.getAbilities().instabuild && level.getBlockEntity(pos) instanceof VendingMachineBlockEntity be) {
+            if (hand == InteractionHand.OFF_HAND && !stack.isEmpty() && player.getMainHandItem().isEmpty()) {
                 if (!level.isClientSide) {
                     be.setGoods(stack);
                     level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set goods to " + stack.getHoverName().getString()), false);
-                }
-                return ItemInteractionResult.SUCCESS;
-            }
-            if (stack.getItem().equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
-                if (!level.isClientSide) {
-                    IntegerGroupData group = stack.getOrDefault(DataComponentRegister.INTEGER_GROUP, IntegerGroupData.EMPTY);
-                    be.setMinRank(group.val1());
-                    be.setPrice(group.val2());
-                    be.setCanSell(group.val3() != 0);
-                    level.sendBlockUpdated(pos, state, state, 2);
-                    player.displayClientMessage(Component.literal("Set min rank to " + be.getMinRank()), false);
-                    player.displayClientMessage(Component.literal("Set price to " + be.getPrice()), false);
-                    player.displayClientMessage(Component.literal("Set allow sell to " + be.isCanSell()), false);
                 }
                 return ItemInteractionResult.SUCCESS;
             }

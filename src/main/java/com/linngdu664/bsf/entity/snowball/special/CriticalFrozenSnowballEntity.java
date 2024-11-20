@@ -8,7 +8,7 @@ import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;

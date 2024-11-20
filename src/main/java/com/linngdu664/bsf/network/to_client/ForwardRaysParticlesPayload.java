@@ -1,9 +1,8 @@
 package com.linngdu664.bsf.network.to_client;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.network.CustomStreamCodecs;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.particle.util.ParticleUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -16,7 +15,7 @@ public record ForwardRaysParticlesPayload(ForwardRaysParticlesParas paras,
                                           int particleType) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ForwardRaysParticlesPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("forward_rays_particles"));
     public static final StreamCodec<ByteBuf, ForwardRaysParticlesPayload> STREAM_CODEC = StreamCodec.composite(
-            CustomStreamCodecs.FORWARD_RAYS_PARTICLES_PARAS_STREAM_CODEC, ForwardRaysParticlesPayload::paras,
+            ForwardRaysParticlesParas.STREAM_CODEC, ForwardRaysParticlesPayload::paras,
             ByteBufCodecs.VAR_INT, ForwardRaysParticlesPayload::particleType,
             ForwardRaysParticlesPayload::new
     );

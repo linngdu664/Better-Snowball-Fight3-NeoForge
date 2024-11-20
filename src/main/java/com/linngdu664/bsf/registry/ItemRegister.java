@@ -4,10 +4,9 @@ import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.item.block.RegionControllerItem;
 import com.linngdu664.bsf.item.block.SmartSnowBlockItem;
 import com.linngdu664.bsf.item.block.VendingMachineItem;
-import com.linngdu664.bsf.item.minigame_tool.RegionTool;
-import com.linngdu664.bsf.item.minigame_tool.ScoringDevice;
+import com.linngdu664.bsf.item.minigame_tool.RegionToolItem;
+import com.linngdu664.bsf.item.minigame_tool.ScoringDeviceItem;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
-import com.linngdu664.bsf.item.minigame_tool.ValueAdjustmentTool;
 import com.linngdu664.bsf.item.misc.*;
 import com.linngdu664.bsf.item.snowball.CompactedSnowballSetItem;
 import com.linngdu664.bsf.item.snowball.force.MonsterGravitySnowballItem;
@@ -158,9 +157,8 @@ public class ItemRegister {
     public static final DeferredItem<Item> RED_TEAM_LINKER = ITEMS.register("red_team_linker", () -> new TeamLinkerItem(14));
     public static final DeferredItem<Item> BLACK_TEAM_LINKER = ITEMS.register("black_team_linker", () -> new TeamLinkerItem(15));
 
-    public static final DeferredItem<Item> REGION_TOOL = ITEMS.register("region_tool", RegionTool::new);
-    public static final DeferredItem<Item> SCORING_DEVICE = ITEMS.register("scoring_device", ScoringDevice::new);
-    public static final DeferredItem<Item> VALUE_ADJUSTMENT_TOOL = ITEMS.register("value_adjustment_tool", ValueAdjustmentTool::new);
+    public static final DeferredItem<Item> REGION_TOOL = ITEMS.register("region_tool", RegionToolItem::new);
+    public static final DeferredItem<Item> SCORING_DEVICE = ITEMS.register("scoring_device", ScoringDeviceItem::new);
     public static final DeferredItem<Item> VENDING_MACHINE = ITEMS.register("vending_machine", VendingMachineItem::new);
     public static final DeferredItem<Item> REGION_CONTROLLER = ITEMS.register("region_controller", RegionControllerItem::new);
 

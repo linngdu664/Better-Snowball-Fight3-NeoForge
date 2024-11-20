@@ -17,6 +17,6 @@ public class BlockRegister {
     public static final DeferredHolder<Block, LooseSnowBlock> LOOSE_SNOW_BLOCK = BLOCKS.register("loose_snow_block", LooseSnowBlock::new);
     public static final DeferredHolder<Block, SnowTrap> SNOW_TRAP = BLOCKS.register("snow_trap", SnowTrap::new);
     public static final DeferredHolder<Block, CriticalSnow> CRITICAL_SNOW = BLOCKS.register("critical_snow", CriticalSnow::new);
-    public static final DeferredHolder<Block, VendingMachine> VENDING_MACHINE = BLOCKS.register("vending_machine", VendingMachine::new);
-    public static final DeferredHolder<Block, RegionController> REGION_CONTROLLER = BLOCKS.register("region_controller", RegionController::new);
+    public static final DeferredHolder<Block, VendingMachineBlock> VENDING_MACHINE_BLOCK = BLOCKS.register("vending_machine", VendingMachineBlock::new);
+    public static final DeferredHolder<Block, RegionControllerBlock> REGION_CONTROLLER_BLOCK = BLOCKS.register("region_controller", RegionControllerBlock::new);
 }

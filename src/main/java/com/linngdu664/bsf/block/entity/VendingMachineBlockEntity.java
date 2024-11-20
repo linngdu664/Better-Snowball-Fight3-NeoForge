@@ -12,15 +12,15 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class VendingMachineEntity extends BlockEntity {
+public class VendingMachineBlockEntity extends BlockEntity {
     // all these fields are sync to client
     private ItemStack goods = Items.AIR.getDefaultInstance();
     private int minRank;
     private int price;
     private boolean canSell;
 
-    public VendingMachineEntity(BlockPos pos, BlockState blockState) {
-        super(BlockEntityRegister.VENDING_MACHINE_ENTITY.get(), pos, blockState);
+    public VendingMachineBlockEntity(BlockPos pos, BlockState blockState) {
+        super(BlockEntityRegister.VENDING_MACHINE_BLOCK_ENTITY.get(), pos, blockState);
     }
 
     @Override

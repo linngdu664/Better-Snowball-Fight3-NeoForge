@@ -5,7 +5,7 @@ import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;

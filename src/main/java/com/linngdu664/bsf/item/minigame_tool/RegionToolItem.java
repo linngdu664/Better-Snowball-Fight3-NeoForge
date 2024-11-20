@@ -18,8 +18,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class RegionTool extends Item {
-    public RegionTool() {
+public class RegionToolItem extends Item {
+    public RegionToolItem() {
         super(new Properties().stacksTo(1).component(DataComponentRegister.REGION, RegionData.EMPTY));
     }
 

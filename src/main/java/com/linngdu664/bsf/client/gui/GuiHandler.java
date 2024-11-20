@@ -1,10 +1,10 @@
 package com.linngdu664.bsf.client.gui;
 
-import com.linngdu664.bsf.block.entity.RegionControllerEntity;
-import com.linngdu664.bsf.block.entity.VendingMachineEntity;
+import com.linngdu664.bsf.block.entity.RegionControllerBlockEntity;
+import com.linngdu664.bsf.block.entity.VendingMachineBlockEntity;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
-import com.linngdu664.bsf.item.minigame_tool.ScoringDevice;
+import com.linngdu664.bsf.item.minigame_tool.ScoringDeviceItem;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.tool.SnowGolemModeTweakerItem;
@@ -170,7 +170,7 @@ public class GuiHandler {
     }
 
     public static void pickBlockEntityVendingMachine(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, ItemStack mainHandItem, float partialTick) {
-        if (blockEntity instanceof VendingMachineEntity vendingMachine) {
+        if (blockEntity instanceof VendingMachineBlockEntity vendingMachine) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             //显示货物
@@ -179,7 +179,7 @@ public class GuiHandler {
                 renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, BSFCommonUtil.getTransStr("goods.tip"));
             }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示价格等级百分比条
-            if (mainHandItem.getItem() instanceof ScoringDevice) {
+            if (mainHandItem.getItem() instanceof ScoringDeviceItem) {
                 V2I barFrame = new V2I(100, 12);
                 int padding = 2;
                 V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
@@ -213,7 +213,7 @@ public class GuiHandler {
     }
 
     public static void pickBlockEntityZoneController(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, float partialTick) {
-        if (blockEntity instanceof RegionControllerEntity zoneController) {
+        if (blockEntity instanceof RegionControllerBlockEntity zoneController) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             //显示队伍

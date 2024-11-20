@@ -1,12 +1,12 @@
 package com.linngdu664.bsf.item.minigame_tool;
 
-import com.linngdu664.bsf.block.entity.VendingMachineEntity;
+import com.linngdu664.bsf.block.entity.VendingMachineBlockEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ScoringDevice extends Item {
-    public ScoringDevice() {
+public class ScoringDeviceItem extends Item {
+    public ScoringDeviceItem() {
         super(new Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.RANK.get(), 0).component(DataComponentRegister.MONEY.get(), 0));
     }
 
@@ -41,7 +41,7 @@ public class ScoringDevice extends Item {
         Level level = context.getLevel();
         Player player = context.getPlayer();
         ItemStack stack = context.getItemInHand();
-        if (level.getBlockEntity(context.getClickedPos()) instanceof VendingMachineEntity be) {
+        if (level.getBlockEntity(context.getClickedPos()) instanceof VendingMachineBlockEntity be) {
             if (!level.isClientSide) {
                 int money = stack.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                 ItemStack goods = be.getGoods();
@@ -146,14 +146,14 @@ public class ScoringDevice extends Item {
         livingEntity.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
     }
 
-    @Override
-    public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
+//    @Override
+//    public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
 //        if (count == 0) {
 //            Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), entity.getPosition(1));
 //            entity.moveTo(tpPoint);
 //            entity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
 //        }
-    }
+//    }
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
