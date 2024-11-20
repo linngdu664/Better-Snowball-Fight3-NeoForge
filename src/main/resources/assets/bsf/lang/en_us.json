@@ -175,7 +175,6 @@
   "item.bsf.scoring_device": "Scoring Device",
   "item.bsf.suspicious_usb_flash_drive": "Suspicious Usb Flash Drive",
   "item.bsf.region_tool": "Region Tool",
-  "item.bsf.value_adjustment_tool": "Value Adjustment Tool",
 
   "entity.bsf.bsf_snow_golem": "Advanced Snow Golem",
   "entity.bsf.monster_gravity_executor": "Monster Gravity Field Generator",
@@ -475,6 +474,7 @@
   "vending_sell.tip": "Handheld Scoring Device <%1$s+%2$s> Recycle all",
   "region_controller_enter.tip": "<%1$s> Enter region",
   "region_controller_strength.tip": "Current Strength: %1$s",
+  "region_controller_no_team_tip": "You must join a team to enter this region.",
 
   "block.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.loose_snow_block": "Loose Snow Block",
@@ -491,5 +491,19 @@
 
   "gui_text_weapon": "Weapon",
   "gui_text_snowball": "Snowball",
-  "gui_text_core": "Core"
+  "gui_text_core": "Core",
+
+  "gui.bsf.block_of_spawn_points": "Block of Spawn Points",
+  "gui.bsf.player_multiplier": "Player Multiplier",
+  "gui.bsf.golem_multiplier": "Golem Multiplier",
+  "gui.bsf.diversity": "Diversity",
+  "gui.bsf.number_of_enemy_teams": "Number of Enemy Teams",
+  "gui.bsf.maximum_number_of_golems": "Maximum Number of Golems",
+  "gui.bsf.battle_region_tip": "Battle region (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
+  "gui.bsf.number_of_spawn_points_tip": "Number of spawn points: %1$s",
+  "gui.bsf.types_of_snow_golems_tip": "Types of snow golems: %1$s",
+  "gui.bsf.minimum_rank": "Minimum Rank",
+  "gui.bsf.price": "Price",
+  "gui.bsf.allow_refunds": "Allow Refunds",
+  "gui.bsf.rank": "Rank"
 }

@@ -2,7 +2,7 @@ package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.BlockRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

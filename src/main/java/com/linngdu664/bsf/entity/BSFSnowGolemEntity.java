@@ -10,7 +10,6 @@ import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemOwnerHurtByTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemOwnerHurtEnemyTeamGoal;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.item.component.IntegerGroupData;
 import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
@@ -26,9 +25,10 @@ import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.misc.BSFTiers;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
+import com.linngdu664.bsf.network.to_client.ShowGolemRankScreenPayload;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.particle.util.ForwardConeParticlesParas;
-import com.linngdu664.bsf.particle.util.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
+import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
@@ -42,6 +42,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -317,6 +318,10 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         return rank;
     }
 
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
     public void setAliveRange(RegionData region) {
         aliveRange = RegionData.copy(region);
     }
@@ -488,9 +493,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 pPlayer.getInventory().placeItemBackInInventory(getCore(), true);
                 setCore(ItemStack.EMPTY);
-            } else if (item.equals(ItemRegister.VALUE_ADJUSTMENT_TOOL.get())) {
-                rank = itemStack.getOrDefault(DataComponentRegister.INTEGER_GROUP.get(), IntegerGroupData.EMPTY).val1();
-                pPlayer.displayClientMessage(Component.literal("Set rank to " + rank), false);
+            } else if (item.equals(Items.BLAZE_ROD) && pPlayer.getAbilities().instabuild) {
+                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new ShowGolemRankScreenPayload(getId(), getRank()));
             }
         }
         return InteractionResult.SUCCESS;

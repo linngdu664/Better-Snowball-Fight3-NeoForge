@@ -25,11 +25,15 @@ public class NetworkRegister {
         registrar.playToClient(VectorInversionParticlesPayload.TYPE, VectorInversionParticlesPayload.STREAM_CODEC, VectorInversionParticlesPayload::handleDataInClient);
         registrar.playToClient(UpdateScorePayload.TYPE, UpdateScorePayload.STREAM_CODEC, UpdateScorePayload::handleDataInClient);
         registrar.playToClient(VelocityInversePayload.TYPE, VelocityInversePayload.STREAM_CODEC, VelocityInversePayload::handleDataInClient);
+        registrar.playToClient(ShowRegionControllerScreenPayload.TYPE, ShowRegionControllerScreenPayload.STREAM_CODEC, ShowRegionControllerScreenPayload::handleDataInClient);
+        registrar.playToClient(ShowGolemRankScreenPayload.TYPE, ShowGolemRankScreenPayload.STREAM_CODEC, ShowGolemRankScreenPayload::handleDataInClient);
 
         registrar.playToServer(AmmoTypePayload.TYPE, AmmoTypePayload.STREAM_CODEC, AmmoTypePayload::handleDataInServer);
         registrar.playToServer(SculkSnowballLauncherSwitchSoundPayload.TYPE, SculkSnowballLauncherSwitchSoundPayload.STREAM_CODEC, SculkSnowballLauncherSwitchSoundPayload::handleDataInServer);
         registrar.playToServer(SwitchTweakerStatusModePayload.TYPE, SwitchTweakerStatusModePayload.STREAM_CODEC, SwitchTweakerStatusModePayload::handleDataInServer);
         registrar.playToServer(SwitchTweakerTargetModePayload.TYPE, SwitchTweakerTargetModePayload.STREAM_CODEC, SwitchTweakerTargetModePayload::handleDataInServer);
-        registrar.playToServer(ValueAdjustmentToolPayload.TYPE, ValueAdjustmentToolPayload.STREAM_CODEC, ValueAdjustmentToolPayload::handleDataInServer);
+        registrar.playToServer(UpdateRegionControllerPayload.TYPE, UpdateRegionControllerPayload.STREAM_CODEC, UpdateRegionControllerPayload::handleDataInServer);
+        registrar.playToServer(UpdateVendingMachinePayload.TYPE, UpdateVendingMachinePayload.STREAM_CODEC, UpdateVendingMachinePayload::handleDataInServer);
+        registrar.playToServer(UpdateGolemRankPayload.TYPE, UpdateGolemRankPayload.STREAM_CODEC, UpdateGolemRankPayload::handleDataInServer);
     }
 }

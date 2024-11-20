@@ -10,7 +10,6 @@ import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.network.to_server.SculkSnowballLauncherSwitchSoundPayload;
 import com.linngdu664.bsf.network.to_server.SwitchTweakerStatusModePayload;
 import com.linngdu664.bsf.network.to_server.SwitchTweakerTargetModePayload;
-import com.linngdu664.bsf.network.to_server.ValueAdjustmentToolPayload;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -51,9 +50,6 @@ public class ClientForgeEvents {
             event.setCanceled(true);
         } else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keySprint.isDown()) {
             PacketDistributor.sendToServer(new SwitchTweakerStatusModePayload(event.getScrollDeltaY() < 0));
-            event.setCanceled(true);
-        } else if (itemStack.is(ItemRegister.VALUE_ADJUSTMENT_TOOL.get()) && minecraft.options.keyShift.isDown()) {
-            PacketDistributor.sendToServer(new ValueAdjustmentToolPayload(event.getScrollDeltaY() > 0, minecraft.options.keySprint.isDown()));
             event.setCanceled(true);
         }
     }

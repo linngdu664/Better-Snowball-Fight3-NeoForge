@@ -175,7 +175,6 @@
   "item.bsf.scoring_device": "积分器",
   "item.bsf.suspicious_usb_flash_drive": "可疑U盘",
   "item.bsf.region_tool": "选区工具",
-  "item.bsf.value_adjustment_tool": "数值调整工具",
 
   "entity.bsf.bsf_snow_golem": "高级雪傀儡",
   "entity.bsf.monster_gravity_executor": "怪物引力场发生器",
@@ -475,6 +474,7 @@
   "vending_sell.tip": "手持积分器 <%1$s+%2$s> 回收全部",
   "region_controller_enter.tip": "<%1$s> 进入区域",
   "region_controller_strength.tip": "强度指数：%1$s",
+  "region_controller_no_team_tip": "你必须加入一个队伍以进入该区域",
 
   "block.bsf.smart_snow_block": "智慧雪块",
   "block.bsf.loose_snow_block": "松散雪块",
@@ -491,5 +491,19 @@
 
   "gui_text_weapon": "武器",
   "gui_text_snowball": "雪球",
-  "gui_text_core": "核心"
+  "gui_text_core": "核心",
+
+  "gui.bsf.block_of_spawn_points": "刷新点方块",
+  "gui.bsf.player_multiplier": "玩家乘数",
+  "gui.bsf.golem_multiplier": "傀儡乘数",
+  "gui.bsf.diversity": "多样度",
+  "gui.bsf.number_of_enemy_teams": "敌队数",
+  "gui.bsf.maximum_number_of_golems": "傀儡上限",
+  "gui.bsf.battle_region_tip": "对战区域 (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
+  "gui.bsf.number_of_spawn_points_tip": "刷新点数量: %1$s",
+  "gui.bsf.types_of_snow_golems_tip": "雪傀儡种类数: %1$s",
+  "gui.bsf.minimum_rank": "最低等级",
+  "gui.bsf.price": "价格",
+  "gui.bsf.allow_refunds": "允许退款",
+  "gui.bsf.rank": "等级"
 }
