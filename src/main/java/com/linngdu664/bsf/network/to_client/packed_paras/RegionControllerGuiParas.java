@@ -17,6 +17,9 @@ public record RegionControllerGuiParas(
         float playerMultiplier,
         float golemMultiplier,
         float diversity,
+        float rankOffset,
+        float fastestStrength,
+        float slowestStrength,
         int enemyTeamNum,
         int maxGolem
 ) {
@@ -31,6 +34,9 @@ public record RegionControllerGuiParas(
             byteBuf.writeFloat(regionControllerGuiParas.playerMultiplier());
             byteBuf.writeFloat(regionControllerGuiParas.golemMultiplier());
             byteBuf.writeFloat(regionControllerGuiParas.diversity());
+            byteBuf.writeFloat(regionControllerGuiParas.rankOffset());
+            byteBuf.writeFloat(regionControllerGuiParas.fastestStrength());
+            byteBuf.writeFloat(regionControllerGuiParas.slowestStrength());
             VarInt.write(byteBuf, regionControllerGuiParas.enemyTeamNum());
             VarInt.write(byteBuf, regionControllerGuiParas.maxGolem());
         }
@@ -43,6 +49,9 @@ public record RegionControllerGuiParas(
                     VarInt.read(byteBuf),
                     VarInt.read(byteBuf),
                     ByteBufCodecs.STRING_UTF8.decode(byteBuf),
+                    byteBuf.readFloat(),
+                    byteBuf.readFloat(),
+                    byteBuf.readFloat(),
                     byteBuf.readFloat(),
                     byteBuf.readFloat(),
                     byteBuf.readFloat(),

@@ -31,6 +31,9 @@ public record UpdateRegionControllerPayload(UpdateRegionControllerParas paras) i
                 be.setPlayerMultiplier(paras.playerMultiplier());
                 be.setGolemMultiplier(paras.golemMultiplier());
                 be.setDiversity(paras.diversity());
+                be.setRankOffset(paras.rankOffset());
+                be.setFastestStrength(paras.fastestStrength());
+                be.setSlowestStrength(paras.slowestStrength());
                 be.setEnemyTeamNum(paras.enemyTeamNum());
                 be.setMaxGolem(paras.maxGolem());       // 这些数值不需要同步到客户端，因此不需要更新blockstate
             }

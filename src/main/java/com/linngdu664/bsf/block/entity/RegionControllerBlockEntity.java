@@ -51,11 +51,14 @@ public class RegionControllerBlockEntity extends BlockEntity {
     private float playerMultiplier;
     private float golemMultiplier;
     private float diversity;
+    private float rankOffset;
+    private float fastestStrength;
+    private float slowestStrength;
     private int enemyTeamNum;
     private int maxGolem;
 
-    private int timer1;               // 扫违规玩家的定时器，不需要持久化
-    private int timer;                // 生成雪傀儡的定时器，不需要持久化
+    private int timer;                // 定时器，不需要持久化
+    private float probability;        // 刷新概率，不需要持久化
     private float currentStrength;    // 同步到客户端
     private byte teamId;              // 同步到客户端
 
@@ -64,59 +67,41 @@ public class RegionControllerBlockEntity extends BlockEntity {
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (level.isClientSide || !level.hasNeighborSignal(pos) || !(blockEntity instanceof RegionControllerBlockEntity be)) {
+        if (level.isClientSide || !level.hasNeighborSignal(pos) || !(blockEntity instanceof RegionControllerBlockEntity be) || be.snowGolemList.isEmpty() || be.summonPosList.isEmpty() || be.enemyTeamNum == 0) {
             return;
         }
-        if (be.timer1 >= 20) {
-            List<? extends Player> playerList = level.players();
-            BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            for (Player player : playerList) {
-                if (!be.region.inRegion(player.position()) || player.isCreative() || player.isSpectator()) {
-                    continue;
-                }
-                int playerTeamId = savedData.getTeam(player.getUUID());
-                if (playerTeamId == -1) {
-                    // 没加队伍的，传送走
-                    player.teleportTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
-                    player.displayClientMessage(Component.translatable("region_controller_no_team_tip"), false);
-                } else if (playerTeamId == be.teamId) {
-                    // 扫描自己队伍的背包，把偷渡的东西全部清了
-                    List<ItemStack> bannedItems = BSFCommonUtil.findInventoryItemStacks(player, p -> !be.region.equals(p.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY)));
-                    for (ItemStack itemStack : bannedItems) {
-                        itemStack.setCount(0);
-                    }
-                }
-            }
-            be.timer1 = 0;
-        } else {
-            be.timer1++;
+        if (be.timer < 20) {
+            be.timer++;
+            return;
         }
 
-        if (be.snowGolemList.isEmpty() || be.summonPosList.isEmpty() || be.enemyTeamNum == 0) {
-            return;
+        List<? extends Player> playerList = level.players();
+        BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        float enemyGolemStrength = 0;
+        float enemyPlayerStrength = 0;
+        float friendlyGolemStrength = 0;
+        float friendlyPlayerStrength = 0;
+        List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
+        List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
+        for (BSFSnowGolemEntity golem : friendlyGolemList) {
+            friendlyGolemStrength += RegionControllerBlockEntity.lnRank(golem.getRank());
         }
-        if (be.timer <= 0) {
-            float enemyGolemStrength = 0;
-            float enemyPlayerStrength = 0;
-            float friendlyGolemStrength = 0;
-            float friendlyPlayerStrength = 0;
-            List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
-            List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
-            for (BSFSnowGolemEntity golem : friendlyGolemList) {
-                friendlyGolemStrength += RegionControllerBlockEntity.lnRank(golem.getRank());
+        for (BSFSnowGolemEntity golem : enemyGolemList) {
+            enemyGolemStrength += RegionControllerBlockEntity.lnRank(golem.getRank());
+        }
+        for (Player player : playerList) {
+            if (!be.region.inRegion(player.position()) || player.isCreative() || player.isSpectator()) {
+                continue;
             }
-            for (BSFSnowGolemEntity golem : enemyGolemList) {
-                enemyGolemStrength += RegionControllerBlockEntity.lnRank(golem.getRank());
-            }
-            List<? extends Player> playerList = level.players();
-            BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            for (Player player : playerList) {
-                if (!be.region.inRegion(player.position()) || player.isCreative() || player.isSpectator()) {
-                    continue;
-                }
+            int playerTeamId = savedData.getTeam(player.getUUID());
+            if (playerTeamId == -1) {
+                // 没加队伍的，传送走
+                player.teleportTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+                player.displayClientMessage(Component.translatable("region_controller_no_team_tip"), false);
+            } else {
                 // 只计算敌队和我方玩家强度
                 List<ItemStack> scoringDevices = BSFCommonUtil.findInventoryItemStacks(player, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()));
-                if (savedData.getTeam(player.getUUID()) != be.teamId) {
+                if (playerTeamId != be.teamId) {
                     for (ItemStack scoringDevice : scoringDevices) {
                         enemyPlayerStrength += RegionControllerBlockEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK, 0));
                     }
@@ -124,14 +109,31 @@ public class RegionControllerBlockEntity extends BlockEntity {
                     for (ItemStack scoringDevice : scoringDevices) {
                         friendlyPlayerStrength += RegionControllerBlockEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK, 0));
                     }
+                    // 扫描自己队伍的背包，把偷渡的东西全部清了
+                    List<ItemStack> bannedItems = BSFCommonUtil.findInventoryItemStacks(player, p -> !be.region.equals(p.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY)));
+                    for (ItemStack itemStack : bannedItems) {
+                        itemStack.setCount(0);
+                    }
                 }
             }
-            float minRank = be.snowGolemList.getFirst().getInt("Rank");
-            float maxRank = be.snowGolemList.getLast().getInt("Rank");
-            be.currentStrength = be.golemMultiplier * (enemyGolemStrength / be.enemyTeamNum - friendlyGolemStrength) + be.playerMultiplier * (enemyPlayerStrength / be.enemyTeamNum - friendlyPlayerStrength) + 0.5F * (minRank + maxRank);
-            level.sendBlockUpdated(pos, state, state, 2);       // 强度同步到客户端
-            float mu = Mth.clamp(be.currentStrength, minRank - be.diversity * 0.5F, maxRank + be.diversity * 0.5F);
+        }
+        be.currentStrength = be.golemMultiplier * (enemyGolemStrength / be.enemyTeamNum - friendlyGolemStrength) + be.playerMultiplier * (enemyPlayerStrength / be.enemyTeamNum - friendlyPlayerStrength);
+        level.sendBlockUpdated(pos, state, state, 2);       // 强度同步到客户端
+
+        if (be.probability <= 0 || level.random.nextFloat() < be.probability) {
+            // 这一刻要尝试生成雪傀儡
+            // 设置概率，对应期望为1.25s-6.25s
+            if (be.currentStrength < be.slowestStrength) {
+                be.probability = 0.16F;
+            } else if (be.currentStrength < be.fastestStrength) {
+                be.probability = 1F / (5F * (be.currentStrength - be.fastestStrength) / (be.slowestStrength - be.fastestStrength) + 1.25F);
+            } else {
+                be.probability = 0.8F;
+            }
             if (friendlyGolemList.size() < be.maxGolem) {
+                float minRank = be.snowGolemList.getFirst().getInt("Rank");
+                float maxRank = be.snowGolemList.getLast().getInt("Rank");
+                float mu = Mth.clamp(be.currentStrength + be.rankOffset, minRank - be.diversity, maxRank + be.diversity);
                 int size = be.snowGolemList.size();
                 float[] cumulativeDistribution = new float[size];
                 float total = 0;
@@ -174,12 +176,8 @@ public class RegionControllerBlockEntity extends BlockEntity {
                     }
                 }
             }
-            // 设置下一次尝试生成的时间，minTime, mu 是过 (minRank-0.5*lHalf, 80), (maxRank+0.5*lHalf, 20) 的直线
-            int minTime = (int) (60F / (minRank - maxRank - be.diversity) * (mu - maxRank - be.diversity * 0.5F) + 20F);
-            be.timer = level.random.nextIntBetweenInclusive(minTime, 2 * minTime);
-        } else {
-            be.timer--;
         }
+        be.timer = 0;
     }
 
     private static float lnRank(int rank) {
@@ -210,6 +208,9 @@ public class RegionControllerBlockEntity extends BlockEntity {
         playerMultiplier = tag.getFloat("PlayerMultiplier");
         golemMultiplier = tag.getFloat("GolemMultiplier");
         diversity = tag.getFloat("Diversity");
+        rankOffset = tag.getFloat("RankOffset");
+        fastestStrength = tag.getFloat("FastestStrength");
+        slowestStrength = tag.getFloat("SlowestStrength");
         enemyTeamNum = tag.getInt("EnemyTeamNum");
         maxGolem = tag.getInt("MaxGolem");
         currentStrength = tag.getFloat("CurrentStrength");
@@ -236,6 +237,9 @@ public class RegionControllerBlockEntity extends BlockEntity {
         tag.putFloat("PlayerMultiplier", playerMultiplier);
         tag.putFloat("GolemMultiplier", golemMultiplier);
         tag.putFloat("Diversity", diversity);
+        tag.putFloat("RankOffset", rankOffset);
+        tag.putFloat("FastestStrength", fastestStrength);
+        tag.putFloat("SlowestStrength", slowestStrength);
         tag.putInt("EnemyTeamNum", enemyTeamNum);
         tag.putInt("MaxGolem", maxGolem);
         tag.putFloat("CurrentStrength", currentStrength);
@@ -341,6 +345,33 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setDiversity(float diversity) {
         this.diversity = diversity;
+        setChanged();
+    }
+
+    public float getRankOffset() {
+        return rankOffset;
+    }
+
+    public void setRankOffset(float rankOffset) {
+        this.rankOffset = rankOffset;
+        setChanged();
+    }
+
+    public float getFastestStrength() {
+        return fastestStrength;
+    }
+
+    public void setFastestStrength(float fastestStrength) {
+        this.fastestStrength = fastestStrength;
+        setChanged();
+    }
+
+    public float getSlowestStrength() {
+        return slowestStrength;
+    }
+
+    public void setSlowestStrength(float slowestStrength) {
+        this.slowestStrength = slowestStrength;
         setChanged();
     }
 

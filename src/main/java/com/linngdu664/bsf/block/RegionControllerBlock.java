@@ -74,6 +74,9 @@ public class RegionControllerBlock extends Block implements EntityBlock {
                         be.getPlayerMultiplier(),
                         be.getGolemMultiplier(),
                         be.getDiversity(),
+                        be.getRankOffset(),
+                        be.getFastestStrength(),
+                        be.getSlowestStrength(),
                         be.getEnemyTeamNum(),
                         be.getMaxGolem()
                 )));

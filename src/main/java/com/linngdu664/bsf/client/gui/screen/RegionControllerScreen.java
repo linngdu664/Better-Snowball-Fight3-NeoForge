@@ -14,10 +14,11 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class RegionControllerScreen extends Screen {
-    private static final int MIDDLE_MAX_WIDTH = 350;
-    private static final int MIDDLE_HEIGHT = 3 * 10 + 15 + 6 * 25;  // 3文本+间隔+6个输入框
-    private static final int LABEL_INPUT_GAP = 4;
+    private static final int MAIN_MAX_WIDTH = 420;
     private static final int MAIN_MARGIN = 9;
+    private static final int MAIN_HEIGHT = 3 * 10 + 15 + 5 * 25;  // 3文本+间隔+5行输入框
+    private static final int LABEL_INPUT_GAP = 4;
+    private static final int LEFT_RIGHT_GAP = 15;
     private final BlockPos blockPos;
     private final Component regionComponent;
     private final Component spawnsComponent;
@@ -26,18 +27,27 @@ public class RegionControllerScreen extends Screen {
     private final Component playerMultiplierComponent = Component.translatable("gui.bsf.player_multiplier");
     private final Component golemMultiplierComponent = Component.translatable("gui.bsf.golem_multiplier");
     private final Component diversityComponent = Component.translatable("gui.bsf.diversity");
+    private final Component rankOffsetComponent = Component.translatable("gui.bsf.rank_offset");
+    private final Component fastestStrengthComponent = Component.translatable("gui.bsf.fastest_strength");
+    private final Component slowestStrengthComponent = Component.translatable("gui.bsf.slowest_strength");
     private final Component enemyTeamNumComponent = Component.translatable("gui.bsf.number_of_enemy_teams");
     private final Component maxGolemNumComponent = Component.translatable("gui.bsf.maximum_number_of_golems");
     private EditBox spawnBlockEdit;
     private EditBox playerMultiplierEdit;
     private EditBox golemMultiplierEdit;
     private EditBox diversityEdit;
+    private EditBox rankOffsetEdit;
+    private EditBox fastestStrengthEdit;
+    private EditBox slowestStrengthEdit;
     private EditBox enemyTeamNumEdit;
     private EditBox maxGolemNumEdit;
     private String spawnBlockStr;
     private String playerMultiplierStr;
     private String golemMultiplierStr;
     private String diversityStr;
+    private String rankOffsetStr;
+    private String fastestStrengthStr;
+    private String slowestStrengthStr;
     private String enemyTeamNumStr;
     private String maxGolemNumStr;
 
@@ -53,6 +63,9 @@ public class RegionControllerScreen extends Screen {
         this.playerMultiplierStr = String.valueOf(paras.playerMultiplier());
         this.golemMultiplierStr = String.valueOf(paras.golemMultiplier());
         this.diversityStr = String.valueOf(paras.diversity());
+        this.rankOffsetStr = String.valueOf(paras.rankOffset());
+        this.fastestStrengthStr = String.valueOf(paras.fastestStrength());
+        this.slowestStrengthStr = String.valueOf(paras.slowestStrength());
         this.enemyTeamNumStr = String.valueOf(paras.enemyTeamNum());
         this.maxGolemNumStr = String.valueOf(paras.maxGolem());
     }
@@ -64,14 +77,25 @@ public class RegionControllerScreen extends Screen {
         Font font = minecraft.font;
 
         // 确定各组件位置
-        int beginY = height / 2 - MIDDLE_HEIGHT / 2;
-        int maxComponentWidth = Math.max(font.width(spawnBlockComponent), Math.max(font.width(playerMultiplierComponent), Math.max(font.width(golemMultiplierComponent), Math.max(font.width(diversityComponent), Math.max(font.width(enemyTeamNumComponent), font.width(maxGolemNumComponent))))));
-        int middleWidth = Math.min(MIDDLE_MAX_WIDTH, width - 2 * MAIN_MARGIN);
-        int labelBeginX = width / 2 - middleWidth / 2;
-        int inputEndX = width / 2 + middleWidth / 2;
-        int labelWidth = Math.min(maxComponentWidth, (middleWidth - LABEL_INPUT_GAP) / 2);
-        int inputBeginX = labelBeginX + labelWidth + LABEL_INPUT_GAP;
-        int inputWidth = inputEndX - inputBeginX;
+        int beginY = height / 2 - MAIN_HEIGHT / 2;
+//        int maxComponentWidth = Math.max(font.width(spawnBlockComponent), Math.max(font.width(playerMultiplierComponent), Math.max(font.width(golemMultiplierComponent), Math.max(font.width(diversityComponent), Math.max(font.width(enemyTeamNumComponent), font.width(maxGolemNumComponent))))));
+        int maxLeftComponentWidth = Math.max(font.width(spawnBlockComponent), Math.max(font.width(playerMultiplierComponent), Math.max(font.width(diversityComponent), Math.max(font.width(fastestStrengthComponent), font.width(enemyTeamNumComponent)))));
+        int maxRightComponentWidth = Math.max(font.width(golemMultiplierComponent), Math.max(font.width(rankOffsetComponent), Math.max(font.width(slowestStrengthComponent), font.width(maxGolemNumComponent))));
+        int mainWidth = Math.min(MAIN_MAX_WIDTH, width - 2 * MAIN_MARGIN);
+        int leftLabelBeginX = width / 2 - mainWidth / 2;
+        int leftLabelWidth = Math.min(maxLeftComponentWidth, (mainWidth / 2 - LEFT_RIGHT_GAP / 2 - LABEL_INPUT_GAP) / 2);
+        int leftInputBeginX = leftLabelBeginX + leftLabelWidth + LABEL_INPUT_GAP;
+        int leftInputWidth = width / 2 - LEFT_RIGHT_GAP / 2 - leftInputBeginX;
+        int rightLabelBeginX = width / 2 + LEFT_RIGHT_GAP / 2;
+        int rightLabelWidth = Math.min(maxRightComponentWidth, (mainWidth / 2 - LEFT_RIGHT_GAP / 2 - LABEL_INPUT_GAP) / 2);
+        int rightInputBeginX = rightLabelBeginX + rightLabelWidth + LABEL_INPUT_GAP;
+        int rightInputWidth = width / 2 + mainWidth / 2 - rightInputBeginX;
+        int fullInputWidth = width / 2 + mainWidth / 2 - leftInputBeginX;
+//        int labelBeginX = width / 2 - mainWidth / 2;
+//        int inputEndX = width / 2 + mainWidth / 2;
+//        int labelWidth = Math.min(maxComponentWidth, (mainWidth - LABEL_INPUT_GAP) / 2);
+//        int inputBeginX = labelBeginX + labelWidth + LABEL_INPUT_GAP;
+//        int inputWidth = inputEndX - inputBeginX;
 
         StringWidget regionLabel = addRenderableWidget(new StringWidget(0, beginY, width, 9, regionComponent, font));
         StringWidget spawnsLabel = addRenderableWidget(new StringWidget(0, beginY + 10, width, 9, spawnsComponent, font));
@@ -80,29 +104,41 @@ public class RegionControllerScreen extends Screen {
         spawnsLabel.alignCenter();
         golemsLabel.alignCenter();
 
-        StringWidget spawnBlockLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 51, labelWidth, 9, spawnBlockComponent, font));
-        StringWidget playerMultiplierLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 76, labelWidth, 9, playerMultiplierComponent, font));
-        StringWidget golemMultiplierLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 101, labelWidth, 9, golemMultiplierComponent, font));
-        StringWidget diversityLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 126, labelWidth, 9, diversityComponent, font));
-        StringWidget enemyTeamNumLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 151, labelWidth, 9, enemyTeamNumComponent, font));
-        StringWidget maxGolemNumLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 176, labelWidth, 9, maxGolemNumComponent, font));
+        StringWidget spawnBlockLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 51, leftLabelWidth, 9, spawnBlockComponent, font));
+        StringWidget playerMultiplierLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 76, leftLabelWidth, 9, playerMultiplierComponent, font));
+        StringWidget golemMultiplierLabel = addRenderableWidget(new StringWidget(rightLabelBeginX, beginY + 76, rightLabelWidth, 9, golemMultiplierComponent, font));
+        StringWidget diversityLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 101, leftLabelWidth, 9, diversityComponent, font));
+        StringWidget rankOffsetLabel = addRenderableWidget(new StringWidget(rightLabelBeginX, beginY + 101, rightLabelWidth, 9, rankOffsetComponent, font));
+        StringWidget fastestStrengthLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 126, leftLabelWidth, 9, fastestStrengthComponent, font));
+        StringWidget slowestStrengthLabel = addRenderableWidget(new StringWidget(rightLabelBeginX, beginY + 126, rightLabelWidth, 9, slowestStrengthComponent, font));
+        StringWidget enemyTeamNumLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 151, leftLabelWidth, 9, enemyTeamNumComponent, font));
+        StringWidget maxGolemNumLabel = addRenderableWidget(new StringWidget(rightLabelBeginX, beginY + 151, rightLabelWidth, 9, maxGolemNumComponent, font));
         spawnBlockLabel.alignRight();
         playerMultiplierLabel.alignRight();
         golemMultiplierLabel.alignRight();
         diversityLabel.alignRight();
+        rankOffsetLabel.alignRight();
+        fastestStrengthLabel.alignRight();
+        slowestStrengthLabel.alignRight();
         enemyTeamNumLabel.alignRight();
         maxGolemNumLabel.alignRight();
 
-        spawnBlockEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 45, inputWidth, 20, spawnBlockComponent));
-        playerMultiplierEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 70, inputWidth, 20, playerMultiplierComponent));
-        golemMultiplierEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 95, inputWidth, 20, golemMultiplierComponent));
-        diversityEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 120, inputWidth, 20, diversityComponent));
-        enemyTeamNumEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 145, inputWidth, 20, enemyTeamNumComponent));
-        maxGolemNumEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 170, inputWidth, 20, maxGolemNumComponent));
+        spawnBlockEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 45, fullInputWidth, 20, spawnBlockComponent));
+        playerMultiplierEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 70, leftInputWidth, 20, playerMultiplierComponent));
+        golemMultiplierEdit = addRenderableWidget(new EditBox(font, rightInputBeginX, beginY + 70, rightInputWidth, 20, golemMultiplierComponent));
+        diversityEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 95, leftInputWidth, 20, diversityComponent));
+        rankOffsetEdit = addRenderableWidget(new EditBox(font, rightInputBeginX, beginY + 95, rightInputWidth, 20, rankOffsetComponent));
+        fastestStrengthEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 120, leftInputWidth, 20, fastestStrengthComponent));
+        slowestStrengthEdit = addRenderableWidget(new EditBox(font, rightInputBeginX, beginY + 120, rightInputWidth, 20, slowestStrengthComponent));
+        enemyTeamNumEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 145, leftInputWidth, 20, enemyTeamNumComponent));
+        maxGolemNumEdit = addRenderableWidget(new EditBox(font, rightInputBeginX, beginY + 145, rightInputWidth, 20, maxGolemNumComponent));
         spawnBlockEdit.setValue(spawnBlockStr);
         playerMultiplierEdit.setValue(playerMultiplierStr);
         golemMultiplierEdit.setValue(golemMultiplierStr);
         diversityEdit.setValue(diversityStr);
+        rankOffsetEdit.setValue(rankOffsetStr);
+        fastestStrengthEdit.setValue(fastestStrengthStr);
+        slowestStrengthEdit.setValue(slowestStrengthStr);
         enemyTeamNumEdit.setValue(enemyTeamNumStr);
         maxGolemNumEdit.setValue(maxGolemNumStr);
     }
@@ -120,6 +156,9 @@ public class RegionControllerScreen extends Screen {
                         Float.parseFloat(playerMultiplierEdit.getValue()),
                         Float.parseFloat(golemMultiplierEdit.getValue()),
                         Float.parseFloat(diversityEdit.getValue()),
+                        Float.parseFloat(rankOffsetEdit.getValue()),
+                        Float.parseFloat(fastestStrengthEdit.getValue()),
+                        Float.parseFloat(slowestStrengthEdit.getValue()),
                         Integer.parseInt(enemyTeamNumEdit.getValue()),
                         Integer.parseInt(maxGolemNumEdit.getValue())
                 )));
@@ -134,6 +173,9 @@ public class RegionControllerScreen extends Screen {
         playerMultiplierStr = playerMultiplierEdit.getValue();
         golemMultiplierStr = golemMultiplierEdit.getValue();
         diversityStr = diversityEdit.getValue();
+        rankOffsetStr = rankOffsetEdit.getValue();
+        fastestStrengthStr = fastestStrengthEdit.getValue();
+        slowestStrengthStr = slowestStrengthEdit.getValue();
         enemyTeamNumStr = enemyTeamNumEdit.getValue();
         maxGolemNumStr = maxGolemNumEdit.getValue();
         super.resize(minecraft, width, height);

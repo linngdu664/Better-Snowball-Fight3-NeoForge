@@ -7,7 +7,18 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
-public record UpdateRegionControllerParas(BlockPos blockPos, String spawnBlock, float playerMultiplier, float golemMultiplier, float diversity, int enemyTeamNum, int maxGolem) {
+public record UpdateRegionControllerParas(
+        BlockPos blockPos,
+        String spawnBlock,
+        float playerMultiplier,
+        float golemMultiplier,
+        float diversity,
+        float rankOffset,
+        float fastestStrength,
+        float slowestStrength,
+        int enemyTeamNum,
+        int maxGolem
+) {
     public static final StreamCodec<ByteBuf, UpdateRegionControllerParas> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public void encode(@NotNull ByteBuf byteBuf, @NotNull UpdateRegionControllerParas paras) {
@@ -16,6 +27,9 @@ public record UpdateRegionControllerParas(BlockPos blockPos, String spawnBlock, 
             byteBuf.writeFloat(paras.playerMultiplier);
             byteBuf.writeFloat(paras.golemMultiplier);
             byteBuf.writeFloat(paras.diversity);
+            byteBuf.writeFloat(paras.rankOffset);
+            byteBuf.writeFloat(paras.fastestStrength);
+            byteBuf.writeFloat(paras.slowestStrength);
             VarInt.write(byteBuf, paras.enemyTeamNum);
             VarInt.write(byteBuf, paras.maxGolem);
         }
@@ -25,6 +39,9 @@ public record UpdateRegionControllerParas(BlockPos blockPos, String spawnBlock, 
             return new UpdateRegionControllerParas(
                     BlockPos.STREAM_CODEC.decode(byteBuf),
                     ByteBufCodecs.STRING_UTF8.decode(byteBuf),
+                    byteBuf.readFloat(),
+                    byteBuf.readFloat(),
+                    byteBuf.readFloat(),
                     byteBuf.readFloat(),
                     byteBuf.readFloat(),
                     byteBuf.readFloat(),
