@@ -66,6 +66,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.List;
+
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
     public static final int CAPTURE_POINTS = 10;
@@ -208,7 +210,8 @@ public class GamePlayEvents {
         ItemStack itemStack = event.getItemStack();
         if (!itemStack.getItem().equals(ItemRegister.REGION_TOOL.get()) && !itemStack.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && itemStack.has(DataComponentRegister.REGION.get())) {
             RegionData region = event.getItemStack().get(DataComponentRegister.REGION.get());
-            event.getToolTip().add(Component.translatable(
+            List<Component> list = event.getToolTip();
+            list.add(Component.translatable(
                     "region_limit.tooltip",
                     String.valueOf(region.start().getX()),
                     String.valueOf(region.start().getY()),
@@ -216,7 +219,10 @@ public class GamePlayEvents {
                     String.valueOf(region.end().getX()),
                     String.valueOf(region.end().getY()),
                     String.valueOf(region.end().getZ())
-            ).withStyle(ChatFormatting.DARK_GRAY));
+            ).withStyle(ChatFormatting.GRAY));
+            if (!region.inRegion(event.getEntity().position())) {
+                list.add(Component.translatable("region_cannot_use.tooltip").withStyle(ChatFormatting.DARK_RED));
+            }
         }
     }
 

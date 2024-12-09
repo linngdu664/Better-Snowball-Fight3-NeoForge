@@ -361,6 +361,7 @@
   "team_linker1.tooltip": "<%1$s+%2$s> 开/关显示队友位置",
   "scoring_device.tooltip": "用于记录等级和雪晶",
   "scoring_device1.tooltip": "长按传送，可在售货机购买/回收物品",
+  "scoring_device_team.tooltip": "队伍：%1$s",
   "scoring_device_rank.tooltip": "等级：%1$s",
   "scoring_device_money.tooltip": "雪晶：%1$s",
   "scoring_device_region.tooltip": "绑定区域：(%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s)",
@@ -370,6 +371,7 @@
 
 
   "region_limit.tooltip": "区域限制：此物品仅可在区域 (%1$s, %2$s, %3$s) -> (%4$s, %5$s, %6$s) 内使用",
+  "region_cannot_use.tooltip": "当前物品不可使用",
 
   "lunch_yes_hand.tooltip": "投掷✓",
   "lunch_yes_cannon.tooltip": "炮击✓",

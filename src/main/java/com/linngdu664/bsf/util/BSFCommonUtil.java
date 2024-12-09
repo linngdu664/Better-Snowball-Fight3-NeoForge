@@ -180,6 +180,7 @@ public class BSFCommonUtil {
      *
      * @return 撞击点位，有可能为null
      */
+    @Nullable
     public static Vec3 getRealEntityHitPosOnMoveVec(Entity pProjectile) {
         Vec3 vec3 = pProjectile.getDeltaMovement();
         Level level = pProjectile.level();

@@ -14,6 +14,7 @@ import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
+import com.linngdu664.bsf.util.BSFColorUtil;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -222,7 +223,7 @@ public class GuiHandler {
             converter.convertAndConsume(new Pair<>(zoneController.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
                 byte teamId = zoneController.getTeamId();
-                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor() | 0xff000000, TeamLinkerItem.getItemStackById(teamId), instance.font, TeamLinkerItem.getColorTransNameById(teamId));
+                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor() | 0xff000000, TeamLinkerItem.getItemStackById(teamId), instance.font, BSFColorUtil.getColorTransNameById(teamId));
             }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);

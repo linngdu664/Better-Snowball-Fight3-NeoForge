@@ -4,7 +4,7 @@ import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.CurrentTeamPayload;
 import com.linngdu664.bsf.network.to_client.TeamMembersPayload;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.util.BSFCommonUtil;
+import com.linngdu664.bsf.util.BSFColorUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -16,7 +16,6 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -37,14 +36,6 @@ public class TeamLinkerItem extends Item {
     public TeamLinkerItem(int teamId) {
         super(new Properties());
         this.teamId = teamId;
-    }
-
-    public static String getColorNameKeyById(int id) {
-        return "color.minecraft." + DyeColor.byId(id).getName();
-    }
-
-    public static String getColorTransNameById(int id) {
-        return BSFCommonUtil.getTransStr(getColorNameKeyById(id));
     }
 
     public static ItemStack getItemStackById(byte id) {
@@ -80,8 +71,8 @@ public class TeamLinkerItem extends Item {
             Component playerName = pPlayer.getName();
             UUID uuid = pPlayer.getUUID();
             int oldId = savedData.getTeam(uuid);
-            Object[] oldNameParam = new Object[]{playerName, getColorTransNameById(oldId)};
-            Object[] newNameParam = new Object[]{playerName, getColorTransNameById(teamId)};
+            Object[] oldNameParam = new Object[]{playerName, BSFColorUtil.getColorTransNameById(oldId)};
+            Object[] newNameParam = new Object[]{playerName, BSFColorUtil.getColorTransNameById(teamId)};
             HashSet<UUID> oldMembers = savedData.getMembers(oldId);
             oldMembers.stream()
                     .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))

@@ -9,6 +9,7 @@ import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
+import com.linngdu664.bsf.util.BSFColorUtil;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -99,8 +100,11 @@ public class ScoringDeviceItem extends Item {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
+        if (itemStack.getOrDefault(DataComponentRegister.RANK.get(), 0) < 0) {
+            pPlayer.startUsingItem(pUsedHand);
+            return InteractionResultHolder.consume(itemStack);
+        }
         RegionData region = itemStack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
-        int rank = itemStack.getOrDefault(DataComponentRegister.RANK.get(), 0);
         byte team = itemStack.getOrDefault(DataComponentRegister.TEAM.get(), (byte) 0);
         Predicate<ItemStack> predicate = p -> {
             if (p.isEmpty()) {
@@ -115,17 +119,10 @@ public class ScoringDeviceItem extends Item {
             if (CurrentTeamPayload.currentTeam != team || BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
                 return InteractionResultHolder.fail(itemStack);
             }
-            if (rank < 0 && !region.inRegion(pPlayer.position())) {
-                return InteractionResultHolder.fail(itemStack);
-            }
         } else {
             BSFTeamSavedData savedData = pLevel.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            if (rank < 0 && !region.inRegion(pPlayer.position())) {
-                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed2.tip"), false);
-                return InteractionResultHolder.fail(itemStack);
-            }
             if (savedData.getTeam(pPlayer.getUUID()) != team) {
-                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_0.tip", TeamLinkerItem.getColorTransNameById(team)), false);
+                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_0.tip", BSFColorUtil.getColorTransNameById(team)), false);
                 return InteractionResultHolder.fail(itemStack);
             }
             if (BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
@@ -146,14 +143,6 @@ public class ScoringDeviceItem extends Item {
         livingEntity.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
     }
 
-//    @Override
-//    public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
-//        if (count == 0) {
-//            Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), entity.getPosition(1));
-//            entity.moveTo(tpPoint);
-//            entity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
-//        }
-//    }
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
@@ -161,6 +150,9 @@ public class ScoringDeviceItem extends Item {
         livingEntity.moveTo(tpPoint);
         livingEntity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
         livingEntity.removeAllEffects();
+        if (stack.getOrDefault(DataComponentRegister.RANK.get(), 0) < 0) {
+            stack.shrink(1);
+        }
         return stack;
     }
 
@@ -176,9 +168,11 @@ public class ScoringDeviceItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         int rank = stack.getOrDefault(DataComponentRegister.RANK.get(), 0);
         int money = stack.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+        int team = stack.getOrDefault(DataComponentRegister.TEAM.get(), (byte) 0);
         RegionData region = stack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
         tooltipComponents.add(Component.translatable("scoring_device.tooltip"));
         tooltipComponents.add(Component.translatable("scoring_device1.tooltip"));
+        tooltipComponents.add(Component.translatable("scoring_device_team.tooltip", BSFColorUtil.getColorTransNameById(team)));
         tooltipComponents.add(Component.translatable("scoring_device_rank.tooltip", String.valueOf(rank)));
         tooltipComponents.add(Component.translatable("scoring_device_money.tooltip", String.valueOf(money)));
         tooltipComponents.add(Component.translatable(
