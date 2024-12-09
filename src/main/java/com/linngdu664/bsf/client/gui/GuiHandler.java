@@ -184,12 +184,14 @@ public class GuiHandler {
                 int padding = 2;
                 V2I barPos = new V2I(widthFrameCenter(window, barFrame.x), heightFrameRatio(window, barFrame.y, 0.1));
                 int deviceMoney = mainHandItem.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                deviceMoney = Math.max(deviceMoney, 0);
                 float v = (float) deviceMoney / vendingMachine.getPrice();
                 renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffffd96d, v > 1 ? 1 : v);
                 String moneyTransStr = BSFCommonUtil.getTransStr("scoring_device_money.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
                 guiGraphics.drawString(instance.font, moneyTransStr, barPos.x + ((barFrame.x - instance.font.width(moneyTransStr)) / 2), barPos.y + padding, 0xffffffff);
                 barPos.y += 25;
                 int deviceRank = mainHandItem.getOrDefault(DataComponentRegister.RANK.get(), 0);
+                deviceRank = Math.max(deviceRank, 0);
                 v = (float) deviceRank / vendingMachine.getMinRank();
                 renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff84e800, v > 1 ? 1 : v);
                 String rankTransStr = BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", deviceRank + "/" + vendingMachine.getMinRank());
