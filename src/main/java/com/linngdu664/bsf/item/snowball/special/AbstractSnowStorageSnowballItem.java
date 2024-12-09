@@ -8,8 +8,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -79,7 +77,7 @@ public abstract class AbstractSnowStorageSnowballItem extends AbstractBSFSnowbal
     }
 
     @Override
-    public void addUsageTips(List<Component> pTooltipComponents) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("snow_storage_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void addMainTips(List<Component> pTooltipComponents) {
+        pTooltipComponents.add(Component.translatable("snow_storage_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

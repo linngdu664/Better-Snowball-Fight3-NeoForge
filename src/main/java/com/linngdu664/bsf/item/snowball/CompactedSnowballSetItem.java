@@ -6,8 +6,6 @@ import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -104,10 +102,10 @@ public class CompactedSnowballSetItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_yes_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_GREEN));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_cannon.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_machine_gun.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_shotgun.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("compacted_snowball_set.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("lunch_yes_hand.tooltip").withStyle(ChatFormatting.DARK_GREEN));
+        tooltipComponents.add(Component.translatable("lunch_no_cannon.tooltip").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.add(Component.translatable("lunch_no_machine_gun.tooltip").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.add(Component.translatable("lunch_no_shotgun.tooltip").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.add(Component.translatable("compacted_snowball_set.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

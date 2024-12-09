@@ -4,8 +4,6 @@ import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -64,6 +62,6 @@ public class RegionToolItem extends Item {
                 region.end().getY(),
                 region.end().getZ()
         ));
-        tooltipComponents.add(MutableComponent.create(new PlainTextContents.LiteralContents("mode: " + (region.start().getY() > region.end().getY() ? "spawn point" : "golem"))));
+        tooltipComponents.add(Component.literal("mode: " + (region.start().getY() > region.end().getY() ? "spawn point" : "golem")));
     }
 }

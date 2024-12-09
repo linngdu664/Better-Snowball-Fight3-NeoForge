@@ -5,16 +5,14 @@ import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ScreenshakePayload;
 import com.linngdu664.bsf.network.to_client.ToggleMovingSoundPayload;
-import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.registry.ParticleRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -144,7 +142,7 @@ public class ColdCompressionJetEngineItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("cold_compression_jet_engine.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("cold_compression_jet_engine1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("cold_compression_jet_engine.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("cold_compression_jet_engine1.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

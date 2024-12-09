@@ -7,6 +7,6 @@ import net.minecraft.client.Minecraft;
 public class ShowGolemRankScreenHandler {
     public static void handlePayload(ShowGolemRankScreenPayload payload) {
         Minecraft mc = Minecraft.getInstance();
-        mc.setScreen(new BSFSnowGolemRankScreen(payload.id(), payload.rank()));
+        mc.setScreen(new BSFSnowGolemRankScreen(payload.id(), payload.rank(), payload.money()));
     }
 }

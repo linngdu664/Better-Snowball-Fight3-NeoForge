@@ -32,7 +32,6 @@ public class BSFDummyEntity extends Mob {
 
     public BSFDummyEntity(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
-        setPersistenceRequired();
     }
 
     @Override
@@ -110,6 +109,10 @@ public class BSFDummyEntity extends Mob {
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public void checkDespawn() {
     }
 
     public float getDPS() {

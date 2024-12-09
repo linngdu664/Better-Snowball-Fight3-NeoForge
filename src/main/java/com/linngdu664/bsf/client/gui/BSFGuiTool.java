@@ -7,7 +7,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -139,7 +141,7 @@ public class BSFGuiTool {
      * @param font          字体
      * @param msg           装备描述
      */
-    public static void renderEquipIntroduced(GuiGraphics guiGraphics, Vec2 equipPoint, Vec2 framePoint, int lineXDistance, int color, ItemStack itemStack, Font font, String msg) {
+    public static void renderEquipIntroduced(GuiGraphics guiGraphics, Vec2 equipPoint, Vec2 framePoint, int lineXDistance, int color, ItemStack itemStack, Font font, Component msg) {
         Vec2 linkPoint = new Vec2(framePoint.x + EQUIPMENT_SLOT_FRAME_GUI.width, framePoint.y + (float) EQUIPMENT_SLOT_FRAME_GUI.height / 2);
         Vec2 xPoint = new Vec2(equipPoint.x - lineXDistance, linkPoint.y);
         if (xPoint.x < linkPoint.x) {
@@ -152,7 +154,8 @@ public class BSFGuiTool {
         renderFillSquareTool(guiGraphics, equipPoint.add(new Vec2(-1f, 0)), equipPoint.add(new Vec2(1f, 2f)), color);
         EQUIPMENT_SLOT_FRAME_GUI.render(guiGraphics, (int) framePoint.x, (int) framePoint.y);
         guiGraphics.renderItem(itemStack, (int) (framePoint.x + 3), (int) (framePoint.y + 3));
-        guiGraphics.drawString(font, msg, framePoint.x - font.width(msg), framePoint.y + 7, color, true);
+        FormattedCharSequence formattedcharsequence = msg.getVisualOrderText();
+        guiGraphics.drawString(font, formattedcharsequence, framePoint.x - font.width(formattedcharsequence), framePoint.y + 7, color, true);
     }
 
     public static void renderLineTool(GuiGraphics guiGraphics, Vec2 p1, Vec2 p2, float d, int color, boolean isDown, float padding, int padColor) {
@@ -311,5 +314,14 @@ public class BSFGuiTool {
                     ", y=" + y +
                     '}';
         }
+    }
+
+    public static class VarObj {
+        public Component tLocatorComponent;
+        public Component sLocatorComponent;
+        public Component tStatusComponent;
+        public Component sStatusComponent;
+        public BSFGuiTool.V2I locateV2I;
+        public BSFGuiTool.V2I statusV2I;
     }
 }

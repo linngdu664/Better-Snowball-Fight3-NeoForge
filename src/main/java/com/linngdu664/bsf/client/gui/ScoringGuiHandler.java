@@ -6,7 +6,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ScoringGuiHandler {
-    public static int score = 0;
+    public static int money = 0;
+    public static int rank = 0;
     public static int hourMeter = 0;
 
     public static void tick() {
@@ -15,8 +16,9 @@ public class ScoringGuiHandler {
         }
     }
 
-    public static void set(int sc) {
-        score = sc;
+    public static void set(int r, int m) {
+        rank = r;
+        money = m;
         hourMeter = 40;
     }
 

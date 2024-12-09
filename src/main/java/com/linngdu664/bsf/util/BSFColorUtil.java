@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.util;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 
 public class BSFColorUtil {
@@ -7,7 +8,7 @@ public class BSFColorUtil {
         return "color.minecraft." + DyeColor.byId(id).getName();
     }
 
-    public static String getColorTransNameById(int id) {
-        return BSFCommonUtil.getTransStr(getColorNameKeyById(id));
+    public static Component getColorTransNameById(int id) {
+        return Component.translatable(getColorNameKeyById(id));
     }
 }

@@ -10,12 +10,13 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 
-public record ShowGolemRankScreenPayload(int id, int rank) implements CustomPacketPayload {
+public record ShowGolemRankScreenPayload(int id, int rank, int money) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ShowGolemRankScreenPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("show_golem_rank_screen"));
 
     public static final StreamCodec<ByteBuf, ShowGolemRankScreenPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, ShowGolemRankScreenPayload::id,
             ByteBufCodecs.VAR_INT, ShowGolemRankScreenPayload::rank,
+            ByteBufCodecs.VAR_INT, ShowGolemRankScreenPayload::money,
             ShowGolemRankScreenPayload::new
     );
 

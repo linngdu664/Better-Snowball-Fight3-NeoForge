@@ -2,8 +2,6 @@ package com.linngdu664.bsf.item.tool;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
@@ -65,6 +63,6 @@ public class GloveItem extends AbstractBSFEnhanceableToolItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("glove.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("glove.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

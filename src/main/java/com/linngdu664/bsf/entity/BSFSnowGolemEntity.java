@@ -26,9 +26,9 @@ import com.linngdu664.bsf.misc.BSFTiers;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ShowGolemRankScreenPayload;
-import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
@@ -106,7 +106,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private double shootX;
     private double shootY;
     private double shootZ;
-    private int rank;                    // 等级，配合积分器使用
+    private int rank;   // 等级，配合积分器使用
+    private int money;  // todo 金钱，配合积分器使用
     private boolean dropEquipment;
     private boolean dropSnowball;
     private RegionData aliveRange;
@@ -163,6 +164,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         pCompound.putBoolean("DropSnowball", dropSnowball);
         pCompound.putByte("FixedTeamId", getFixedTeamId());
         pCompound.putInt("Rank", rank);
+        pCompound.putInt("Money", money);
         if (aliveRange != null) {
             aliveRange.saveToCompoundTag("AliveRange", pCompound);
         }
@@ -188,6 +190,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         dropSnowball = pCompound.getBoolean("DropSnowball");
         setFixedTeamId(pCompound.getByte("FixedTeamId"));
         rank = pCompound.getInt("Rank");
+        money = pCompound.getInt("Money");
         aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
         if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
             setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
@@ -320,6 +323,14 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
 
     public void setRank(int rank) {
         this.rank = rank;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
     }
 
     public void setAliveRange(RegionData region) {
@@ -494,7 +505,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 pPlayer.getInventory().placeItemBackInInventory(getCore(), true);
                 setCore(ItemStack.EMPTY);
             } else if (item.equals(Items.BLAZE_ROD) && pPlayer.getAbilities().instabuild) {
-                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new ShowGolemRankScreenPayload(getId(), getRank()));
+                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new ShowGolemRankScreenPayload(getId(), getRank(), getMoney()));
             }
         }
         return InteractionResult.SUCCESS;

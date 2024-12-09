@@ -70,7 +70,6 @@ import java.util.List;
 
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class GamePlayEvents {
-    public static final int CAPTURE_POINTS = 10;
     private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), 0.15, AttributeModifier.Operation.ADD_VALUE);
     private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
@@ -89,33 +88,36 @@ public class GamePlayEvents {
                         RegionData region = device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
                         RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
                         if (region1.equals(region) && region.inRegion(killerPlayer.position()) && region.inRegion(deathPlayer.position())) {
+                            // 胜者拿走败者20%的钱
                             int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                            int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
+                            int getPoints = deathPlayerPoint / 5;
                             device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                            PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(getPoints));
+                            PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
                             int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                             device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
-                            device1.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
-                            PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getPoints));
+                            PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(0, getPoints));
                         }
                     }
                 } else if (deathEntity instanceof BSFSnowGolemEntity deathGolem) {
                     ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                     if (device != null && (deathGolem.getFixedTeamId() >= 0 && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) || deathGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerPlayer, deathGolem.getOwner())) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(killerPlayer.position())) {
-                        int killerPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                        int getPoints = deathGolem.getRank();
-                        device.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
-                        device.set(DataComponentRegister.RANK.get(), killerPlayerPoint + getPoints);
-                        PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getPoints));
+                        int killerPlayerRank = device.getOrDefault(DataComponentRegister.RANK.get(), 0);
+                        int killerPlayerMoney = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                        int getRank = deathGolem.getRank();
+                        int getMoney = deathGolem.getMoney();
+                        device.set(DataComponentRegister.RANK.get(), killerPlayerRank + getRank);
+                        device.set(DataComponentRegister.MONEY.get(), killerPlayerMoney + getMoney);
+                        PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getRank, getMoney));
                     }
                 }
             } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
                 ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                 if (device != null && (killerGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) || killerGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerGolem.getOwner(), deathPlayer)) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(deathPlayer.position())) {
+                    // 掉10%的钱
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                    int getPoints = deathPlayerPoint - CAPTURE_POINTS > 0 ? CAPTURE_POINTS : deathPlayerPoint;
+                    int getPoints = deathPlayerPoint / 10;
                     device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                    PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(getPoints));
+                    PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
                 }
             }
         }

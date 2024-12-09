@@ -14,8 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -144,8 +142,8 @@ public class SnowmanInHandItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Options options = Minecraft.getInstance().options;
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand1.tooltip", null, new Object[]{options.keyShift.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowman_in_hand2.tooltip", null, new Object[]{options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(Component.translatable("snowman_in_hand.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("snowman_in_hand1.tooltip", options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(Component.translatable("snowman_in_hand2.tooltip", options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

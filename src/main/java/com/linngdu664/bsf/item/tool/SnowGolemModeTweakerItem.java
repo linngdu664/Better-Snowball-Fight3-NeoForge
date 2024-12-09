@@ -1,7 +1,6 @@
 package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.registry.DataComponentRegister;
-import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -41,21 +40,13 @@ public class SnowGolemModeTweakerItem extends Item {
         };
     }
 
-//    @Override
-//    public void onCraftedBy(ItemStack pStack, @NotNull Level pLevel, @NotNull Player pPlayer) {
-//        pStack.getOrCreateTag().putByte("Status", (byte) 0);
-//        pStack.getOrCreateTag().putByte("Locator", (byte) 0);
-//    }
-
-
     @Override
     public void appendHoverText(ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
         Options options = Minecraft.getInstance().options;
-        new BSFCommonUtil.TipBuilder(pTooltipComponents)
-                .add("snow_golem_mode_tweaker.tooltip", ChatFormatting.DARK_GRAY, options.keyShift.getTranslatedKeyMessage())
-                .add("snow_golem_mode_tweaker1.tooltip", ChatFormatting.DARK_GRAY, options.keySprint.getTranslatedKeyMessage())
-                .add("snow_golem_mode_tweaker2.tooltip", ChatFormatting.BLUE)
-                .add("tweaker_target.tip", ChatFormatting.DARK_GRAY, BSFCommonUtil.getTransStr(locatorMap(stack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0))))
-                .add("tweaker_status.tip", ChatFormatting.DARK_GRAY, BSFCommonUtil.getTransStr(statusMap(stack.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0))));
+        pTooltipComponents.add(Component.translatable("snow_golem_mode_tweaker.tooltip", options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.add(Component.translatable("snow_golem_mode_tweaker1.tooltip", options.keySprint.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.add(Component.translatable("snow_golem_mode_tweaker2.tooltip").withStyle(ChatFormatting.BLUE));
+        pTooltipComponents.add(Component.translatable("tweaker_target.tip", Component.translatable(locatorMap(stack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0)))).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.add(Component.translatable("tweaker_status.tip", Component.translatable(statusMap(stack.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0)))).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

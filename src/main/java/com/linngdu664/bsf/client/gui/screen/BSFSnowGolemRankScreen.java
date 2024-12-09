@@ -12,18 +12,22 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class BSFSnowGolemRankScreen extends Screen {
     private static final int MIDDLE_MAX_WIDTH = 350;
-    private static final int MIDDLE_HEIGHT = 25;  // 1个输入框
+    private static final int MIDDLE_HEIGHT = 25 * 2;  // 2个输入框
     private static final int LABEL_INPUT_GAP = 4;
     private static final int MAIN_MARGIN = 9;
     private final int id;
     private final Component rankComponent = Component.translatable("gui.bsf.rank");
+    private final Component moneyComponent = Component.translatable("gui.bsf.money");
     private EditBox rankEdit;
+    private EditBox moneyEdit;
     private String rankStr;
+    private String moneyStr;
 
-    public BSFSnowGolemRankScreen(int id, int rank) {
+    public BSFSnowGolemRankScreen(int id, int rank, int money) {
         super(Component.literal(""));
         this.id = id;
         this.rankStr = String.valueOf(rank);
+        this.moneyStr = String.valueOf(money);
     }
 
     @Override
@@ -32,7 +36,7 @@ public class BSFSnowGolemRankScreen extends Screen {
         Font font = minecraft.font;
         // 确定各组件位置
         int beginY = height / 2 - MIDDLE_HEIGHT / 2;
-        int maxComponentWidth = font.width(rankComponent);
+        int maxComponentWidth = Math.max(font.width(rankComponent), font.width(moneyComponent));
         int middleWidth = Math.min(MIDDLE_MAX_WIDTH, width - 2 * MAIN_MARGIN);
         int labelBeginX = width / 2 - middleWidth / 2;
         int inputEndX = width / 2 + middleWidth / 2;
@@ -41,10 +45,14 @@ public class BSFSnowGolemRankScreen extends Screen {
         int inputWidth = inputEndX - inputBeginX;
 
         StringWidget rankLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 6, labelWidth, 9, rankComponent, font));
+        StringWidget moneyLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 31, labelWidth, 9, moneyComponent, font));
         rankLabel.alignRight();
+        moneyLabel.alignRight();
 
         rankEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY, inputWidth, 20, rankComponent));
+        moneyEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 25, inputWidth, 20, moneyComponent));
         rankEdit.setValue(rankStr);
+        moneyEdit.setValue(moneyStr);
     }
 
     @Override
@@ -52,7 +60,7 @@ public class BSFSnowGolemRankScreen extends Screen {
         super.onClose();
         if (minecraft.level.getEntity(id) instanceof BSFSnowGolemEntity) {
             try {
-                PacketDistributor.sendToServer(new UpdateGolemRankPayload(id, Integer.parseInt(rankEdit.getValue())));
+                PacketDistributor.sendToServer(new UpdateGolemRankPayload(id, Integer.parseInt(rankEdit.getValue()), Integer.parseInt(moneyEdit.getValue())));
             } catch (NumberFormatException ignore) {
 
             }
@@ -62,6 +70,7 @@ public class BSFSnowGolemRankScreen extends Screen {
     @Override
     public void resize(Minecraft minecraft, int width, int height) {
         rankStr = rankEdit.getValue();
+        moneyStr = moneyEdit.getValue();
         super.resize(minecraft, width, height);
     }
 }

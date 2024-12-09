@@ -1,10 +1,9 @@
 package com.linngdu664.bsf.item.misc;
 
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
-import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
+import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.registry.EffectRegister;
-import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
@@ -66,8 +65,8 @@ public class SuspiciousUSBFlashDriveItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        BSFCommonUtil.addTrans(tooltipComponents, "suspicious_usb_flash_drive.tooltip", ChatFormatting.GRAY);
-        BSFCommonUtil.addTrans(tooltipComponents, "suspicious_usb_flash_drive1.tooltip", ChatFormatting.GRAY);
-        BSFCommonUtil.addTrans(tooltipComponents, "suspicious_usb_flash_drive2.tooltip", ChatFormatting.DARK_GRAY, Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage());
+        tooltipComponents.add(Component.translatable("suspicious_usb_flash_drive.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("suspicious_usb_flash_drive1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("suspicious_usb_flash_drive2.tooltip", Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

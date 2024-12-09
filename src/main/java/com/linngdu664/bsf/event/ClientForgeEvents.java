@@ -1,8 +1,8 @@
 package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
 import com.linngdu664.bsf.client.gui.ScoringGuiHandler;
+import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
 import com.linngdu664.bsf.item.tool.ColdCompressionJetEngineItem;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;

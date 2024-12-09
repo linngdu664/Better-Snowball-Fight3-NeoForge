@@ -2,8 +2,6 @@ package com.linngdu664.bsf.item.misc;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -30,7 +28,7 @@ public class SnowGolemCoreItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         for (int i = 0, size = hoverText.length; i < size; i++) {
-            tooltipComponents.add(MutableComponent.create(new TranslatableContents(hoverText[i], null, new Object[0])).withStyle(chatFormats[i]));
+            tooltipComponents.add(Component.translatable(hoverText[i]).withStyle(chatFormats[i]));
         }
     }
 }

@@ -14,8 +14,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -165,38 +163,38 @@ public abstract class AbstractBSFSnowballItem extends Item implements Projectile
     public void generateWeaponTips(List<Component> pTooltipComponents) {
         int typeFlag = getTypeFlag();
         if ((typeFlag & HAND_TYPE_FLAG) == 0) {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
+            pTooltipComponents.add(Component.translatable("lunch_no_hand.tooltip").withStyle(ChatFormatting.DARK_RED));
         } else {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_yes_hand.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_GREEN));
+            pTooltipComponents.add(Component.translatable("lunch_yes_hand.tooltip").withStyle(ChatFormatting.DARK_GREEN));
         }
         if ((typeFlag & SnowballCannonItem.TYPE_FLAG) == 0) {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_cannon.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
+            pTooltipComponents.add(Component.translatable("lunch_no_cannon.tooltip").withStyle(ChatFormatting.DARK_RED));
         } else {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_yes_cannon.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_GREEN));
+            pTooltipComponents.add(Component.translatable("lunch_yes_cannon.tooltip").withStyle(ChatFormatting.DARK_GREEN));
         }
         if ((typeFlag & SnowballMachineGunItem.TYPE_FLAG) == 0) {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_machine_gun.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
+            pTooltipComponents.add(Component.translatable("lunch_no_machine_gun.tooltip").withStyle(ChatFormatting.DARK_RED));
         } else {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_yes_machine_gun.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_GREEN));
+            pTooltipComponents.add(Component.translatable("lunch_yes_machine_gun.tooltip").withStyle(ChatFormatting.DARK_GREEN));
         }
         if ((typeFlag & SnowballShotgunItem.TYPE_FLAG) == 0) {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_no_shotgun.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_RED));
+            pTooltipComponents.add(Component.translatable("lunch_no_shotgun.tooltip").withStyle(ChatFormatting.DARK_RED));
         } else {
-            pTooltipComponents.add(MutableComponent.create(new TranslatableContents("lunch_yes_shotgun.tooltip", null, new Object[0])).withStyle(ChatFormatting.DARK_GREEN));
+            pTooltipComponents.add(Component.translatable("lunch_yes_shotgun.tooltip").withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 
     public void addUsageTips(List<Component> pTooltipComponents) {
     }
 
-    public void addLastTips(List<Component> pTooltipComponents) {
+    public void addMainTips(List<Component> pTooltipComponents) {
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         generateWeaponTips(tooltipComponents);
+        addMainTips(tooltipComponents);
         addUsageTips(tooltipComponents);
-        addLastTips(tooltipComponents);
     }
 
     /**

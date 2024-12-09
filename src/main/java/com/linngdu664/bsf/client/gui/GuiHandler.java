@@ -15,7 +15,6 @@ import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.util.BSFColorUtil;
-import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -34,12 +33,10 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.StringUtils;
 import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -82,7 +79,7 @@ public class GuiHandler {
         }
     }
 
-    public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, CoordinateConverter converter, Entity pickEntity, float partialTick, Map<String, Object> varMap) {
+    public static void pickEntityBSFSnowGolem(GuiGraphics guiGraphics, CoordinateConverter converter, Entity pickEntity, float partialTick, VarObj varObj) {
         Minecraft instance = Minecraft.getInstance();
         Player player = instance.player;
         if (pickEntity.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()) && player.equals(((BSFSnowGolemEntity) pickEntity).getOwner())) {
@@ -97,7 +94,7 @@ public class GuiHandler {
                 ItemStack finalEquip = equip;
                 list.add(new Pair<>(entityPosition.add(entity.getMiddleModelForward(partialTick, 4).scale(0.7).add(0, 1.3, 0)), v2 -> {
                     V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_weapon"));
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, finalEquip, instance.font, Component.translatable("weapon.tip"));
                     float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) / finalEquip.getMaxDamage();
                     renderProgressBar(guiGraphics, new V2I(v2IRatio.x - 4, v2IRatio.y + 23), new V2I(30, 6), 2, 0xffffffff, percent > 0.3 ? 0xff85e900 : 0xfffc3d49, percent);
                 }));
@@ -107,7 +104,7 @@ public class GuiHandler {
                 ItemStack finalEquip = equip;
                 list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(-0.3).add(0, 1.2, 0)), v2 -> {
                     V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.5);
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.07), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_snowball"));
+                    renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.07), 0xffffffff, finalEquip, instance.font, Component.translatable("snowball.tip"));
                     float percent = (float) (finalEquip.getMaxDamage() - finalEquip.getDamageValue()) / finalEquip.getMaxDamage();
                     renderProgressBar(guiGraphics, new V2I(v2IRatio.x - 4, v2IRatio.y + 23), new V2I(30, 6), 2, 0xffffffff, percent > 0.3 ? 0xff85e900 : 0xfffc3d49, percent);
                 }));
@@ -115,16 +112,14 @@ public class GuiHandler {
             equip = entity.getCore();
             if (equip != ItemStack.EMPTY) {
                 ItemStack finalEquip = equip;
-                list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(0.3).add(0, 1.05, 0)), v2 -> {
-                    renderEquipIntroduced(guiGraphics, v2, v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.7).getVec2(), widthWinRatio(window, 0.12), 0xffffffff, finalEquip, instance.font, BSFCommonUtil.getTransStr("gui_text_core"));
-                }));
+                list.add(new Pair<>(entityPosition.add(viewVector0Y.scale(0.3).add(0, 1.05, 0)), v2 -> renderEquipIntroduced(guiGraphics, v2, v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.7).getVec2(), widthWinRatio(window, 0.12), 0xffffffff, finalEquip, instance.font, Component.translatable("core.tip"))));
             }
             converter.convertAndConsume(list, guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示模式
             byte locator = entity.getLocator();
             byte status = entity.getStatus();
-            varMap.put("sLocatorStr", BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator)));
-            varMap.put("sStatusStr", BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.statusMap(status)));
+            varObj.sLocatorComponent = Component.translatable(SnowGolemModeTweakerItem.locatorMap(locator));
+            varObj.sStatusComponent = Component.translatable(SnowGolemModeTweakerItem.statusMap(status));
             BSFGuiTool.V2I locateV2I = GOLEM_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5);
             locateV2I.set(locateV2I.x - 1, locateV2I.y - 1 + locator * 20);
             GOLEM_SELECTOR_GUI.render(guiGraphics, locateV2I.x, locateV2I.y);
@@ -134,8 +129,8 @@ public class GuiHandler {
             if (entity.getEnhance()) {
                 ADVANCE_MODE_GUI.renderRatio(guiGraphics, window, 0.5, 0.8);
             }
-            varMap.put("locateV2I", locateV2I);
-            varMap.put("statusV2I", statusV2I);
+            varObj.locateV2I = locateV2I;
+            varObj.statusV2I = statusV2I;
 
             //显示血条/cd
             V2I barFrame = new V2I(100, 10);
@@ -177,7 +172,7 @@ public class GuiHandler {
             //显示货物
             converter.convertAndConsume(new Pair<>(vendingMachine.getBlockPos().getCenter(), v2 -> {
                 V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.4);
-                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, BSFCommonUtil.getTransStr("goods.tip"));
+                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), 0xffffffff, vendingMachine.getGoods(), instance.font, Component.translatable("goods.tip"));
             }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示价格等级百分比条
             if (mainHandItem.getItem() instanceof ScoringDeviceItem) {
@@ -188,25 +183,25 @@ public class GuiHandler {
                 deviceMoney = Math.max(deviceMoney, 0);
                 float v = (float) deviceMoney / vendingMachine.getPrice();
                 renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xffffd96d, v > 1 ? 1 : v);
-                String moneyTransStr = BSFCommonUtil.getTransStr("scoring_device_money.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
-                guiGraphics.drawString(instance.font, moneyTransStr, barPos.x + ((barFrame.x - instance.font.width(moneyTransStr)) / 2), barPos.y + padding, 0xffffffff);
+                Component moneyTransComponent = Component.translatable("scoring_device_money.tooltip", deviceMoney + "/" + vendingMachine.getPrice());
+                guiGraphics.drawString(instance.font, moneyTransComponent, barPos.x + ((barFrame.x - instance.font.width(moneyTransComponent)) / 2), barPos.y + padding, 0xffffffff);
                 barPos.y += 25;
                 int deviceRank = mainHandItem.getOrDefault(DataComponentRegister.RANK.get(), 0);
                 deviceRank = Math.max(deviceRank, 0);
                 v = (float) deviceRank / vendingMachine.getMinRank();
                 renderProgressBar(guiGraphics, barPos, barFrame, padding, 0xffffffff, 0xff84e800, v > 1 ? 1 : v);
-                String rankTransStr = BSFCommonUtil.getTransStr("scoring_device_rank.tooltip", deviceRank + "/" + vendingMachine.getMinRank());
-                guiGraphics.drawString(instance.font, rankTransStr, barPos.x + ((barFrame.x - instance.font.width(rankTransStr)) / 2), barPos.y + padding, 0xffffffff);
+                Component rankTransComponent = Component.translatable("scoring_device_rank.tooltip", deviceRank + "/" + vendingMachine.getMinRank());
+                guiGraphics.drawString(instance.font, rankTransComponent, barPos.x + ((barFrame.x - instance.font.width(rankTransComponent)) / 2), barPos.y + padding, 0xffffffff);
             }
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_price.tip", vendingMachine.getPrice()), v2I.x, v2I.y, 0xffffffff);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_rank.tip", vendingMachine.getMinRank()), v2I.x, v2I.y + 10, 0xffffffff);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_buy.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 20, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("vending_price.tip", vendingMachine.getPrice()), v2I.x, v2I.y, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("vending_rank.tip", vendingMachine.getMinRank()), v2I.x, v2I.y + 10, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("vending_buy.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 20, 0xffffffff);
             if (vendingMachine.isCanSell()) {
-                guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("recyclable.tip"), v2I.x, v2I.y + 40, 0xff3574f0);
-                guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_recycle.tip", vendingMachine.getPrice()), v2I.x, v2I.y + 50, 0xffffffff);
-                guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("vending_sell.tip", instance.options.keyShift.getTranslatedKeyMessage(), instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 60, 0xffffffff);
+                guiGraphics.drawString(instance.font, Component.translatable("recyclable.tip"), v2I.x, v2I.y + 40, 0xff3574f0);
+                guiGraphics.drawString(instance.font, Component.translatable("vending_recycle.tip", vendingMachine.getPrice()), v2I.x, v2I.y + 50, 0xffffffff);
+                guiGraphics.drawString(instance.font, Component.translatable("vending_sell.tip", instance.options.keyShift.getTranslatedKeyMessage(), instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 60, 0xffffffff);
             }
             //显示商品名
             Component displayName = vendingMachine.getGoods().getDisplayName();
@@ -227,12 +222,12 @@ public class GuiHandler {
             }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_strength.tip", String.format("%.2f", zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
-            guiGraphics.drawString(instance.font, BSFCommonUtil.getTransStr("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 10, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("region_controller_strength.tip", String.format("%.2f", zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 10, 0xffffffff);
         }
     }
 
-    public static void itemInHandSnowGolemModeTweaker(GuiGraphics guiGraphics, ItemStack mainHandItem, ItemStack offHandItem, Map<String, Object> varMap) {
+    public static void itemInHandSnowGolemModeTweaker(GuiGraphics guiGraphics, ItemStack mainHandItem, ItemStack offHandItem, VarObj varObj) {
         ItemStack tweaker = null;
         if (mainHandItem.getItem() instanceof SnowGolemModeTweakerItem) {
             tweaker = mainHandItem;
@@ -244,37 +239,37 @@ public class GuiHandler {
             Window window = instance.getWindow();
             //显示模式调整器gui
             byte locator = tweaker.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
-            varMap.put("tLocatorStr", BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.locatorMap(locator)));
+            varObj.tLocatorComponent = Component.translatable(SnowGolemModeTweakerItem.locatorMap(locator));
             byte status = tweaker.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0);
-            varMap.put("tStatusStr", BSFCommonUtil.getTransStr(SnowGolemModeTweakerItem.statusMap(status)));
+            varObj.tStatusComponent = Component.translatable(SnowGolemModeTweakerItem.statusMap(status));
             V2I locateV2IT = TWEAKER_LOCATOR_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 30, 0);
             locateV2IT.set(locateV2IT.x - 1, locateV2IT.y - 1 + locator * 20);
             TWEAKER_SELECTOR_GUI.render(guiGraphics, locateV2IT.x, locateV2IT.y);
             V2I statusV2IT = TWEAKER_STATUS_GUI.renderRatio(guiGraphics, window, 0.7, 0.5, 90, 0);
             statusV2IT.set(statusV2IT.x - 1, statusV2IT.y - 1 + status * 20);
             TWEAKER_SELECTOR_GUI.render(guiGraphics, statusV2IT.x, statusV2IT.y);
-            V2I locateV2I = (V2I) varMap.get("locateV2I");
+            V2I locateV2I = varObj.locateV2I;
             if (locateV2I != null && locateV2I.y != locateV2IT.y) {
                 SETTER_ARROW_GUI.render(guiGraphics, locateV2I.x + 23, locateV2IT.y + 2);
             }
-            V2I statusV2I = (V2I) varMap.get("statusV2I");
+            V2I statusV2I = varObj.statusV2I;
             if (statusV2I != null && statusV2I.y != statusV2IT.y) {
                 SETTER_ARROW_GUI.render(guiGraphics, statusV2I.x + 23, statusV2IT.y + 2);
             }
         }
     }
 
-    public static void specialModeText(GuiGraphics guiGraphics, Map<String, Object> varMap) {
-        String sLocatorStr = (String) varMap.get("sLocatorStr");
-        String tLocatorStr = (String) varMap.get("tLocatorStr");
-        String sStatusStr = (String) varMap.get("sStatusStr");
-        String tStatusStr = (String) varMap.get("tStatusStr");
-        if (!(StringUtils.isBlank(sLocatorStr) && StringUtils.isBlank(tLocatorStr))) {
+    public static void specialModeText(GuiGraphics guiGraphics, VarObj varObj) {
+        Component sLocatorComponent = varObj.sLocatorComponent;
+        Component tLocatorComponent = varObj.tLocatorComponent;
+        Component sStatusComponent = varObj.sStatusComponent;
+        Component tStatusComponent = varObj.tStatusComponent;
+        if (!(sLocatorComponent == null && tLocatorComponent == null)) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             //显示模式调整文字
-            String lStr = BSFCommonUtil.getTransStr("tweaker_target.tip", StringUtils.isBlank(sLocatorStr) ? tLocatorStr : StringUtils.isBlank(tLocatorStr) || sLocatorStr.equals(tLocatorStr) ? sLocatorStr : sLocatorStr + " << " + tLocatorStr);
-            String sStr = BSFCommonUtil.getTransStr("tweaker_status.tip", StringUtils.isBlank(sStatusStr) ? tStatusStr : StringUtils.isBlank(tStatusStr) || sStatusStr.equals(tStatusStr) ? sStatusStr : sStatusStr + " << " + tStatusStr);
+            Component lStr = Component.translatable("tweaker_target.tip", sLocatorComponent == null ? tLocatorComponent : tLocatorComponent == null || sLocatorComponent.equals(tLocatorComponent) ? sLocatorComponent : sLocatorComponent.getString() + " << " + tLocatorComponent.getString());
+            Component sStr = Component.translatable("tweaker_status.tip", sStatusComponent == null ? tStatusComponent : tStatusComponent == null || sStatusComponent.equals(tStatusComponent) ? sStatusComponent : sStatusComponent.getString() + " << " + tStatusComponent.getString());
             V2I v2I = v2IRatio(window, 0.6, 0.75);
             guiGraphics.drawString(instance.font, lStr, v2I.x, v2I.y, 0xffffffff);
             guiGraphics.drawString(instance.font, sStr, v2I.x, v2I.y + 10, 0xffffffff);
@@ -286,9 +281,14 @@ public class GuiHandler {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
             V2I v2I = v2IRatio(window, 0.9, 0.4);
-            String scoreStr = BSFCommonUtil.getTransStr(ScoringGuiHandler.score >= 0 ? "scoring_device_kill_bonus.tip" : "scoring_device_death_punishment.tip", String.valueOf(ScoringGuiHandler.score));
+            Component scoreComponent;
+            if (ScoringGuiHandler.money >= 0) {
+                scoreComponent = Component.translatable("scoring_device_kill_bonus.tip", String.valueOf(ScoringGuiHandler.rank), String.valueOf(ScoringGuiHandler.money));
+            } else {
+                scoreComponent = Component.translatable("scoring_device_death_punishment.tip", String.valueOf(ScoringGuiHandler.money));
+            }
             RenderSystem.enableBlend();
-            guiGraphics.drawString(instance.font, scoreStr, v2I.x - instance.font.width(scoreStr), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
+            guiGraphics.drawString(instance.font, scoreComponent, v2I.x - instance.font.width(scoreComponent), v2I.y, 0xffffff | ScoringGuiHandler.getBlend());
             RenderSystem.disableBlend();
         }
     }

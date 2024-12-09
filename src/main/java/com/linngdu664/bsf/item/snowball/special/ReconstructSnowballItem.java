@@ -7,8 +7,6 @@ import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,7 +34,8 @@ public class ReconstructSnowballItem extends AbstractSnowStorageSnowballItem {
     }
 
     @Override
-    public void addLastTips(List<Component> pTooltipComponents) {
-        pTooltipComponents.add(MutableComponent.create(new TranslatableContents("reconstruct_snowball.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
+    public void addMainTips(List<Component> pTooltipComponents) {
+        super.addMainTips(pTooltipComponents);
+        pTooltipComponents.add(Component.translatable("reconstruct_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }

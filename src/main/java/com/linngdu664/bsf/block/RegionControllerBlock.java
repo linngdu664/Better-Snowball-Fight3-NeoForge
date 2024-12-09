@@ -1,10 +1,10 @@
 package com.linngdu664.bsf.block;
 
 import com.linngdu664.bsf.block.entity.RegionControllerBlockEntity;
-import com.linngdu664.bsf.network.to_client.packed_paras.RegionControllerGuiParas;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
 import com.linngdu664.bsf.network.to_client.ShowRegionControllerScreenPayload;
+import com.linngdu664.bsf.network.to_client.packed_paras.RegionControllerGuiParas;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;

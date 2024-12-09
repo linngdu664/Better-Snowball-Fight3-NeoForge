@@ -91,12 +91,12 @@ public class SnowballTankItem extends Item {
         Item item = stack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (item instanceof AbstractBSFSnowballItem snowballItem) {
             snowballItem.generateWeaponTips(tooltipComponents);
-            snowballItem.addLastTips(tooltipComponents);
+            snowballItem.addMainTips(tooltipComponents);
         } else {
-            tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_storage_tank.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-            tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_storage_tank1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-            tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_storage_tank2.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-            tooltipComponents.add(MutableComponent.create(new TranslatableContents("snowball_storage_tank3.tooltip", null, new Object[]{Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+            tooltipComponents.add(Component.translatable("snowball_storage_tank.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltipComponents.add(Component.translatable("snowball_storage_tank1.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltipComponents.add(Component.translatable("snowball_storage_tank2.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltipComponents.add(Component.translatable("snowball_storage_tank3.tooltip", Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 

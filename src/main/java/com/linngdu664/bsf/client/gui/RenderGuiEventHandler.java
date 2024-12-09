@@ -15,9 +15,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class RenderGuiEventHandler {
     @SubscribeEvent
@@ -26,7 +23,7 @@ public class RenderGuiEventHandler {
         if (instance.options.hideGui) {
             return;
         }
-        Map<String, Object> varMap = new HashMap<>();
+        BSFGuiTool.VarObj varObj = new BSFGuiTool.VarObj();
         Player player = instance.player;
         ItemStack mainHandItem = player.getMainHandItem();
         ItemStack offHandItem = player.getOffhandItem();
@@ -44,15 +41,15 @@ public class RenderGuiEventHandler {
         GuiHandler.itemInHandBSFWeapon(guiGraphics, mainHandItem, offHandItem);
         if (pickType == HitResult.Type.ENTITY) {
             Entity entity1 = ((EntityHitResult) pick).getEntity();
-            GuiHandler.pickEntityBSFSnowGolem(guiGraphics, converter, entity1, partialTick, varMap);
+            GuiHandler.pickEntityBSFSnowGolem(guiGraphics, converter, entity1, partialTick, varObj);
             GuiHandler.pickEntityBSFDummy(guiGraphics, entity1);
         } else if (pickType == HitResult.Type.BLOCK) {
             BlockEntity blockEntity = player.level().getBlockEntity(((BlockHitResult) pick).getBlockPos());
             GuiHandler.pickBlockEntityVendingMachine(guiGraphics, converter, blockEntity, mainHandItem, partialTick);
             GuiHandler.pickBlockEntityZoneController(guiGraphics, converter, blockEntity, partialTick);
         }
-        GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varMap);
-        GuiHandler.specialModeText(guiGraphics, varMap);
+        GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varObj);
+        GuiHandler.specialModeText(guiGraphics, varObj);
         guiGraphics.pose().popPose();
     }
 }

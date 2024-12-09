@@ -462,8 +462,8 @@
   "scoring_device_sell_success.tip": "所有相關物品已被回收，回收價爲%1$s",
   "scoring_device_no_item_to_sell.tip": "沒有能被回收的相關物品",
   "scoring_device_cannot_sell.tip": "這颱售貨機不能回收物品",
-  "scoring_device_kill_bonus.tip": "雪晶 +%1$s",
-  "scoring_device_death_punishment.tip": "雪晶 -%1$s",
+  "scoring_device_kill_bonus.tip": "等級+%1$s 雪晶 +%2$s",
+  "scoring_device_death_punishment.tip": "雪晶 %1$s",
   "scoring_device_tp_failed1_0.tip": "必須加入%1$s隊才能進入區域",
   "scoring_device_tp_failed1_1.tip": "進入區域不能攜帶【區域限製屬性與積分器綁定區域不同的物品】，包括沒有區域限製的物品，請檢查背包",
   "scoring_device_tp_failed2.tip": "隻有在區域內才能傳送",
@@ -477,6 +477,9 @@
   "region_controller_enter.tip": "<%1$s> 進入區域",
   "region_controller_strength.tip": "強度指數：%1$s",
   "region_controller_no_team_tip": "你必須加入一個隊伍以進入該區域",
+  "weapon.tip": "武器",
+  "snowball.tip": "雪球",
+  "core.tip": "核心",
 
   "block.bsf.smart_snow_block": "智慧雪塊",
   "block.bsf.loose_snow_block": "鬆散雪塊",
@@ -490,10 +493,6 @@
   "enchantment.bsf.kinetic_energy_storage": "動能儲存",
   "enchantment.bsf.snow_golem_exclusive": "雪傀儡專屬",
   "enchantment.bsf.floating_shooting": "漂浮射擊",
-
-  "gui_text_weapon": "武器",
-  "gui_text_snowball": "雪球",
-  "gui_text_core": "核心",
 
   "gui.bsf.block_of_spawn_points": "刷新點方塊",
   "gui.bsf.player_multiplier": "玩家乘數",
@@ -510,5 +509,6 @@
   "gui.bsf.minimum_rank": "最低等級",
   "gui.bsf.price": "價格",
   "gui.bsf.allow_refunds": "允許退款",
-  "gui.bsf.rank": "等級"
+  "gui.bsf.rank": "等級",
+  "gui.bsf.money": "金錢"
 }

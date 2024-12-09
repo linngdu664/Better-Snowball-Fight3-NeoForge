@@ -2,8 +2,8 @@ package com.linngdu664.bsf.item.tool;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
-import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
+import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.EffectRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
@@ -114,9 +114,9 @@ public class BasinItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("basin0.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("basin1.tooltip", null, new Object[0])).withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(MutableComponent.create(new TranslatableContents("basin2.tooltip", null, new Object[]{Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()})).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(Component.translatable("basin0.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("basin1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("basin2.tooltip", Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     /**

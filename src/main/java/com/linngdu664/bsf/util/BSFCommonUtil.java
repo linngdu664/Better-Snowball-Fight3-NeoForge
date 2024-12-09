@@ -1,10 +1,8 @@
 package com.linngdu664.bsf.util;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -217,18 +215,6 @@ public class BSFCommonUtil {
         return Math.atan2(vec.y, Math.sqrt(vec.x * vec.x + vec.z * vec.z));
     }
 
-    public static String getTransStr(String transKey, Object... args) {
-        return Component.translatable(transKey, args).getString();
-    }
-
-    public static Component getTransCp(String transKey, ChatFormatting format, Object... args) {
-        return Component.translatable(transKey, args).withStyle(format);
-    }
-
-    public static void addTrans(List<Component> pTooltipComponents, String transKey, ChatFormatting format, Object... args) {
-        pTooltipComponents.add(getTransCp(transKey, format, args));
-    }
-
     public static List<ItemStack> findInventoryItemStacks(Player player, Predicate<ItemStack> filter) {
         NonNullList<ItemStack>[] playerInventoryList = getPlayerInventoryList(player);
         List<ItemStack> outItemStacks = new ArrayList<>();
@@ -257,18 +243,5 @@ public class BSFCommonUtil {
     private static NonNullList<ItemStack>[] getPlayerInventoryList(Player player) {
         Inventory inventory = player.getInventory();
         return new NonNullList[]{inventory.items, inventory.armor, inventory.offhand};
-    }
-
-    public static class TipBuilder {
-        public List<Component> tooltipComponents;
-
-        public TipBuilder(List<Component> tooltipComponents) {
-            this.tooltipComponents = tooltipComponents;
-        }
-
-        public TipBuilder add(String transKey, ChatFormatting format, Object... args) {
-            BSFCommonUtil.addTrans(this.tooltipComponents, transKey, format, args);
-            return this;
-        }
     }
 }

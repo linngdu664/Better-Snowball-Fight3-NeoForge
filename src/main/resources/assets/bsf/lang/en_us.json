@@ -462,8 +462,8 @@
   "scoring_device_sell_success.tip": "All related items have been recycled and the recycling price is %1$s.",
   "scoring_device_no_item_to_sell.tip": "There are no relevant items that can be recycled.",
   "scoring_device_cannot_sell.tip": "This machine can't recycle items.",
-  "scoring_device_kill_bonus.tip": "Snow Crystals +%1$s",
-  "scoring_device_death_punishment.tip": "Snow Crystals -%1$s",
+  "scoring_device_kill_bonus.tip": "Rank +%1$s Snow Crystals +%2$s",
+  "scoring_device_death_punishment.tip": "Snow Crystals %1$s",
   "scoring_device_tp_failed1_0.tip": "You must join %1$s team before entering the region",
   "scoring_device_tp_failed1_1.tip": "You cannot bring [items with region restriction attributes different from the integrator binding region] into the region, including items without region restrictions, please check your backpack",
   "scoring_device_tp_failed2.tip": "You can only teleport within the region.",
@@ -477,6 +477,9 @@
   "region_controller_enter.tip": "<%1$s> Enter region",
   "region_controller_strength.tip": "Current Strength: %1$s",
   "region_controller_no_team_tip": "You must join a team to enter this region.",
+  "weapon.tip": "Weapon",
+  "snowball.tip": "Snowball",
+  "core.tip": "Core",
 
   "block.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.loose_snow_block": "Loose Snow Block",
@@ -490,10 +493,6 @@
   "enchantment.bsf.kinetic_energy_storage": "Kinetic Energy Storage",
   "enchantment.bsf.snow_golem_exclusive": "Snow Golem Exclusive",
   "enchantment.bsf.floating_shooting": "Floating Shot",
-
-  "gui_text_weapon": "Weapon",
-  "gui_text_snowball": "Snowball",
-  "gui_text_core": "Core",
 
   "gui.bsf.block_of_spawn_points": "Block of Spawns",
   "gui.bsf.player_multiplier": "Player Multiplier",
@@ -510,5 +509,6 @@
   "gui.bsf.minimum_rank": "Minimum Rank",
   "gui.bsf.price": "Price",
   "gui.bsf.allow_refunds": "Allow Refunds",
-  "gui.bsf.rank": "Rank"
+  "gui.bsf.rank": "Rank",
+  "gui.bsf.money": "Money"
 }
