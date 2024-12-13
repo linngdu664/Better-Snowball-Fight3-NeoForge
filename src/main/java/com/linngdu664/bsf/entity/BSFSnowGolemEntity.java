@@ -107,7 +107,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private double shootY;
     private double shootZ;
     private int rank;   // 等级，配合积分器使用
-    private int money;  // todo 金钱，配合积分器使用
+    private int money;  // 金钱，配合积分器使用
     private boolean dropEquipment;
     private boolean dropSnowball;
     private RegionData aliveRange;
@@ -630,7 +630,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         Level level = level();
         ItemStack weapon = getWeapon();
         ItemStack ammo = getAmmo();
-//        CompoundTag compoundTag = ammo.getOrCreateTag();
         AbstractBSFWeaponItem weaponItem = (AbstractBSFWeaponItem) weapon.getItem();
         if (!ammo.has(DataComponentRegister.AMMO_ITEM) || (((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getTypeFlag() & weaponItem.getTypeFlag()) == 0) {
             return;

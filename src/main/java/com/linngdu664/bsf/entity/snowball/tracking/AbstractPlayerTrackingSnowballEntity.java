@@ -30,32 +30,34 @@ public abstract class AbstractPlayerTrackingSnowballEntity extends AbstractTrack
     @Override
     public Entity getTarget() {
         Vec3 velocity = getDeltaMovement();
+        Vec3 selfPos = getPosition(1);
         Level level = level();
         Entity shooter = getOwner();
         AABB aabb = getBoundingBox().inflate(range);
         BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
         if (shooter instanceof Player player) {
-            List<Player> list = level.getEntitiesOfClass(Player.class, aabb, p -> !p.isSpectator() && !p.equals(shooter) && !savedData.isSameTeam(player, p) && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(getPosition(1))) > 0.5);
+            List<Player> list = level.getEntitiesOfClass(Player.class, aabb, p -> !p.isSpectator() && !p.equals(shooter) && !savedData.isSameTeam(player, p) && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(selfPos)) > 0.5);
             if (!list.isEmpty()) {
                 return level.getNearestEntity(list, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
             }
             List<BSFSnowGolemEntity> list1 = level.getEntitiesOfClass(BSFSnowGolemEntity.class, aabb, p -> {
+                Vec3 targetPos = p.getPosition(1);
                 if (p.getFixedTeamId() >= 0) {
                     if (savedData.getTeam(player.getUUID()) != p.getFixedTeamId()) {
-                        return BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(getPosition(1))) > 0.5;
+                        return BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
                     }
                     return false;
                 }
                 if (p.getOwner() == null) {
                     return true;
                 }
-                return !p.getOwner().equals(player) && !savedData.isSameTeam(player, p.getOwner()) && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(getPosition(1))) > 0.5;
+                return !p.getOwner().equals(player) && !savedData.isSameTeam(player, p.getOwner()) && BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
             });
             return level.getNearestEntity(list1, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
         }
         if (shooter instanceof BSFSnowGolemEntity snowGolem) {
             LivingEntity target = snowGolem.getTarget();
-            if (target != null && (target.getType().equals(EntityType.PLAYER) || target.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()))) {
+            if (target != null && (target.getType().equals(EntityType.PLAYER) || target.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get())) && BSFCommonUtil.vec3AngleCos(velocity, target.getPosition(1).subtract(selfPos)) > 0.5) {
                 return target;
             }
         }

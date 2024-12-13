@@ -48,7 +48,9 @@ public class RenderGuiEventHandler {
             GuiHandler.pickBlockEntityVendingMachine(guiGraphics, converter, blockEntity, mainHandItem, partialTick);
             GuiHandler.pickBlockEntityZoneController(guiGraphics, converter, blockEntity, partialTick);
         }
-        GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varObj);
+        if (!player.isSpectator()) {
+            GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varObj);
+        }
         GuiHandler.specialModeText(guiGraphics, varObj);
         guiGraphics.pose().popPose();
     }

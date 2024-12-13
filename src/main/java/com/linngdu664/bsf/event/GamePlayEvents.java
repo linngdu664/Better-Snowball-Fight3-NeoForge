@@ -128,8 +128,11 @@ public class GamePlayEvents {
         Entity targetEntity = event.getEntity();
         DamageSource damageSource = event.getSource();
         if (!targetEntity.level().isClientSide && damageSource.is(DamageTypes.THROWN) && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
-            BSFTeamSavedData savedData = targetEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             Entity killerEntity = damageSource.getEntity();
+            if (targetEntity.equals(killerEntity)) {
+                return;
+            }
+            BSFTeamSavedData savedData = targetEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             if (killerEntity instanceof Player killerPlayer && (targetEntity instanceof Player targetPlayer && savedData.isSameTeam(killerPlayer, targetPlayer) || targetEntity instanceof BSFSnowGolemEntity targetGolem && (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerPlayer.getUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerPlayer, targetGolem.getOwner())))
                     || killerEntity instanceof BSFSnowGolemEntity killerGolem && (targetEntity instanceof Player targetPlayer && (killerGolem.getFixedTeamId() >= 0 && savedData.getTeam(targetPlayer.getUUID()) == killerGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetPlayer))
                     || targetEntity instanceof BSFSnowGolemEntity targetGolem && (killerGolem.getFixedTeamId() >= 0 && (targetGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() == targetGolem.getFixedTeamId() || killerGolem.getFixedTeamId() == savedData.getTeam(targetGolem.getOwnerUUID())) || killerGolem.getFixedTeamId() < 0 && (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerGolem.getOwnerUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetGolem.getOwner()))))) {

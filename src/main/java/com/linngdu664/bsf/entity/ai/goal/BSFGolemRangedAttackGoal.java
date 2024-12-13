@@ -264,8 +264,8 @@ public class BSFGolemRangedAttackGoal extends Goal {
         BlockPos targetBlockPos = new BlockPos(BSFCommonUtil.vec3ToI(targetPos));
         for (int r = 4; r <= 10; r++) {
             float step = 1.0F / r;
-            for (float theta = 0; theta < Mth.PI * 0.25; theta += step) {
-                for (float phi = 0; phi < Mth.PI * 0.5; phi += step) {
+            for (float theta = 0; theta < Mth.PI * 0.25F; theta += step) {
+                for (float phi = 0; phi < Mth.PI * 0.5F; phi += step) {
                     int x = Mth.floor(targetX + r * Mth.cos(initTheta + theta) * Mth.cos(phi));
                     int y = Mth.floor(targetY + r * Mth.sin(phi));
                     int z = Mth.floor(targetZ + r * Mth.sin(initTheta + theta) * Mth.cos(phi));

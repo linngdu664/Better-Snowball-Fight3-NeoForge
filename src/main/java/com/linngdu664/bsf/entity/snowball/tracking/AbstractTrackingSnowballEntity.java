@@ -54,71 +54,83 @@ public abstract class AbstractTrackingSnowballEntity extends AbstractBSFSnowball
     protected void missilesTracking() {
         Vec3 velocity = getDeltaMovement();
         if (velocity.lengthSqr() < 0.25) {
+            // 速度过慢时失去跟踪
             setNoGravity(false);
-        } else if (target == null || !target.isAlive()) {
+            return;
+        }
+        if (target == null) {
+            // 没有目标时获取新目标
             target = getTarget();
             setNoGravity(false);
-        } else {
-            setNoGravity(true);
-            Vec3 delta;
-            if (isLockFeet) {
-                delta = target.getPosition(1).subtract(getPosition(1));
-            } else {
-                delta = target.getBoundingBox().getCenter().subtract(getPosition(1));
-            }
-            double cosTheta = BSFCommonUtil.vec2AngleCos(delta.x, delta.z, velocity.x, velocity.z);
-            if (cosTheta > 1) {
-                cosTheta = 1;
-            }
-            double sinTheta;
-            float maxTurningAngleCos = Mth.cos(7.1619724F * (float) velocity.length() * Mth.DEG_TO_RAD);
-            float maxTurningAngleSin = Mth.sin(7.1619724F * (float) velocity.length() * Mth.DEG_TO_RAD);
-            if (cosTheta < maxTurningAngleCos) {
-                cosTheta = maxTurningAngleCos;
-                sinTheta = maxTurningAngleSin;
-            } else {
-                sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
-            }
-            double vx, vz, vy;
-            double d0 = velocity.x * cosTheta - velocity.z * sinTheta;
-            double d1 = velocity.x * sinTheta + velocity.z * cosTheta;
-            double d2 = velocity.x * cosTheta + velocity.z * sinTheta;
-            double d3 = -velocity.x * sinTheta + velocity.z * cosTheta;
-            if (d0 * delta.x + d1 * delta.z > d2 * delta.x + d3 * delta.z) {
-                vx = d0;
-                vz = d1;
-            } else {
-                vx = d2;
-                vz = d3;
-            }
-            double vNewX = Math.sqrt(BSFCommonUtil.lengthSqr(vx, vz));
-            double deltaNewX = Math.sqrt(BSFCommonUtil.lengthSqr(delta.x, delta.z));
-            cosTheta = BSFCommonUtil.vec2AngleCos(vNewX, velocity.y, deltaNewX, delta.y);
-            if (cosTheta > 1) {
-                cosTheta = 1;
-            }
-            if (cosTheta < maxTurningAngleCos) {
-                cosTheta = maxTurningAngleCos;
-                sinTheta = maxTurningAngleSin;
-            } else {
-                sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
-            }
-            d0 = vNewX * cosTheta - velocity.y * sinTheta;
-            d1 = vNewX * sinTheta + velocity.y * cosTheta;
-            d2 = vNewX * cosTheta + velocity.y * sinTheta;
-            d3 = -vNewX * sinTheta + velocity.y * cosTheta;
-            double adjusted;
-            if (d0 * deltaNewX + d1 * delta.y > d2 * deltaNewX + d3 * delta.y) {
-                adjusted = d0;
-                vy = d1;
-            } else {
-                adjusted = d2;
-                vy = d3;
-            }
-            vx *= adjusted / vNewX;
-            vz *= adjusted / vNewX;
-            //Do not directly use "setDeltaMovement" because it will cause the lagging of texture. Use "push" may avoid this.
-            push(vx - velocity.x, vy - velocity.y, vz - velocity.z);
+            return;
         }
+        Vec3 targetPos = target.getPosition(1);
+        Vec3 selfPos = getPosition(1);
+        if (!target.isAlive() || BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) < 0.5) {
+            // 目标死了或偏角过大时获取新目标
+            target = getTarget();
+            setNoGravity(false);
+            return;
+        }
+        setNoGravity(true);
+        Vec3 delta;
+        if (isLockFeet) {
+            delta = targetPos.subtract(selfPos);
+        } else {
+            delta = target.getBoundingBox().getCenter().subtract(selfPos);
+        }
+        double cosTheta = BSFCommonUtil.vec2AngleCos(delta.x, delta.z, velocity.x, velocity.z);
+        if (cosTheta > 1) {
+            cosTheta = 1;
+        }
+        double sinTheta;
+        float maxTurningAngleCos = Mth.cos(7.1619724F * (float) velocity.length() * Mth.DEG_TO_RAD);
+        float maxTurningAngleSin = Mth.sin(7.1619724F * (float) velocity.length() * Mth.DEG_TO_RAD);
+        if (cosTheta < maxTurningAngleCos) {
+            cosTheta = maxTurningAngleCos;
+            sinTheta = maxTurningAngleSin;
+        } else {
+            sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
+        }
+        double vx, vz, vy;
+        double d0 = velocity.x * cosTheta - velocity.z * sinTheta;
+        double d1 = velocity.x * sinTheta + velocity.z * cosTheta;
+        double d2 = velocity.x * cosTheta + velocity.z * sinTheta;
+        double d3 = -velocity.x * sinTheta + velocity.z * cosTheta;
+        if (d0 * delta.x + d1 * delta.z > d2 * delta.x + d3 * delta.z) {
+            vx = d0;
+            vz = d1;
+        } else {
+            vx = d2;
+            vz = d3;
+        }
+        double vNewX = Math.sqrt(BSFCommonUtil.lengthSqr(vx, vz));
+        double deltaNewX = Math.sqrt(BSFCommonUtil.lengthSqr(delta.x, delta.z));
+        cosTheta = BSFCommonUtil.vec2AngleCos(vNewX, velocity.y, deltaNewX, delta.y);
+        if (cosTheta > 1) {
+            cosTheta = 1;
+        }
+        if (cosTheta < maxTurningAngleCos) {
+            cosTheta = maxTurningAngleCos;
+            sinTheta = maxTurningAngleSin;
+        } else {
+            sinTheta = Math.sqrt(1 - cosTheta * cosTheta);
+        }
+        d0 = vNewX * cosTheta - velocity.y * sinTheta;
+        d1 = vNewX * sinTheta + velocity.y * cosTheta;
+        d2 = vNewX * cosTheta + velocity.y * sinTheta;
+        d3 = -vNewX * sinTheta + velocity.y * cosTheta;
+        double adjusted;
+        if (d0 * deltaNewX + d1 * delta.y > d2 * deltaNewX + d3 * delta.y) {
+            adjusted = d0;
+            vy = d1;
+        } else {
+            adjusted = d2;
+            vy = d3;
+        }
+        vx *= adjusted / vNewX;
+        vz *= adjusted / vNewX;
+        //Do not directly use "setDeltaMovement" because it will cause the lagging of texture. Use "push" may avoid this.
+        push(vx - velocity.x, vy - velocity.y, vz - velocity.z);
     }
 }

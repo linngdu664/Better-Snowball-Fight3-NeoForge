@@ -2,8 +2,7 @@ package com.linngdu664.bsf.entity;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -91,7 +90,7 @@ public class BSFDummyEntity extends Mob {
                 entityData.set(DPS, sum);
                 damage = 0F;
             }
-            setCustomName(MutableComponent.create(new PlainTextContents.LiteralContents(String.format(getDPS() < 10 ? "DPS: %.2f" : "DPS: %.3g", getDPS()))));
+            setCustomName(Component.literal(String.format(getDPS() < 10 ? "DPS: %.2f" : "DPS: %.3g", getDPS())));
         }
     }
 
@@ -112,7 +111,8 @@ public class BSFDummyEntity extends Mob {
     }
 
     @Override
-    public void checkDespawn() {
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false;
     }
 
     public float getDPS() {
