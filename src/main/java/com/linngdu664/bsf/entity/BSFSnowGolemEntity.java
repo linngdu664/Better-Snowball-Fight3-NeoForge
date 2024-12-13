@@ -33,6 +33,7 @@ import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -64,6 +65,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
@@ -634,7 +636,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         if (!ammo.has(DataComponentRegister.AMMO_ITEM) || (((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getTypeFlag() & weaponItem.getTypeFlag()) == 0) {
             return;
         }
-        float damageChance = 1.0F / (1.0F + EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.UNBREAKING), weapon));
         ILaunchAdjustment launchAdjustment = weaponItem.getLaunchAdjustment(1, ammo.getItem());
         int j = weapon.getItem() instanceof SnowballShotgunItem ? 4 : 1;
         for (int i = 0; i < j; i++) {
@@ -644,7 +645,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
             AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment, aliveRange);
             snowball.shoot(shootX, shootY, shootZ, launchVelocity, launchAccuracy);
             level.addFreshEntity(snowball);
-            if (!getEnhance() && getOwner() != null) {
+            if (!ammo.has(DataComponents.UNBREAKABLE) && !getEnhance() && getOwner() != null) {
                 ammo.setDamageValue(ammo.getDamageValue() + 1);
                 if (ammo.getDamageValue() == ammo.getMaxDamage()) {
                     ItemStack empty;
@@ -664,7 +665,8 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 }
                 PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(getEyePosition(), new Vec3(shootX, shootY, shootZ), 4.5F, aStep, 1.5F, 0.1F), BSFParticleType.SNOWFLAKE.ordinal()));
                 playSound(j == 4 ? SoundRegister.SHOTGUN_FIRE_2.get() : SoundRegister.SNOWBALL_CANNON_SHOOT.get(), 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                if (getRandom().nextFloat() <= damageChance && !getEnhance()) {
+                float damageChance = 1.0F / (1.0F + EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.UNBREAKING), weapon));
+                if (!weapon.has(DataComponents.UNBREAKABLE) && !getEnhance() && getRandom().nextFloat() <= damageChance) {
                     weapon.setDamageValue(weapon.getDamageValue() + 1);
                     if (weapon.getDamageValue() == 256) {
                         setWeapon(ItemStack.EMPTY);
