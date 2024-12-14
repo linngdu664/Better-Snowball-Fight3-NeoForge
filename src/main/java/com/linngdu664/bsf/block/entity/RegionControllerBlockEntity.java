@@ -103,11 +103,11 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 List<ItemStack> scoringDevices = BSFCommonUtil.findInventoryItemStacks(player, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()));
                 if (playerTeamId != be.teamId) {
                     for (ItemStack scoringDevice : scoringDevices) {
-                        enemyPlayerStrength += RegionControllerBlockEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK, 0));
+                        enemyPlayerStrength += scoringDevice.getOrDefault(DataComponentRegister.RANK, 0);
                     }
                 } else {
                     for (ItemStack scoringDevice : scoringDevices) {
-                        friendlyPlayerStrength += RegionControllerBlockEntity.lnRank(scoringDevice.getOrDefault(DataComponentRegister.RANK, 0));
+                        friendlyPlayerStrength += scoringDevice.getOrDefault(DataComponentRegister.RANK, 0);
                     }
                     // 扫描自己队伍的背包，把偷渡的东西全部清了
                     List<ItemStack> bannedItems = BSFCommonUtil.findInventoryItemStacks(player, p -> !be.region.equals(p.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY)));
@@ -117,6 +117,8 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 }
             }
         }
+        enemyPlayerStrength = Mth.sqrt(enemyPlayerStrength);
+        friendlyPlayerStrength = Mth.sqrt(friendlyPlayerStrength);
         be.currentStrength = be.golemMultiplier * (enemyGolemStrength / be.enemyTeamNum - friendlyGolemStrength) + be.playerMultiplier * (enemyPlayerStrength / be.enemyTeamNum - friendlyPlayerStrength);
         level.sendBlockUpdated(pos, state, state, 2);       // 强度同步到客户端
 
