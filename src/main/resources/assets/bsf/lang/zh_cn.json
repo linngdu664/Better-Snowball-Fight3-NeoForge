@@ -510,5 +510,6 @@
   "gui.bsf.price": "价格",
   "gui.bsf.allow_refunds": "允许退款",
   "gui.bsf.rank": "等级",
-  "gui.bsf.money": "金钱"
+  "gui.bsf.money": "金钱",
+  "gui.bsf.lifespan": "寿命"
 }

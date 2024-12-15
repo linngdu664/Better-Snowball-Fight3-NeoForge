@@ -510,5 +510,6 @@
   "gui.bsf.price": "Price",
   "gui.bsf.allow_refunds": "Allow Refunds",
   "gui.bsf.rank": "Rank",
-  "gui.bsf.money": "Money"
+  "gui.bsf.money": "Money",
+  "gui.bsf.lifespan": "Lifespan"
 }

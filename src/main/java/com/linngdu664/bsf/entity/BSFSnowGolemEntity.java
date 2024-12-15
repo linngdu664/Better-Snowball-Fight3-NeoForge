@@ -65,10 +65,8 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -88,6 +86,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 // I call this "shit mountain".
+// todo TeaCon后重构，受不了了
 public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob {
     public static final int STYLE_NUM = 9;
     private static final EntityDataAccessor<ItemStack> WEAPON = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
@@ -110,6 +109,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     private double shootZ;
     private int rank;   // 等级，配合积分器使用
     private int money;  // 金钱，配合积分器使用
+    private int lifespan;   // boss寿命
     private boolean dropEquipment;
     private boolean dropSnowball;
     private RegionData aliveRange;
@@ -167,6 +167,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         pCompound.putByte("FixedTeamId", getFixedTeamId());
         pCompound.putInt("Rank", rank);
         pCompound.putInt("Money", money);
+        pCompound.putInt("Lifespan", lifespan);
         if (aliveRange != null) {
             aliveRange.saveToCompoundTag("AliveRange", pCompound);
         }
@@ -193,6 +194,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         setFixedTeamId(pCompound.getByte("FixedTeamId"));
         rank = pCompound.getInt("Rank");
         money = pCompound.getInt("Money");
+        lifespan = pCompound.getInt("Lifespan");
         aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
         if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
             setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
@@ -333,6 +335,10 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
 
     public void setMoney(int money) {
         this.money = money;
+    }
+
+    public void setLifespan(int lifespan) {
+        this.lifespan = lifespan;
     }
 
     public void setAliveRange(RegionData region) {
@@ -507,7 +513,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 pPlayer.getInventory().placeItemBackInInventory(getCore(), true);
                 setCore(ItemStack.EMPTY);
             } else if (item.equals(Items.BLAZE_ROD) && pPlayer.getAbilities().instabuild) {
-                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new ShowGolemRankScreenPayload(getId(), getRank(), getMoney()));
+                PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new ShowGolemRankScreenPayload(getId(), rank, money, lifespan));
             }
         }
         return InteractionResult.SUCCESS;
@@ -550,14 +556,12 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     public void tick() {
         Level level = level();
         if (!level.isClientSide) {
-            if (aliveRange != null && !aliveRange.inRegion(position())) {
-                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
-            }
             setTicksFrozen(0);
+            int coreCooldown = getCoreCoolDown();
             if (getEnhance()) {
                 heal(1);
                 addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 2, 3));
-                if (getCoreCoolDown() > 0) {
+                if (coreCooldown > 0) {
                     setCoreCoolDown(Math.max(getCoreCoolDown() - 5, 0));
                 }
             }
@@ -567,16 +571,16 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
             if (getWeaponAng() > 0) {
                 setWeaponAng(getWeaponAng() - 60);
             }
-            Item item = getCore().getItem();
-            if (item.equals(ItemRegister.SWIFTNESS_GOLEM_CORE.get())) {
+            Item core = getCore().getItem();
+            if (core.equals(ItemRegister.SWIFTNESS_GOLEM_CORE.get())) {
                 addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 2, 0));
             }
-            if (getCoreCoolDown() > 0) {
-                setCoreCoolDown(getCoreCoolDown() - 1);
-            } else if (getCoreCoolDown() == 0) {
-                if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
+            if (coreCooldown > 0) {
+                setCoreCoolDown(coreCooldown - 1);
+            } else if (coreCooldown == 0) {
+                if (core.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
                     this.heal(0.05f);
-                } else if (item.equals(ItemRegister.REPULSIVE_FIELD_GOLEM_CORE.get()) && getTarget() != null) {
+                } else if (core.equals(ItemRegister.REPULSIVE_FIELD_GOLEM_CORE.get()) && getTarget() != null) {
                     LivingEntity target = getTarget();
                     List<Projectile> list1 = level.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(3), p -> !this.equals(p.getOwner()) && BSFCommonUtil.vec3AngleCos(getTarget().getPosition(0).subtract(getPosition(0)), p.getPosition(0).subtract(getPosition(0))) > 0);
                     List<Projectile> list = level.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(5), p -> !this.equals(p.getOwner()) && BSFCommonUtil.vec3AngleCos(getTarget().getPosition(0).subtract(getPosition(0)), p.getPosition(0).subtract(getPosition(0))) > 0);
@@ -604,6 +608,9 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
                 entityData.set(TARGET_NAME, Optional.empty());
             } else {
                 entityData.set(TARGET_NAME, Optional.of(target.getName()));
+            }
+            if (isAlive() && (aliveRange != null && !aliveRange.inRegion(position()) || getFixedTeamId() >= 0 && lifespan > 0 && --lifespan == 0)) {
+                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
             }
         }
         super.tick();
@@ -679,24 +686,22 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     @Override
-    public void die(@NotNull DamageSource pCause) {
-        super.die(pCause);
-        if (level().getGameRules().getBoolean(GameRules.RULE_DOMOBLOOT)) {
-            if (dropEquipment) {
-                int weaponVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getWeapon());
-                int ammoVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getAmmo());
-                int snowGolemExclusive = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), getWeapon());
-                if (weaponVanish <= 0 && snowGolemExclusive <= 0) {
-                    spawnAtLocation(getWeapon());
-                }
-                if (ammoVanish <= 0) {
-                    spawnAtLocation(getAmmo());
-                }
-                spawnAtLocation(getCore());
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
+        // 永远不会掉隐藏的护甲了，同时已经判断掉落gamerule了
+        if (dropEquipment) {
+            int weaponVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getWeapon());
+            int ammoVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getAmmo());
+            int snowGolemExclusive = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), getWeapon());
+            if (weaponVanish <= 0 && snowGolemExclusive <= 0) {
+                spawnAtLocation(getWeapon());
             }
-            if (dropSnowball) {
-                spawnAtLocation(new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
+            if (ammoVanish <= 0) {
+                spawnAtLocation(getAmmo());
             }
+            spawnAtLocation(getCore());
+        }
+        if (dropSnowball) {
+            spawnAtLocation(new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
         }
     }
 
