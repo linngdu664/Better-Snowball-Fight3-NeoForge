@@ -1,7 +1,7 @@
 package com.linngdu664.bsf.client.renderer.entity.layers;
 
 import com.linngdu664.bsf.client.model.BSFSnowGolemModel;
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -15,13 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 
-public class BSFSnowGolemHoldItemLayer extends RenderLayer<BSFSnowGolemEntity, BSFSnowGolemModel<BSFSnowGolemEntity>> {
-    public BSFSnowGolemHoldItemLayer(RenderLayerParent<BSFSnowGolemEntity, BSFSnowGolemModel<BSFSnowGolemEntity>> pRenderer) {
+public class BSFSnowGolemHoldItemLayer extends RenderLayer<AbstractBSFSnowGolemEntity, BSFSnowGolemModel<AbstractBSFSnowGolemEntity>> {
+    public BSFSnowGolemHoldItemLayer(RenderLayerParent<AbstractBSFSnowGolemEntity, BSFSnowGolemModel<AbstractBSFSnowGolemEntity>> pRenderer) {
         super(pRenderer);
     }
 
     @Override
-    public void render(@NotNull PoseStack pMatrixStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, BSFSnowGolemEntity pLivingEntity, float pLimbSwing, float pLimbSwingAmount, float pPartialTicks, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
+    public void render(@NotNull PoseStack pMatrixStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, AbstractBSFSnowGolemEntity pLivingEntity, float pLimbSwing, float pLimbSwingAmount, float pPartialTicks, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
         ItemStack itemstack = pLivingEntity.getWeapon();
         ItemInHandRenderer itemInHandRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer();
         if (!itemstack.isEmpty()) {

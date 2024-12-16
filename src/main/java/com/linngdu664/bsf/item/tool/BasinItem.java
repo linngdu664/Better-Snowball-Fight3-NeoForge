@@ -1,6 +1,6 @@
 package com.linngdu664.bsf.item.tool;
 
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
@@ -180,7 +180,7 @@ public class BasinItem extends Item {
 
     private void addEffectsToLivingEntities(List<LivingEntity> list, Player pPlayer, Level pLevel, Function<Float, Integer> tFunc, Function<Float, Integer> ampFunc, int jamTime) {
         for (LivingEntity livingEntity : list) {
-            if (!(livingEntity instanceof BSFSnowGolemEntity) && !(livingEntity instanceof SnowGolem)) {
+            if (!(livingEntity instanceof AbstractBSFSnowGolemEntity) && !(livingEntity instanceof SnowGolem)) {
                 float r = pPlayer.distanceTo(livingEntity);
                 int t = tFunc.apply(r);
                 int amp = ampFunc.apply(r);

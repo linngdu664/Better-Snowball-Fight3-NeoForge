@@ -3,7 +3,7 @@ package com.linngdu664.bsf.client.model;// Made with Blockbench 4.4.1
 // Paste this class into your mod and generate all required imports
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class BSFSnowGolemModel<T extends BSFSnowGolemEntity> extends EntityModel<T> {
+public class BSFSnowGolemModel<T extends AbstractBSFSnowGolemEntity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("bsf_snow_golem"), "main");
     private final ModelPart middle;
@@ -78,7 +78,7 @@ public class BSFSnowGolemModel<T extends BSFSnowGolemEntity> extends EntityModel
     }
 
     @Override
-    public void setupAnim(BSFSnowGolemEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(AbstractBSFSnowGolemEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.up.yRot = netHeadYaw * Mth.DEG_TO_RAD;
         this.up.xRot = headPitch * Mth.DEG_TO_RAD;
         this.middle.yRot = netHeadYaw * Mth.DEG_TO_RAD * 0.25F;

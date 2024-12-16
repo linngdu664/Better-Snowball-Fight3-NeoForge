@@ -1,9 +1,10 @@
 package com.linngdu664.bsf.entity.snowball.tracking;
 
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
-import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -40,24 +41,25 @@ public abstract class AbstractPlayerTrackingSnowballEntity extends AbstractTrack
             if (!list.isEmpty()) {
                 return level.getNearestEntity(list, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
             }
-            List<BSFSnowGolemEntity> list1 = level.getEntitiesOfClass(BSFSnowGolemEntity.class, aabb, p -> {
+            List<AbstractBSFSnowGolemEntity> list1 = level.getEntitiesOfClass(AbstractBSFSnowGolemEntity.class, aabb, p -> {
                 Vec3 targetPos = p.getPosition(1);
-                if (p.getFixedTeamId() >= 0) {
-                    if (savedData.getTeam(player.getUUID()) != p.getFixedTeamId()) {
+                if (p instanceof RegionControllerSnowGolemEntity golem) {
+                    if (savedData.getTeam(player.getUUID()) != golem.getFixedTeamId()) {
                         return BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
                     }
                     return false;
                 }
-                if (p.getOwner() == null) {
+                BSFSnowGolemEntity golem = (BSFSnowGolemEntity) p;
+                if (golem.getOwner() == null) {
                     return true;
                 }
-                return !p.getOwner().equals(player) && !savedData.isSameTeam(player, p.getOwner()) && BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
+                return !golem.getOwner().equals(player) && !savedData.isSameTeam(player, golem.getOwner()) && BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
             });
             return level.getNearestEntity(list1, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
         }
-        if (shooter instanceof BSFSnowGolemEntity snowGolem) {
+        if (shooter instanceof AbstractBSFSnowGolemEntity snowGolem) {
             LivingEntity target = snowGolem.getTarget();
-            if (target != null && (target.getType().equals(EntityType.PLAYER) || target.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get())) && BSFCommonUtil.vec3AngleCos(velocity, target.getPosition(1).subtract(selfPos)) > 0.5) {
+            if (target != null && (target.getType().equals(EntityType.PLAYER) || target instanceof AbstractBSFSnowGolemEntity) && BSFCommonUtil.vec3AngleCos(velocity, target.getPosition(1).subtract(selfPos)) > 0.5) {
                 return target;
             }
         }

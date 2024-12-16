@@ -5,6 +5,7 @@ import com.linngdu664.bsf.client.renderer.block.VendingMachineEntityRenderer;
 import com.linngdu664.bsf.client.renderer.entity.*;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
 import com.linngdu664.bsf.entity.executor.*;
 import com.linngdu664.bsf.entity.snowball.force.MonsterGravitySnowballEntity;
 import com.linngdu664.bsf.entity.snowball.force.MonsterRepulsionSnowballEntity;
@@ -33,6 +34,10 @@ public class EntityRegister {
             ENTITY_TYPES.register("bsf_snow_golem", () -> EntityType.Builder.of(BSFSnowGolemEntity::new, MobCategory.MISC)
                     .sized(0.7F, 1.9F).clientTrackingRange(8).immuneTo(Blocks.POWDER_SNOW)
                     .build(Main.makeResLoc("bsf_snow_golem").toString()));
+    public static final DeferredHolder<EntityType<?>, EntityType<RegionControllerSnowGolemEntity>> REGION_CONTROLLER_SNOW_GOLEM =
+            ENTITY_TYPES.register("region_controller_snow_golem", () -> EntityType.Builder.of(RegionControllerSnowGolemEntity::new, MobCategory.MISC)
+                    .sized(0.7F, 1.9F).clientTrackingRange(8).immuneTo(Blocks.POWDER_SNOW)
+                    .build(Main.makeResLoc("region_controller_snow_golem").toString()));
     public static final DeferredHolder<EntityType<?>, EntityType<BSFDummyEntity>> BSF_DUMMY =
             ENTITY_TYPES.register("bsf_dummy", () -> EntityType.Builder.of(BSFDummyEntity::new, MobCategory.MISC)
                     .sized(0.7F, 1.9F).clientTrackingRange(8).build(Main.makeResLoc("bsf_dummy").toString()));
@@ -96,6 +101,7 @@ public class EntityRegister {
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(BSF_SNOW_GOLEM.get(), BSFSnowGolemRenderer::new);
+            event.registerEntityRenderer(REGION_CONTROLLER_SNOW_GOLEM.get(), BSFSnowGolemRenderer::new);
             event.registerEntityRenderer(BSF_DUMMY.get(), BSFDummyRenderer::new);
             event.registerEntityRenderer(MONSTER_GRAVITY_EXECUTOR.get(), pContext -> new FixedForceExecutorRenderer(pContext, FixedForceExecutorLayerType.MONSTER_GRAVITY));
             event.registerEntityRenderer(MONSTER_REPULSION_EXECUTOR.get(), pContext -> new FixedForceExecutorRenderer(pContext, FixedForceExecutorLayerType.MONSTER_REPULSION));
@@ -147,6 +153,7 @@ public class EntityRegister {
         @SubscribeEvent
         public static void onCreateEntityAttribute(EntityAttributeCreationEvent event) {
             event.put(BSF_SNOW_GOLEM.get(), TamableAnimal.createLivingAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.FOLLOW_RANGE, 100.0).add(Attributes.MOVEMENT_SPEED, 0.3).build());
+            event.put(REGION_CONTROLLER_SNOW_GOLEM.get(), TamableAnimal.createLivingAttributes().add(Attributes.MAX_HEALTH, 15.0).add(Attributes.FOLLOW_RANGE, 100.0).add(Attributes.MOVEMENT_SPEED, 0.3).build());
             event.put(BSF_DUMMY.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH, Float.MAX_VALUE).add(Attributes.FOLLOW_RANGE, 100.0).add(Attributes.MOVEMENT_SPEED, 0).add(Attributes.KNOCKBACK_RESISTANCE, Double.MAX_VALUE).build());
         }
     }

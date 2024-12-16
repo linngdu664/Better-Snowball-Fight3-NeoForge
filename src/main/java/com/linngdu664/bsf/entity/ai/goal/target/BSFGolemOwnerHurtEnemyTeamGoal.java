@@ -13,14 +13,14 @@ public class BSFGolemOwnerHurtEnemyTeamGoal extends TargetGoal {
     private int timestamp;
 
     public BSFGolemOwnerHurtEnemyTeamGoal(BSFSnowGolemEntity snowGolem) {
-        super(snowGolem, false);
+        super(snowGolem, true);
         this.snowGolem = snowGolem;
         this.setFlags(EnumSet.of(Flag.TARGET));
     }
 
     public boolean canUse() {
         LivingEntity owner = snowGolem.getOwner();
-        if (!snowGolem.isTame() || snowGolem.isOrderedToSit() || owner == null) {
+        if (snowGolem.isOrderedToSit() || owner == null) {
             return false;
         }
         ownerLastHurt = owner.getLastHurtMob();

@@ -177,6 +177,7 @@
   "item.bsf.region_tool": "選區工具",
 
   "entity.bsf.bsf_snow_golem": "高級雪傀儡",
+  "entity.bsf.region_controller_snow_golem": "高級雪傀儡",
   "entity.bsf.monster_gravity_executor": "怪物引力場髮生器",
   "entity.bsf.monster_repulsion_executor": "怪物斥力場髮生器",
   "entity.bsf.projectile_gravity_executor": "射彈引力場髮生器",

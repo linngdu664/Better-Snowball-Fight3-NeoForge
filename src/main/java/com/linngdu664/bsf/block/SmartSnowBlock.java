@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
@@ -56,13 +57,10 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
                     pLevel.levelEvent(2001, blockInWorld.getPos(), Block.getId(blockInWorld.getState()));
                 }
                 BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(pLevel);
-                snowGolem.setTame(true, false);
                 snowGolem.setOwnerUUID(player.getUUID());
                 snowGolem.setOrderedToSit(true);
-                snowGolem.setDropEquipment(true);
-                snowGolem.setDropSnowball(true);
                 snowGolem.setAliveRange(pStack.get(DataComponentRegister.REGION));
-                snowGolem.setStyle((byte) (pLevel.getRandom().nextInt(0, BSFSnowGolemEntity.STYLE_NUM)));
+                snowGolem.setStyle((byte) (pLevel.getRandom().nextInt(0, AbstractBSFSnowGolemEntity.STYLE_NUM)));
                 BlockPos blockPos = blockPatternMatch.getBlock(0, 2, 0).getPos();
                 snowGolem.moveTo(blockPos.getX() + 0.5D, blockPos.getY() + 0.05D, blockPos.getZ() + 0.5D, 0.0F, 0.0F);
                 pLevel.addFreshEntity(snowGolem);

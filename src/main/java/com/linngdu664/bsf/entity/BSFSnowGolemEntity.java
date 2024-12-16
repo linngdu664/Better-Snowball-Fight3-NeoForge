@@ -1,9 +1,6 @@
 package com.linngdu664.bsf.entity;
 
-import com.linngdu664.bsf.entity.ai.goal.BSFGolemFollowOwnerGoal;
-import com.linngdu664.bsf.entity.ai.goal.BSFGolemRandomStrollGoal;
-import com.linngdu664.bsf.entity.ai.goal.BSFGolemRangedAttackGoal;
-import com.linngdu664.bsf.entity.ai.goal.BSFGolemTargetNearGoal;
+import com.linngdu664.bsf.entity.ai.goal.*;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemHurtByTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemNearsetAttackableTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemOwnerHurtByTargetGoal;
@@ -11,7 +8,6 @@ import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemOwnerHurtEnemyTeamGoal;
 import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.ItemData;
-import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
@@ -29,10 +25,10 @@ import com.linngdu664.bsf.network.to_client.ShowGolemRankScreenPayload;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
-import com.linngdu664.bsf.registry.*;
-import com.linngdu664.bsf.util.BSFCommonUtil;
+import com.linngdu664.bsf.registry.DataComponentRegister;
+import com.linngdu664.bsf.registry.ItemRegister;
+import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -44,22 +40,20 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BiomeTags;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
-import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
@@ -68,86 +62,43 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-// I call this "shit mountain".
-// todo TeaCon后重构，受不了了
-public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob {
-    public static final int STYLE_NUM = 9;
-    private static final EntityDataAccessor<ItemStack> WEAPON = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<ItemStack> AMMO = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<ItemStack> CORE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<Integer> WEAPON_ANG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Byte> STYLE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
+public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements OwnableEntity {
+    private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Byte> STATUS_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Byte> LOCATOR_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> POTION_SICKNESS = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> CORE_COOL_DOWN = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Optional<Component>> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
-    private static final EntityDataAccessor<Byte> FIXED_TEAM_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);     // 当此属性不为-1时，为固定队伍，owner无效
-    // server only
-    private float launchVelocity;
-    private float launchAccuracy;
-    private double shootX;
-    private double shootY;
-    private double shootZ;
-    private int rank;   // 等级，配合积分器使用
-    private int money;  // 金钱，配合积分器使用
-    private int lifespan;   // boss寿命
-    private boolean dropEquipment;
-    private boolean dropSnowball;
-    private RegionData aliveRange;
-    /*
-     status flag:
-     0: standby
-     1: follow
-     2: follow & attack
-     3: patrol & attack
-     4: turret
+    protected static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
-     locator flag:
-     0: monster
-     1: target locator
-     2: enemy player & enemy ownable
-     3: all
-     */
+    private boolean orderedToSit;
 
-    public BSFSnowGolemEntity(EntityType<? extends TamableAnimal> p_21803_, Level p_21804_) {
-        super(p_21803_, p_21804_);
-        this.setPathfindingMalus(PathType.WATER, -1.0F);
+    public BSFSnowGolemEntity(EntityType<? extends AbstractBSFSnowGolemEntity> entityType, Level level) {
+        super(entityType, level);
+        setDropEquipment(true);
+        setDropSnowball(true);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(WEAPON, ItemStack.EMPTY);
-        builder.define(AMMO, ItemStack.EMPTY);
-        builder.define(CORE, ItemStack.EMPTY);
-        builder.define(WEAPON_ANG, 0);
-        builder.define(STYLE, (byte) 0);
         builder.define(STATUS_FLAG, (byte) 0);
         builder.define(LOCATOR_FLAG, (byte) 0);
         builder.define(POTION_SICKNESS, 0);
         builder.define(ENHANCE, false);
-        builder.define(CORE_COOL_DOWN, 0);
         builder.define(TARGET_NAME, Optional.empty());
-        builder.define(FIXED_TEAM_ID, (byte) -1);
+        builder.define(DATA_FLAGS_ID, (byte) 0);
+        builder.define(DATA_OWNERUUID_ID, Optional.empty());
     }
 
     @Override
@@ -155,25 +106,12 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         super.addAdditionalSaveData(pCompound);
         pCompound.putByte("Status", getStatus());
         pCompound.putByte("Locator", getLocator());
-        pCompound.put("Weapon", getWeapon().saveOptional(registryAccess()));
-        pCompound.put("Ammo", getAmmo().saveOptional(registryAccess()));
-        pCompound.put("Core", getCore().saveOptional(registryAccess()));
-        pCompound.putByte("Style", getStyle());
         pCompound.putBoolean("Enhance", getEnhance());
         pCompound.putInt("PotionSickness", getPotionSickness());
-        pCompound.putInt("CoreCoolDown", getCoreCoolDown());
-        pCompound.putBoolean("DropEquipment", dropEquipment);
-        pCompound.putBoolean("DropSnowball", dropSnowball);
-        pCompound.putByte("FixedTeamId", getFixedTeamId());
-        pCompound.putInt("Rank", rank);
-        pCompound.putInt("Money", money);
-        pCompound.putInt("Lifespan", lifespan);
-        if (aliveRange != null) {
-            aliveRange.saveToCompoundTag("AliveRange", pCompound);
+        if (getOwnerUUID() != null) {
+            pCompound.putUUID("Owner", getOwnerUUID());
         }
-        if (getTarget() != null) {
-            pCompound.putUUID("TargetUUID", getTarget().getUUID());
-        }
+        pCompound.putBoolean("Sitting", orderedToSit);
     }
 
     @Override
@@ -181,24 +119,17 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         super.readAdditionalSaveData(pCompound);
         setStatus(pCompound.getByte("Status"));
         setLocator(pCompound.getByte("Locator"));
-        setWeapon(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Weapon")));
-        setAmmo(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Ammo")));
-        setCore(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Core")));
-        setWeaponAng(pCompound.getInt("WeaponAng"));
-        setStyle(pCompound.getByte("Style"));
         setEnhance(pCompound.getBoolean("Enhance"));
         setPotionSickness(pCompound.getInt("PotionSickness"));
-        setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
-        dropEquipment = pCompound.getBoolean("DropEquipment");
-        dropSnowball = pCompound.getBoolean("DropSnowball");
-        setFixedTeamId(pCompound.getByte("FixedTeamId"));
-        rank = pCompound.getInt("Rank");
-        money = pCompound.getInt("Money");
-        lifespan = pCompound.getInt("Lifespan");
-        aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
-        if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
-            setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
+        UUID uuid;
+        if (pCompound.hasUUID("Owner")) {
+            uuid = pCompound.getUUID("Owner");
+        } else {
+            String s = pCompound.getString("Owner");
+            uuid = OldUsersConverter.convertMobOwnerIfNecessary(getServer(), s);
         }
+        setOwnerUUID(uuid);
+        setOrderedToSit(pCompound.getBoolean("Sitting"));
     }
 
     public byte getStatus() {
@@ -221,74 +152,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         return entityData.get(TARGET_NAME);
     }
 
-    public ItemStack getWeapon() {
-        return entityData.get(WEAPON);
-    }
-
-    public void setWeapon(ItemStack itemStack) {
-        entityData.set(WEAPON, itemStack);
-    }
-
-    public ItemStack getAmmo() {
-        return entityData.get(AMMO);
-    }
-
-    public void setAmmo(ItemStack itemStack) {
-        entityData.set(AMMO, itemStack);
-    }
-
-    public int getWeaponAng() {
-        return entityData.get(WEAPON_ANG);
-    }
-
-    public void setWeaponAng(int ang) {
-        entityData.set(WEAPON_ANG, ang);
-    }
-
-    public ItemStack getCore() {
-        return entityData.get(CORE);
-    }
-
-    public void setCore(ItemStack itemStack) {
-        entityData.set(CORE, itemStack);
-    }
-
-    public byte getStyle() {
-        return entityData.get(STYLE);
-    }
-
-    public void setStyle(byte style) {
-        entityData.set(STYLE, style);
-    }
-
-    public void setLaunchVelocity(float launchVelocity) {
-        this.launchVelocity = launchVelocity;
-    }
-
-    public void setLaunchAccuracy(float launchAccuracy) {
-        this.launchAccuracy = launchAccuracy;
-    }
-
-    public void setShootX(double shootX) {
-        this.shootX = shootX;
-    }
-
-    public void setShootY(double shootY) {
-        this.shootY = shootY;
-    }
-
-    public void setShootZ(double shootZ) {
-        this.shootZ = shootZ;
-    }
-
-    public int getCoreCoolDown() {
-        return entityData.get(CORE_COOL_DOWN);
-    }
-
-    public void setCoreCoolDown(int coolDown) {
-        entityData.set(CORE_COOL_DOWN, coolDown);
-    }
-
     public int getPotionSickness() {
         return entityData.get(POTION_SICKNESS);
     }
@@ -305,49 +168,26 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         entityData.set(ENHANCE, enhance0);
     }
 
-    public void setDropEquipment(boolean b) {
-        this.dropEquipment = b;
+    public boolean isOrderedToSit() {
+        return orderedToSit;
     }
 
-    public void setDropSnowball(boolean b) {
-        this.dropSnowball = b;
+    public void setOrderedToSit(boolean orderedToSit) {
+        this.orderedToSit = orderedToSit;
     }
 
-    public byte getFixedTeamId() {
-        return entityData.get(FIXED_TEAM_ID);
+    @Override
+    public @Nullable UUID getOwnerUUID() {
+        return entityData.get(DATA_OWNERUUID_ID).orElse(null);
     }
 
-    public void setFixedTeamId(byte teamId) {
-        entityData.set(FIXED_TEAM_ID, teamId);
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
-    public int getMoney() {
-        return money;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
-    public void setLifespan(int lifespan) {
-        this.lifespan = lifespan;
-    }
-
-    public void setAliveRange(RegionData region) {
-        aliveRange = RegionData.copy(region);
+    public void setOwnerUUID(@Nullable UUID uuid) {
+        entityData.set(DATA_OWNERUUID_ID, Optional.ofNullable(uuid));
     }
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
+        goalSelector.addGoal(1, new BSFGolemSitWhenOrderedToGoal(this));
         goalSelector.addGoal(2, new BSFGolemTargetNearGoal(this));
         goalSelector.addGoal(3, new BSFGolemFollowOwnerGoal(this, 1.0, 8.0F, 3.0F, 20.0F));
         goalSelector.addGoal(4, new BSFGolemRangedAttackGoal(this, 1.0, 30, 50.0F));
@@ -358,11 +198,6 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
         targetSelector.addGoal(2, new BSFGolemOwnerHurtByTargetGoal(this));
         targetSelector.addGoal(3, new BSFGolemOwnerHurtEnemyTeamGoal(this));
         targetSelector.addGoal(4, new BSFGolemNearsetAttackableTargetGoal(this));
-    }
-
-    @Override
-    public boolean isFood(ItemStack itemStack) {
-        return false;
     }
 
     @Override
@@ -520,122 +355,7 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     @Override
-    public void aiStep() {
-        super.aiStep();
-        Level level = level();
-        if (!level.isClientSide) {
-            if (level.getBiome(blockPosition()).is(BiomeTags.SNOW_GOLEM_MELTS)) {
-                this.hurt(this.damageSources().onFire(), 1.0F);
-            }
-            if (!EventHooks.canEntityGrief(level, this)) {
-                return;
-            }
-            BlockState blockState = Blocks.SNOW.defaultBlockState();
-            BlockState blockState1 = BlockRegister.CRITICAL_SNOW.get().defaultBlockState();
-            for (int i = 0; i < 4; ++i) {
-                int j = Mth.floor(getX() + (double) ((float) (i % 2 * 2 - 1) * 0.25F));
-                int k = Mth.floor(getY());
-                int l = Mth.floor(getZ() + (double) ((float) (i / 2 % 2 * 2 - 1) * 0.25F));
-                BlockPos blockPos1 = new BlockPos(j, k, l);
-                if (getCore().getItem().equals(ItemRegister.CRITICAL_SNOW_GOLEM_CORE.get())) {
-                    if ((level.isEmptyBlock(blockPos1) || level.getBlockState(blockPos1).equals(blockState)) && blockState1.canSurvive(level, blockPos1)) {
-                        level.setBlockAndUpdate(blockPos1, blockState1);
-                        level.gameEvent(GameEvent.BLOCK_PLACE, blockPos1, GameEvent.Context.of(this, blockState1));
-                    }
-                } else {
-                    if (level.isEmptyBlock(blockPos1) && blockState.canSurvive(level, blockPos1)) {
-                        level.setBlockAndUpdate(blockPos1, blockState);
-                        level.gameEvent(GameEvent.BLOCK_PLACE, blockPos1, GameEvent.Context.of(this, blockState));
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void tick() {
-        Level level = level();
-        if (!level.isClientSide) {
-            setTicksFrozen(0);
-            int coreCooldown = getCoreCoolDown();
-            if (getEnhance()) {
-                heal(1);
-                addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 2, 3));
-                if (coreCooldown > 0) {
-                    setCoreCoolDown(Math.max(getCoreCoolDown() - 5, 0));
-                }
-            }
-            if (getPotionSickness() > 0) {
-                setPotionSickness(getPotionSickness() - 1);
-            }
-            if (getWeaponAng() > 0) {
-                setWeaponAng(getWeaponAng() - 60);
-            }
-            Item core = getCore().getItem();
-            if (core.equals(ItemRegister.SWIFTNESS_GOLEM_CORE.get())) {
-                addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 2, 0));
-            }
-            if (coreCooldown > 0) {
-                setCoreCoolDown(coreCooldown - 1);
-            } else if (coreCooldown == 0) {
-                if (core.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
-                    this.heal(0.05f);
-                } else if (core.equals(ItemRegister.REPULSIVE_FIELD_GOLEM_CORE.get()) && getTarget() != null) {
-                    LivingEntity target = getTarget();
-                    List<Projectile> list1 = level.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(3), p -> !this.equals(p.getOwner()) && BSFCommonUtil.vec3AngleCos(getTarget().getPosition(0).subtract(getPosition(0)), p.getPosition(0).subtract(getPosition(0))) > 0);
-                    List<Projectile> list = level.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(5), p -> !this.equals(p.getOwner()) && BSFCommonUtil.vec3AngleCos(getTarget().getPosition(0).subtract(getPosition(0)), p.getPosition(0).subtract(getPosition(0))) > 0);
-                    if (!list1.isEmpty()) {
-                        for (Projectile projectile : list) {
-                            Vec3 vec3 = projectile.getDeltaMovement();
-                            double v2 = vec3.lengthSqr();
-                            double sin2Phi = vec3.y * vec3.y / v2;
-                            double cosPhi = Math.sqrt(1 - sin2Phi);
-                            double theta = Mth.atan2(target.getZ() - getZ(), target.getX() - getX());
-                            double sinTheta = Mth.sin((float) theta);
-                            double cosTheta = Mth.cos((float) theta);
-                            double v = vec3.length();
-                            Vec3 vec31 = new Vec3(v * cosTheta * cosPhi, -vec3.y, v * sinTheta * cosPhi);
-                            projectile.push(vec31.x - vec3.x, vec31.y - vec3.y, vec31.z - vec3.z);
-                            ((ServerLevel) level).sendParticles(ParticleRegister.GENERATOR_PUSH.get(), projectile.getX(), projectile.getY(), projectile.getZ(), 1, 0, 0, 0, 0);
-                        }
-                        playSound(SoundRegister.FIELD_PUSH.get(), 0.5F, 1.0F / (getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                        resetCoreCoolDown();
-                    }
-                }
-            }
-            LivingEntity target = getTarget();
-            if (target == null) {
-                entityData.set(TARGET_NAME, Optional.empty());
-            } else {
-                entityData.set(TARGET_NAME, Optional.of(target.getName()));
-            }
-            if (isAlive() && (aliveRange != null && !aliveRange.inRegion(position()) || getFixedTeamId() >= 0 && lifespan > 0 && --lifespan == 0)) {
-                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
-            }
-        }
-        super.tick();
-    }
-
-    @Override
-    public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
-        Level level = level();
-        if (!level.isClientSide) {
-            Item item = getCore().getItem();
-            if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
-                resetCoreCoolDown();
-            } else if (pSource.getDirectEntity() instanceof Projectile && item.equals(ItemRegister.ENDER_TELEPORTATION_GOLEM_CORE.get()) && getCoreCoolDown() == 0 && (getStatus() == 2 || getStatus() == 3)) {
-                Vec3 vec3 = getRandomTeleportPos();
-                if (vec3 != null) {
-                    tpWithParticlesAndResetCD(vec3);
-                    return false;
-                }
-            }
-        }
-        return super.hurt(pSource, pAmount);
-    }
-
-    @Override
-    public void performRangedAttack(@NotNull LivingEntity pTarget, float pDistanceFactor) {
+    public void performRangedAttack(LivingEntity livingEntity, float v) {
         Level level = level();
         ItemStack weapon = getWeapon();
         ItemStack ammo = getAmmo();
@@ -686,185 +406,79 @@ public class BSFSnowGolemEntity extends TamableAnimal implements RangedAttackMob
     }
 
     @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
-        // 永远不会掉隐藏的护甲了，同时已经判断掉落gamerule了
-        if (dropEquipment) {
-            int weaponVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getWeapon());
-            int ammoVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getAmmo());
-            int snowGolemExclusive = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), getWeapon());
-            if (weaponVanish <= 0 && snowGolemExclusive <= 0) {
-                spawnAtLocation(getWeapon());
+    public void tick() {
+        Level level = level();
+        if (!level.isClientSide) {
+            int coreCooldown = getCoreCoolDown();
+            if (getEnhance()) {
+                heal(1);
+                addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 2, 3));
+                if (coreCooldown > 0) {
+                    setCoreCoolDown(Math.max(getCoreCoolDown() - 5, 0));
+                }
             }
-            if (ammoVanish <= 0) {
-                spawnAtLocation(getAmmo());
+            if (getPotionSickness() > 0) {
+                setPotionSickness(getPotionSickness() - 1);
             }
-            spawnAtLocation(getCore());
+            LivingEntity target = getTarget();
+            if (target == null) {
+                entityData.set(TARGET_NAME, Optional.empty());
+            } else {
+                entityData.set(TARGET_NAME, Optional.of(target.getName()));
+            }
+            if (isAlive() && (aliveRange != null && !aliveRange.inRegion(position()))) {
+                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
+            }
         }
-        if (dropSnowball) {
-            spawnAtLocation(new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
+        super.tick();
+    }
+
+    @Override
+    public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
+        Level level = level();
+        if (!level.isClientSide) {
+            Item item = getCore().getItem();
+            if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
+                resetCoreCoolDown();
+            } else if (pSource.getDirectEntity() instanceof Projectile && item.equals(ItemRegister.ENDER_TELEPORTATION_GOLEM_CORE.get()) && getCoreCoolDown() == 0 && (getStatus() == 2 || getStatus() == 3)) {
+                Vec3 vec3 = getRandomTeleportPos();
+                if (vec3 != null) {
+                    tpWithParticlesAndResetCD(vec3);
+                    return false;
+                }
+            }
         }
+        return super.hurt(pSource, pAmount);
     }
 
-    @Override
-    public boolean isSensitiveToWater() {
-        return true;
-    }
-
-    @Override
-    protected int calculateFallDamage(float pDistance, float pDamageMultiplier) {
-        return 0;
-    }
-
-    @Override
-    protected SoundEvent getAmbientSound() {
-        return SoundEvents.SNOW_GOLEM_AMBIENT;
-    }
-
-    @Override
-    protected SoundEvent getHurtSound(@NotNull DamageSource pDamageSource) {
-        return SoundEvents.SNOW_GOLEM_HURT;
-    }
-
-    @Override
-    protected SoundEvent getDeathSound() {
-        return SoundEvents.SNOW_GOLEM_DEATH;
-    }
-
-    @Override
-    public AgeableMob getBreedOffspring(@NotNull ServerLevel p_146743_, @NotNull AgeableMob p_146744_) {
-        return null;
-    }
-
-    @Override
-    protected float getBlockSpeedFactor() {
-        if (level().getBlockState(new BlockPos(BSFCommonUtil.vec3ToI(getPosition(0)))).getBlock().equals(BlockRegister.CRITICAL_SNOW.get())) {
-            return 1.0F;
-        }
-        return super.getBlockSpeedFactor();
-    }
-
-    @Override
-    protected float getBlockJumpFactor() {
-        if (level().getBlockState(new BlockPos(BSFCommonUtil.vec3ToI(getPosition(0)))).getBlock().equals(BlockRegister.CRITICAL_SNOW.get())) {
-            return 1.0F;
-        }
-        return super.getBlockJumpFactor();
-    }
-
-    @Override
-    public boolean wantsToAttack(@Nullable LivingEntity pTarget, @NotNull LivingEntity pOwner) {
+    public boolean isEntityHasSameOwner(@Nullable LivingEntity pTarget) {
         if (pTarget == null) {
             return false;
         }
-        return !(pTarget instanceof OwnableEntity ownableEntity && pOwner.equals(ownableEntity.getOwner()));
+        return pTarget instanceof OwnableEntity ownableEntity && Objects.equals(getOwner(), ownableEntity.getOwner());
     }
 
+    @Override
     public boolean canPassiveAttackInAttackEnemyTeamMode(Entity entity) {
         if (entity == null) {
             return false;
         }
         BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-        int fixedTeamId = getFixedTeamId();
-        if (fixedTeamId >= 0) {
-            // 确定一点：只有玩家的UUID会出现在队伍存档数据中
-            if (entity instanceof BSFSnowGolemEntity snowGolem) {
-                if (snowGolem.getFixedTeamId() >= 0) {
-                    return fixedTeamId != snowGolem.getFixedTeamId();
-                }
-                return fixedTeamId != savedData.getTeam(snowGolem.getOwnerUUID());
-            }
-            if (entity instanceof OwnableEntity ownableEntity) {
-                return fixedTeamId != savedData.getTeam(ownableEntity.getOwnerUUID());
-            }
-            if (entity.getType().equals(EntityType.PLAYER)) {
-                return fixedTeamId != savedData.getTeam(entity.getUUID());
-            }
-            return false;
-        }
-        if (entity instanceof BSFSnowGolemEntity snowGolem) {
-            if (savedData.getTeam(getOwnerUUID()) < 0) {
-                return !Objects.equals(getOwner(), snowGolem.getOwner());
-            }
-            if (snowGolem.getFixedTeamId() >= 0) {
-                return savedData.getTeam(getOwnerUUID()) != snowGolem.getFixedTeamId();
-            }
-            return !savedData.isSameTeam(getOwner(), snowGolem.getOwner());
-        }
         if (entity instanceof OwnableEntity ownableEntity) {
             if (savedData.getTeam(getOwnerUUID()) < 0) {
                 return !Objects.equals(getOwner(), ownableEntity.getOwner());
             }
             return !savedData.isSameTeam(getOwner(), ownableEntity.getOwner());
         }
+        if (entity instanceof RegionControllerSnowGolemEntity snowGolem) {
+            if (savedData.getTeam(getOwnerUUID()) < 0) {
+                return true;
+            }
+            return savedData.getTeam(getOwnerUUID()) != snowGolem.getFixedTeamId();
+        }
         if (entity.getType().equals(EntityType.PLAYER)) {
             return !savedData.isSameTeam(getOwner(), entity);
         }
         return false;
-//        if (entity.getType().equals(EntityType.PLAYER)) {
-//            return !savedData.isSameTeam(getOwner(), entity);
-//        } else if (entity instanceof OwnableEntity ownableEntity) {
-//            if (savedData.getTeam(getOwnerUUID()) < 0) {
-//                return !Objects.equals(getOwner(), ownableEntity.getOwner());
-//            }
-//            return !savedData.isSameTeam(getOwner(), ownableEntity.getOwner());
-//        } else {
-//            return false;
-//        }
-    }
-
-    public void resetCoreCoolDown() {
-        setCoreCoolDown(((SnowGolemCoreItem) getCore().getItem()).getCoolDown());
-    }
-
-    public Vec3 getRandomTeleportPos() {
-        Level level = level();
-        RandomSource randomSource = getRandom();
-        float initTheta = (float) BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);
-        double golemX = getX();
-        double golemY = getY();
-        double golemZ = getZ();
-        boolean clockwise = randomSource.nextInt(0, 2) == 0;
-        for (int r = 20; r >= 4; r--) {
-            float step = 1.0F / r;
-            for (float theta = 0; theta < 2 * Mth.PI; theta += step) {
-                float theta1 = clockwise ? theta : -theta;
-                for (float phi = 0; phi <= Mth.PI * 0.5; phi += step) {
-                    int x = Mth.floor(golemX + r * Mth.cos(initTheta + theta1) * Mth.cos(phi));
-                    int y = Mth.floor(golemY + r * Mth.sin(phi));
-                    int y1 = Mth.floor(golemY - r * Mth.sin(phi));
-                    int z = Mth.floor(golemZ + r * Mth.sin(initTheta + theta1) * Mth.cos(phi));
-                    BlockPos blockPos = new BlockPos(x, y, z);
-                    if (canStandOn(blockPos, level)) {
-                        return new Vec3(x, y, z);
-                    }
-                    blockPos = new BlockPos(x, y1, z);
-                    if (canStandOn(blockPos, level)) {
-                        return new Vec3(x, y1, z);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public boolean canStandOn(BlockPos blockPos, Level level) {
-        return level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() &&
-                level.getBlockState(blockPos.above()).getCollisionShape(level, blockPos.above()).isEmpty() &&
-                level.getBlockState(blockPos.below()).blocksMotion();
-    }
-
-    public void tpWithParticlesAndResetCD(Vec3 vec3) {
-        AABB aabb = getBoundingBox();
-        Vec3 center = aabb.getCenter();
-        double x = 0.5 * (aabb.maxX - aabb.minX);
-        double y = 0.5 * (aabb.maxY - aabb.minY);
-        ((ServerLevel) level()).sendParticles(ParticleTypes.PORTAL, center.x, center.y, center.z, 81, x, y, x, 0);
-        teleportTo(vec3.x, vec3.y, vec3.z);
-        playSound(SoundEvents.ENDERMAN_TELEPORT);
-        resetCoreCoolDown();
-    }
-
-    public Vec3 getMiddleModelForward(float partialTicks, double degreeOffset) {
-        return BSFCommonUtil.radRotationToVector(1, (Mth.lerp(partialTicks, this.yBodyRotO + ((this.yHeadRotO - this.yBodyRotO) * 0.25), this.yBodyRot + ((this.yHeadRot - this.yBodyRot) * 0.25)) + 90 + degreeOffset) * Mth.DEG_TO_RAD, 0);
     }
 }

@@ -14,17 +14,17 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
     private int timestamp;
 
     public BSFGolemOwnerHurtByTargetGoal(BSFSnowGolemEntity snowGolem) {
-        super(snowGolem, false);
+        super(snowGolem, true);
         this.snowGolem = snowGolem;
         this.setFlags(EnumSet.of(Flag.TARGET));
     }
 
-    //     0: monster
+//     0: monster
 //     1: target locator
 //     2: enemy player
 //     3: all
     public boolean canUse() {
-        if (!snowGolem.isTame() || snowGolem.isOrderedToSit()) {
+        if (snowGolem.isOrderedToSit()) {
             return false;
         }
         LivingEntity owner = snowGolem.getOwner();
@@ -46,7 +46,7 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
                 }
                 break;
             default:
-                if (!snowGolem.wantsToAttack(ownerLastHurtBy, owner)) {
+                if (snowGolem.isEntityHasSameOwner(ownerLastHurtBy)) {
                     return false;
                 }
         }

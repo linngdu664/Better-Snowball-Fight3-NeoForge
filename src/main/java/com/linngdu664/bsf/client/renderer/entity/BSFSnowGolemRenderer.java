@@ -3,20 +3,20 @@ package com.linngdu664.bsf.client.renderer.entity;
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.client.model.BSFSnowGolemModel;
 import com.linngdu664.bsf.client.renderer.entity.layers.BSFSnowGolemHoldItemLayer;
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public class BSFSnowGolemRenderer extends MobRenderer<BSFSnowGolemEntity, BSFSnowGolemModel<BSFSnowGolemEntity>> {
+public class BSFSnowGolemRenderer extends MobRenderer<AbstractBSFSnowGolemEntity, BSFSnowGolemModel<AbstractBSFSnowGolemEntity>> {
     public BSFSnowGolemRenderer(EntityRendererProvider.Context context) {
         super(context, new BSFSnowGolemModel<>(context.bakeLayer(BSFSnowGolemModel.LAYER_LOCATION)), 0.7f);
         this.addLayer(new BSFSnowGolemHoldItemLayer(this));
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(@NotNull BSFSnowGolemEntity pEntity) {
+    public @NotNull ResourceLocation getTextureLocation(@NotNull AbstractBSFSnowGolemEntity pEntity) {
         switch (pEntity.getStyle()) {
             case 0 -> {
                 return Main.makeResLoc("textures/models/bsf_snow_golem_1.png");

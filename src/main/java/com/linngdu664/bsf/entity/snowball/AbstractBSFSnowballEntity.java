@@ -2,7 +2,7 @@ package com.linngdu664.bsf.entity.snowball;
 
 import com.linngdu664.bsf.config.ServerConfig;
 import com.linngdu664.bsf.entity.Absorbable;
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.entity.snowball.util.LaunchFrom;
 import com.linngdu664.bsf.item.component.RegionData;
@@ -125,7 +125,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
             entity.hurt(level.damageSources().thrown(this, this.getOwner()), hurt);
 
             // Handle frozen and weakness effects
-            if (properties.frozenTicks > 0 && !(entity instanceof BSFSnowGolemEntity) && !(entity instanceof SnowGolem)) {
+            if (properties.frozenTicks > 0 && !(entity instanceof AbstractBSFSnowGolemEntity) && !(entity instanceof SnowGolem)) {
                 if (entity.getTicksFrozen() < properties.frozenTicks) {
                     entity.setTicksFrozen(properties.frozenTicks);
                 }

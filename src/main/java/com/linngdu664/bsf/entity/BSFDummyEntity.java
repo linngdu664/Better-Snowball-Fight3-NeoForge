@@ -101,7 +101,7 @@ public class BSFDummyEntity extends Mob {
         if (item.equals(Items.SNOWBALL)) {
             Level level = level();
             if (!level.isClientSide) {
-                entityData.set(STYLE, (byte) ((getStyle() + 1) % BSFSnowGolemEntity.STYLE_NUM));
+                entityData.set(STYLE, (byte) ((getStyle() + 1) % AbstractBSFSnowGolemEntity.STYLE_NUM));
                 ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY() + 1, this.getZ(), 20, 0, 0.5, 0, 0.05);
                 this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }

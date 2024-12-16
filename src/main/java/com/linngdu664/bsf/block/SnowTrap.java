@@ -1,6 +1,6 @@
 package com.linngdu664.bsf.block;
 
-import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -87,7 +87,7 @@ public class SnowTrap extends Block {
     @Override
     public void entityInside(@NotNull BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
         if (pEntity instanceof LivingEntity livingEntity && pLevel instanceof ServerLevel serverLevel) {
-            if (!(livingEntity instanceof BSFSnowGolemEntity) && !(livingEntity instanceof SnowGolem)) {
+            if (!(livingEntity instanceof AbstractBSFSnowGolemEntity) && !(livingEntity instanceof SnowGolem)) {
                 livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4));
                 if (livingEntity.getTicksFrozen() < 200) {
                     livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + 160);

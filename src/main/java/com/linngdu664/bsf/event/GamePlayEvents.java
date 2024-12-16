@@ -2,7 +2,9 @@ package com.linngdu664.bsf.event;
 
 import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.config.ServerConfig;
+import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.misc.SnowFallBootsItem;
 import com.linngdu664.bsf.item.snowball.normal.SmoothSnowballItem;
@@ -98,9 +100,9 @@ public class GamePlayEvents {
                             PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(0, getPoints));
                         }
                     }
-                } else if (deathEntity instanceof BSFSnowGolemEntity deathGolem) {
+                } else if (deathEntity instanceof RegionControllerSnowGolemEntity deathGolem) {
                     ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
-                    if (device != null && (deathGolem.getFixedTeamId() >= 0 && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) || deathGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerPlayer, deathGolem.getOwner())) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(killerPlayer.position())) {
+                    if (device != null && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(killerPlayer.position())) {
                         int killerPlayerRank = device.getOrDefault(DataComponentRegister.RANK.get(), 0);
                         int killerPlayerMoney = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                         int getRank = deathGolem.getRank();
@@ -110,9 +112,9 @@ public class GamePlayEvents {
                         PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getRank, getMoney));
                     }
                 }
-            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
+            } else if (killerEntity instanceof RegionControllerSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
                 ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
-                if (device != null && (killerGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) || killerGolem.getFixedTeamId() < 0 && !savedData.isSameTeam(killerGolem.getOwner(), deathPlayer)) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(deathPlayer.position())) {
+                if (device != null && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(deathPlayer.position())) {
                     // 掉10%的钱
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                     int getPoints = deathPlayerPoint / 10;
@@ -133,38 +135,67 @@ public class GamePlayEvents {
                 return;
             }
             BSFTeamSavedData savedData = targetEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
-            if (killerEntity instanceof Player killerPlayer && (targetEntity instanceof Player targetPlayer && savedData.isSameTeam(killerPlayer, targetPlayer) || targetEntity instanceof BSFSnowGolemEntity targetGolem && (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerPlayer.getUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerPlayer, targetGolem.getOwner())))
-                    || killerEntity instanceof BSFSnowGolemEntity killerGolem && (targetEntity instanceof Player targetPlayer && (killerGolem.getFixedTeamId() >= 0 && savedData.getTeam(targetPlayer.getUUID()) == killerGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetPlayer))
-                    || targetEntity instanceof BSFSnowGolemEntity targetGolem && (killerGolem.getFixedTeamId() >= 0 && (targetGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() == targetGolem.getFixedTeamId() || killerGolem.getFixedTeamId() == savedData.getTeam(targetGolem.getOwnerUUID())) || killerGolem.getFixedTeamId() < 0 && (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerGolem.getOwnerUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetGolem.getOwner()))))) {
-                event.setNewDamage(0);
+            if (killerEntity instanceof Player killerPlayer) {
+                switch (targetEntity) {
+                    case Player targetPlayer -> {
+                        if (savedData.isSameTeam(killerPlayer, targetPlayer)) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    case BSFSnowGolemEntity targetGolem -> {
+                        if (savedData.isSameTeam(killerPlayer, targetGolem.getOwner())) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    case RegionControllerSnowGolemEntity targetGolem -> {
+                        if (savedData.getTeam(killerPlayer.getUUID()) == targetGolem.getFixedTeamId()) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    default -> {
+                    }
+                }
+            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem) {
+                switch (targetEntity) {
+                    case Player targetPlayer -> {
+                        if (savedData.isSameTeam(killerGolem.getOwner(), targetPlayer)) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    case BSFSnowGolemEntity targetGolem -> {
+                        if (savedData.isSameTeam(killerGolem.getOwner(), targetGolem.getOwner())) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    case RegionControllerSnowGolemEntity targetGolem -> {
+                        if (savedData.getTeam(killerGolem.getOwnerUUID()) == targetGolem.getFixedTeamId()) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    default -> {
+                    }
+                }
+            } else if (killerEntity instanceof RegionControllerSnowGolemEntity killerGolem) {
+                switch (targetEntity) {
+                    case Player targetPlayer -> {
+                        if (killerGolem.getFixedTeamId() == savedData.getTeam(targetPlayer.getUUID())) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    case BSFSnowGolemEntity targetGolem -> {
+                        if (killerGolem.getFixedTeamId() == savedData.getTeam(targetGolem.getOwnerUUID())) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    case RegionControllerSnowGolemEntity targetGolem -> {
+                        if (killerGolem.getFixedTeamId() == targetGolem.getFixedTeamId()) {
+                            event.setNewDamage(0);
+                        }
+                    }
+                    default -> {
+                    }
+                }
             }
-//            if (killerEntity instanceof Player killerPlayer) {
-//                if (targetEntity instanceof Player targetPlayer) {
-//                    if (savedData.isSameTeam(killerPlayer, targetPlayer)) {
-//                        event.setNewDamage(0);
-//                    }
-//                } else if (targetEntity instanceof BSFSnowGolemEntity targetGolem) {
-//                    if (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerPlayer.getUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerPlayer, targetGolem.getOwner())) {
-//                        event.setNewDamage(0);
-//                    }
-//                }
-//            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem) {
-//                if (targetEntity instanceof Player targetPlayer) {
-//                    if (killerGolem.getFixedTeamId() >= 0 && savedData.getTeam(targetPlayer.getUUID()) == killerGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetPlayer)) {
-//                        event.setNewDamage(0);
-//                    }
-//                } else if (targetEntity instanceof BSFSnowGolemEntity targetGolem) {
-//                    if (killerGolem.getFixedTeamId() >= 0) {
-//                        if (targetGolem.getFixedTeamId() >= 0 && killerGolem.getFixedTeamId() == targetGolem.getFixedTeamId() || killerGolem.getFixedTeamId() == savedData.getTeam(targetGolem.getOwnerUUID())) {
-//                            event.setNewDamage(0);
-//                        }
-//                    } else {
-//                        if (targetGolem.getFixedTeamId() >= 0 && savedData.getTeam(killerGolem.getOwnerUUID()) == targetGolem.getFixedTeamId() || savedData.isSameTeam(killerGolem.getOwner(), targetGolem.getOwner())) {
-//                            event.setNewDamage(0);
-//                        }
-//                    }
-//                }
-//            }
         }
     }
 
@@ -239,7 +270,7 @@ public class GamePlayEvents {
         if (!level.isClientSide && !player.isSpectator() && entity instanceof LivingEntity target) {
             Item item = player.getMainHandItem().getItem();
             if (item instanceof SolidBucketItem) {
-                if (!(target instanceof BSFSnowGolemEntity) && !(target instanceof SnowGolem)) {
+                if (!(target instanceof AbstractBSFSnowGolemEntity) && !(target instanceof SnowGolem)) {
                     if (target.getTicksFrozen() < 240) {
                         target.setTicksFrozen(240);
                     }
@@ -258,7 +289,7 @@ public class GamePlayEvents {
                     player.getInventory().placeItemBackInInventory(new ItemStack(Items.BUCKET), true);
                 }
             } else if (item instanceof SnowballItem || item instanceof SmoothSnowballItem) {
-                if (!(target instanceof BSFSnowGolemEntity) && !(target instanceof SnowGolem)) {
+                if (!(target instanceof AbstractBSFSnowGolemEntity) && !(target instanceof SnowGolem)) {
                     if (target.getTicksFrozen() < 180) {
                         target.setTicksFrozen(180);
                     }

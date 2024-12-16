@@ -13,14 +13,13 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
         this.snowGolem = snowGolem;
     }
 
-    //     0: monster
+//     0: monster
 //     1: target locator
 //     2: enemy player
 //     3: all
     @Override
     public boolean canUse() {
         LivingEntity lastHurtByMob = snowGolem.getLastHurtByMob();
-        LivingEntity owner = snowGolem.getOwner();
         // 待测试主人
         return switch (snowGolem.getLocator()) {
             case 0 -> {
@@ -35,12 +34,7 @@ public class BSFGolemHurtByTargetGoal extends HurtByTargetGoal {
                 }
                 yield false;
             }
-            case 3 -> {
-                if (owner == null) {
-                    yield super.canUse();
-                }
-                yield snowGolem.wantsToAttack(lastHurtByMob, owner) && super.canUse();
-            }
+            case 3 -> !snowGolem.isEntityHasSameOwner(lastHurtByMob) && super.canUse();
             default -> false;
         };
     }

@@ -177,6 +177,7 @@
   "item.bsf.region_tool": "Region Tool",
 
   "entity.bsf.bsf_snow_golem": "Advanced Snow Golem",
+  "entity.bsf.region_controller_snow_golem": "Advanced Snow Golem",
   "entity.bsf.monster_gravity_executor": "Monster Gravity Field Generator",
   "entity.bsf.monster_repulsion_executor": "Monster Repulsion Field Generator",
   "entity.bsf.projectile_gravity_executor": "Projectile Gravity Field Generator",

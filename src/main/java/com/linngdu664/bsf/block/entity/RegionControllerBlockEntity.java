@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.block.entity;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
@@ -81,12 +82,12 @@ public class RegionControllerBlockEntity extends BlockEntity {
         float enemyPlayerStrength = 0;
         float friendlyGolemStrength = 0;
         float friendlyPlayerStrength = 0;
-        List<BSFSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
-        List<BSFSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
-        for (BSFSnowGolemEntity golem : friendlyGolemList) {
+        List<RegionControllerSnowGolemEntity> friendlyGolemList = level.getEntitiesOfClass(RegionControllerSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() == be.teamId);
+        List<RegionControllerSnowGolemEntity> enemyGolemList = level.getEntitiesOfClass(RegionControllerSnowGolemEntity.class, be.region.toBoundingBox(), p -> p.getFixedTeamId() >= 0 && p.getFixedTeamId() != be.teamId);
+        for (RegionControllerSnowGolemEntity golem : friendlyGolemList) {
             friendlyGolemStrength += golem.getRank();
         }
-        for (BSFSnowGolemEntity golem : enemyGolemList) {
+        for (RegionControllerSnowGolemEntity golem : enemyGolemList) {
             enemyGolemStrength += golem.getRank();
         }
         for (Player player : playerList) {
@@ -170,17 +171,12 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 List<BlockPos> blockPosList = summonPosList;
                 BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));
                 Vec3 summonPos = blockPos.above().getBottomCenter();
-                BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(level);
+                RegionControllerSnowGolemEntity snowGolem = EntityRegister.REGION_CONTROLLER_SNOW_GOLEM.get().create(level);
                 snowGolem.readAdditionalSaveData(snowGolemList.get(i));
-                snowGolem.setFixedTeamId(teamId);
-                snowGolem.setAliveRange(region);
-                snowGolem.setOwnerUUID(null);
-                snowGolem.setOrderedToSit(false);
-                snowGolem.setTame(false, false);
-                snowGolem.setLocator((byte) 2);
-                snowGolem.setStatus((byte) 3);
                 snowGolem.setDropEquipment(false);
                 snowGolem.setDropSnowball(false);
+                snowGolem.setFixedTeamId(teamId);
+                snowGolem.setAliveRange(region);
                 snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                 level.addFreshEntity(snowGolem);
                 Vec3 color = new Vec3(0.9, 0.9, 0.9);
