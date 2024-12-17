@@ -11,14 +11,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 
 public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal {
     private static final int DEFAULT_RANDOM_INTERVAL = 4;
     private static final int SEARCH_DISTANCE = 100;
     private final RegionControllerSnowGolemEntity snowGolem;
-    @Nullable
     protected LivingEntity target;
 
 
@@ -65,11 +63,7 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
     }
 
     public void start() {
-        this.mob.setTarget(this.target);
+        mob.setTarget(target);
         super.start();
-    }
-
-    public void setTarget(@Nullable LivingEntity pTarget) {
-        this.target = pTarget;
     }
 }

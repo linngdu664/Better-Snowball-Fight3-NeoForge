@@ -177,7 +177,7 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
                 attackRadius *= 0.2F;
                 attackRadiusSqr *= 0.04F;
             }
-            if (golem.getCore().getItem().equals(ItemRegister.ACTIVE_TELEPORTATION_GOLEM_CORE.get()) && golem.getCoreCoolDown() == 0) {
+            if (golem.getCore().getItem().equals(ItemRegister.ACTIVE_TELEPORTATION_GOLEM_CORE.get()) && golem.getCoreCoolDown() == 0 && golem.canMoveAndAttack()) {
                 Vec3 vec3 = getTargetBackTeleportPos();
                 if (vec3 != null) {
                     golem.tpWithParticlesAndResetCD(vec3);
@@ -194,7 +194,7 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
             } else {
                 --seeTime;
             }
-            if (d0 <= attackRadiusSqr && seeTime >= 20) {
+            if (d0 <= attackRadiusSqr && seeTime >= 20 || !golem.canMoveAndAttack()) {
                 golem.getNavigation().stop();
                 ++strafingTime;
             } else {
@@ -210,7 +210,7 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
                 }
                 strafingTime = 0;
             }
-            if (strafingTime > -1) {
+            if (strafingTime > -1 && golem.canMoveAndAttack()) {
                 if (d0 > attackRadiusSqr * 0.64F) {
                     strafingBackwards = false;
                 } else if (d0 < attackRadiusSqr * 0.09F) {

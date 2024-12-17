@@ -36,15 +36,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class RegionControllerBlockEntity extends BlockEntity {
-//    private static final float LN2 = 0.69314718F;
-//    private static final float[] LN_TABLE = new float[256];
-//
-//    static {
-//        for (int i = 0; i < 256; i++) {
-//            LN_TABLE[i] = (float) Math.log(1.0 + (double) i / 256.0);
-//        }
-//    }
-
     private ArrayList<CompoundTag> snowGolemList = new ArrayList<>();
     private ArrayList<BlockPos> summonPosList = new ArrayList<>();
     private RegionData region = RegionData.EMPTY;
@@ -186,14 +177,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
             }
         }
     }
-/*
-    private static float lnRank(int rank) {
-        if (rank <= 0) {
-            return 0F;
-        }
-        int fRank = Float.floatToIntBits((float) rank);
-        return (float) ((fRank >> 23) - 127) * LN2 + LN_TABLE[(fRank >> 15) & 0xff];
-    }*/
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {

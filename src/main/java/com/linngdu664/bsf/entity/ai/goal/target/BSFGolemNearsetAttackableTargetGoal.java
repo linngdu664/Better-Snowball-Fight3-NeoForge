@@ -33,7 +33,7 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
         if (this.mob.getRandom().nextInt(DEFAULT_RANDOM_INTERVAL) != 0) {
             return false;
         }
-        this.findTarget();
+        findTarget();
         return target != null;
     }
 
@@ -90,9 +90,5 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     public void start() {
         this.mob.setTarget(this.target);
         super.start();
-    }
-
-    public void setTarget(@Nullable LivingEntity pTarget) {
-        this.target = pTarget;
     }
 }

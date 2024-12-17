@@ -40,7 +40,7 @@ public class BSFGolemFollowOwnerGoal extends Goal {
     public boolean canUse() {
         LivingEntity livingentity = golem.getOwner();
         int status = golem.getStatus();
-        if (livingentity == null || livingentity.isSpectator() || golem.isOrderedToSit() || status == 3 || status == 4) {
+        if (livingentity == null || livingentity.isSpectator() || status == 0 || status == 3 || status == 4) {
             return false;
         }
         double ownerDisSqr = golem.distanceToSqr(livingentity);
@@ -53,10 +53,11 @@ public class BSFGolemFollowOwnerGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        if (navigation.isDone() || golem.isOrderedToSit()) {
+        int status = golem.getStatus();
+        if (navigation.isDone() || status == 0) {
             return false;
         }
-        if (golem.getStatus() == 1 || golem.getTarget() == null) {
+        if (status == 1 || golem.getTarget() == null) {
             return !(golem.distanceToSqr(owner) <= stopDisSqr);
         }
         return !(golem.distanceToSqr(owner) <= hasTargetStopDisSqr);
@@ -71,7 +72,7 @@ public class BSFGolemFollowOwnerGoal extends Goal {
     public void stop() {
         owner = null;
         navigation.stop();
-        golem.setTarget(null);
+        golem.setTarget(null);      // force to find a new target
     }
 
     @Override

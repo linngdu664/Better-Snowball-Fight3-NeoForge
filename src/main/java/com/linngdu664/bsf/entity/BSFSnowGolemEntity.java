@@ -5,29 +5,20 @@ import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemHurtByTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemNearsetAttackableTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemOwnerHurtByTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.BSFGolemOwnerHurtEnemyTeamGoal;
-import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
-import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
-import com.linngdu664.bsf.item.component.ItemData;
 import com.linngdu664.bsf.item.component.UuidData;
 import com.linngdu664.bsf.item.misc.SnowGolemCoreItem;
-import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
-import com.linngdu664.bsf.item.tank.LargeSnowballTankItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.item.tool.SnowballClampItem;
-import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.misc.BSFTiers;
-import com.linngdu664.bsf.network.to_client.ForwardConeParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ShowGolemRankScreenPayload;
-import com.linngdu664.bsf.network.to_client.packed_paras.ForwardConeParticlesParas;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
 import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
-import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
@@ -45,7 +36,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -55,7 +45,6 @@ import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -78,10 +67,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     private static final EntityDataAccessor<Byte> LOCATOR_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> POTION_SICKNESS = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<Component>> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
-    protected static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_UUID);
-
-    private boolean orderedToSit;
 
     public BSFSnowGolemEntity(EntityType<? extends AbstractBSFSnowGolemEntity> entityType, Level level) {
         super(entityType, level);
@@ -97,7 +83,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         builder.define(POTION_SICKNESS, 0);
         builder.define(ENHANCE, false);
         builder.define(TARGET_NAME, Optional.empty());
-        builder.define(DATA_FLAGS_ID, (byte) 0);
         builder.define(DATA_OWNERUUID_ID, Optional.empty());
     }
 
@@ -111,7 +96,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         if (getOwnerUUID() != null) {
             pCompound.putUUID("Owner", getOwnerUUID());
         }
-        pCompound.putBoolean("Sitting", orderedToSit);
     }
 
     @Override
@@ -129,7 +113,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             uuid = OldUsersConverter.convertMobOwnerIfNecessary(getServer(), s);
         }
         setOwnerUUID(uuid);
-        setOrderedToSit(pCompound.getBoolean("Sitting"));
     }
 
     public byte getStatus() {
@@ -166,14 +149,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
 
     public void setEnhance(boolean enhance0) {
         entityData.set(ENHANCE, enhance0);
-    }
-
-    public boolean isOrderedToSit() {
-        return orderedToSit;
-    }
-
-    public void setOrderedToSit(boolean orderedToSit) {
-        this.orderedToSit = orderedToSit;
     }
 
     @Override
@@ -283,7 +258,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                 }
                 setLocator((byte) targetMode);
                 setStatus((byte) statusMode);
-                setOrderedToSit(statusMode == 0);
                 pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("import_state.tip", null, new Object[0])), false);
                 Vec3 color = new Vec3(0.5, 1, 0.5);
                 PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
@@ -355,57 +329,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     }
 
     @Override
-    public void performRangedAttack(LivingEntity livingEntity, float v) {
-        Level level = level();
-        ItemStack weapon = getWeapon();
-        ItemStack ammo = getAmmo();
-        AbstractBSFWeaponItem weaponItem = (AbstractBSFWeaponItem) weapon.getItem();
-        if (!ammo.has(DataComponentRegister.AMMO_ITEM) || (((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getTypeFlag() & weaponItem.getTypeFlag()) == 0) {
-            return;
-        }
-        ILaunchAdjustment launchAdjustment = weaponItem.getLaunchAdjustment(1, ammo.getItem());
-        int j = weapon.getItem() instanceof SnowballShotgunItem ? 4 : 1;
-        for (int i = 0; i < j; i++) {
-            if (!ammo.has(DataComponentRegister.AMMO_ITEM)) {
-                break;
-            }
-            AbstractBSFSnowballEntity snowball = ((AbstractBSFSnowballItem) ammo.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item()).getCorrespondingEntity(level, this, launchAdjustment, aliveRange);
-            snowball.shoot(shootX, shootY, shootZ, launchVelocity, launchAccuracy);
-            level.addFreshEntity(snowball);
-            if (!ammo.has(DataComponents.UNBREAKABLE) && !getEnhance() && getOwner() != null) {
-                ammo.setDamageValue(ammo.getDamageValue() + 1);
-                if (ammo.getDamageValue() == ammo.getMaxDamage()) {
-                    ItemStack empty;
-                    if (ammo.getItem() instanceof LargeSnowballTankItem) {
-                        empty = ItemRegister.LARGE_SNOWBALL_TANK.get().getDefaultInstance();
-                    } else {
-                        empty = ItemRegister.SNOWBALL_TANK.get().getDefaultInstance();
-                    }
-                    empty.setDamageValue(empty.getMaxDamage());
-                    setAmmo(empty);
-                }
-            }
-            if (i == 0) {
-                int aStep = 90;
-                if (weaponItem.equals(ItemRegister.POWERFUL_SNOWBALL_CANNON.get()) || weaponItem.equals(ItemRegister.SNOWBALL_SHOTGUN.get())) {
-                    aStep = 45;
-                }
-                PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(getEyePosition(), new Vec3(shootX, shootY, shootZ), 4.5F, aStep, 1.5F, 0.1F), BSFParticleType.SNOWFLAKE.ordinal()));
-                playSound(j == 4 ? SoundRegister.SHOTGUN_FIRE_2.get() : SoundRegister.SNOWBALL_CANNON_SHOOT.get(), 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-                float damageChance = 1.0F / (1.0F + EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.UNBREAKING), weapon));
-                if (!weapon.has(DataComponents.UNBREAKABLE) && !getEnhance() && getRandom().nextFloat() <= damageChance) {
-                    weapon.setDamageValue(weapon.getDamageValue() + 1);
-                    if (weapon.getDamageValue() == 256) {
-                        setWeapon(ItemStack.EMPTY);
-                        playSound(SoundEvents.ITEM_BREAK, 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 0.8F));
-                    }
-                }
-                setWeaponAng(360);
-            }
-        }
-    }
-
-    @Override
     public void tick() {
         Level level = level();
         if (!level.isClientSide) {
@@ -431,24 +354,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             }
         }
         super.tick();
-    }
-
-    @Override
-    public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
-        Level level = level();
-        if (!level.isClientSide) {
-            Item item = getCore().getItem();
-            if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
-                resetCoreCoolDown();
-            } else if (pSource.getDirectEntity() instanceof Projectile && item.equals(ItemRegister.ENDER_TELEPORTATION_GOLEM_CORE.get()) && getCoreCoolDown() == 0 && (getStatus() == 2 || getStatus() == 3)) {
-                Vec3 vec3 = getRandomTeleportPos();
-                if (vec3 != null) {
-                    tpWithParticlesAndResetCD(vec3);
-                    return false;
-                }
-            }
-        }
-        return super.hurt(pSource, pAmount);
     }
 
     public boolean isEntityHasSameOwner(@Nullable LivingEntity pTarget) {
@@ -480,5 +385,22 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             return !savedData.isSameTeam(getOwner(), entity);
         }
         return false;
+    }
+
+    @Override
+    public boolean shouldConsumeAmmo() {
+        return !(getAmmo().has(DataComponents.UNBREAKABLE) || getEnhance() || getOwner() == null);
+    }
+
+    @Override
+    public boolean shouldDamageWeapon() {
+        ItemStack weapon = getWeapon();
+        float damageChance = 1.0F / (1.0F + EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.UNBREAKING), weapon));
+        return !(weapon.has(DataComponents.UNBREAKABLE) || getEnhance() || getOwner() == null || getRandom().nextFloat() > damageChance);
+    }
+
+    @Override
+    public boolean canMoveAndAttack() {
+        return getStatus() == 2 || getStatus() == 3;
     }
 }

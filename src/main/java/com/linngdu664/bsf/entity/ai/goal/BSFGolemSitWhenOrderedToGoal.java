@@ -9,14 +9,14 @@ import java.util.EnumSet;
 public class BSFGolemSitWhenOrderedToGoal extends Goal {
     private final BSFSnowGolemEntity golem;
 
-    public BSFGolemSitWhenOrderedToGoal(BSFSnowGolemEntity mob) {
-        this.golem = mob;
+    public BSFGolemSitWhenOrderedToGoal(BSFSnowGolemEntity golem) {
+        this.golem = golem;
         this.setFlags(EnumSet.of(Flag.JUMP, Flag.MOVE));
     }
 
     @Override
     public boolean canContinueToUse() {
-        return golem.isOrderedToSit();
+        return golem.getStatus() == 0;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class BSFGolemSitWhenOrderedToGoal extends Goal {
             if (livingentity == null) {
                 return true;
             } else {
-                return (!(golem.distanceToSqr(livingentity) < 144.0) || livingentity.getLastHurtByMob() == null) && golem.isOrderedToSit();
+                return (!(golem.distanceToSqr(livingentity) < 144.0) || livingentity.getLastHurtByMob() == null) && golem.getStatus() == 0;
             }
         }
     }

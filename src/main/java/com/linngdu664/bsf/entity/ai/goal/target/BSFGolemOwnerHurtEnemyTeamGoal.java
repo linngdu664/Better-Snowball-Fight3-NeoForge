@@ -20,7 +20,7 @@ public class BSFGolemOwnerHurtEnemyTeamGoal extends TargetGoal {
 
     public boolean canUse() {
         LivingEntity owner = snowGolem.getOwner();
-        if (snowGolem.isOrderedToSit() || owner == null) {
+        if (snowGolem.getStatus() == 0 || owner == null) {
             return false;
         }
         ownerLastHurt = owner.getLastHurtMob();
