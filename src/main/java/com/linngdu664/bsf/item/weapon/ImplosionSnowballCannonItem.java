@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.item.weapon;
 
+import com.linngdu664.bsf.block.CriticalSnow;
 import com.linngdu664.bsf.block.LooseSnowBlock;
 import com.linngdu664.bsf.client.screenshake.Easing;
 import com.linngdu664.bsf.client.screenshake.ScreenshakeHandler;
@@ -77,8 +78,9 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                     PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ImplosionSnowballCannonParticlesPayload(paPos.x, paPos.y, paPos.z, cameraVec.x, cameraVec.y, cameraVec.z));
                 }
                 AABB aabb = pPlayer.getBoundingBox().inflate(RADIUM).expandTowards(cameraVec.scale(DISTANCE + RADIUM));
+
                 BlockPos.betweenClosedStream(aabb)
-                        .filter(p -> serverLevel.getBlockState(p).getBlock() instanceof LooseSnowBlock && BSFCommonUtil.pointOnTheFrontConeArea(pPlayer.getViewVector(1f), eyePosition, p.getCenter(), RADIUM, DISTANCE))
+                        .filter(p -> serverLevel.getBlockState(p).getBlock() instanceof LooseSnowBlock || serverLevel.getBlockState(p).getBlock() instanceof CriticalSnow && BSFCommonUtil.pointOnTheFrontConeArea(pPlayer.getViewVector(1f), eyePosition, p.getCenter(), RADIUM, DISTANCE))
                         .forEach(p -> {
                             serverLevel.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
                             BlockState snow = Blocks.SNOW.defaultBlockState();
