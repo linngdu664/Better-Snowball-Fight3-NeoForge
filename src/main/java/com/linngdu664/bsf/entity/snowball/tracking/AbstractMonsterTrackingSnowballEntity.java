@@ -6,7 +6,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
@@ -28,6 +27,6 @@ public abstract class AbstractMonsterTrackingSnowballEntity extends AbstractTrac
         Level level = level();
         Vec3 velocity = getDeltaMovement();
         List<Mob> list = level.getEntitiesOfClass(Mob.class, getBoundingBox().inflate(range), (p) -> p instanceof Enemy && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(getPosition(1))) > 0.5);
-        return level.getNearestEntity(list, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
+        return getNearest(list);
     }
 }
