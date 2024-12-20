@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
-    //    private final ArrayList<ItemStack> itemStackArrayList = new ArrayList<>();
     private final HashMap<Item, Integer> snowballCount = new HashMap<>();
     private boolean release = true;
     private int timer = 0;
@@ -100,9 +99,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                     this.discard();
                 }
                 if (!release) {
-//                    float damage = getDamage();
-//                    setDamage(damage + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
-//                    setBlazeDamage(getBlazeDamage() + (damage < 15 ? absorbable.getSubspacePower() : 15 * absorbable.getSubspacePower() / damage));
                     setDamage(getDamage() + absorbable.getSubspacePower());
                     setBlazeDamage(getBlazeDamage() + absorbable.getSubspacePower());
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);
@@ -118,8 +114,6 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, p.getX(), p.getY(), p.getZ(), 8, 0, 0, 0, 0.05);
                 p.discard();
                 if (!release) {
-//                    float damage = getDamage();
-//                    setDamage(damage + (damage < 15 ? 1 : 15 / damage));
                     setDamage(getDamage() + 1);
                     setBlazeDamage(getBlazeDamage() + 1);
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);

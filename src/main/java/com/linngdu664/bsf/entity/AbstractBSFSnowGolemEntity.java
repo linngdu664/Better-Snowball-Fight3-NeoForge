@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -54,7 +53,6 @@ import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.List;
 
 public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implements RangedAttackMob {
@@ -98,8 +96,8 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         Component customName = getCustomName();
-        if (customName != null){
-            pCompound.putString("CustomName", customName.tryCollapseToString());
+        if (customName != null) {
+            pCompound.putString("CustomName", customName.getString());
         }
         pCompound.putBoolean("CustomNameVisible", isCustomNameVisible());
         pCompound.put("Weapon", getWeapon().saveOptional(registryAccess()));
@@ -123,10 +121,10 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
-        if (pCompound.contains("CustomName")){
+        if (pCompound.contains("CustomName")) {
             setCustomName(Component.literal(pCompound.getString("CustomName")));
         }
-        if (pCompound.contains("CustomNameVisible")){
+        if (pCompound.contains("CustomNameVisible")) {
             setCustomNameVisible(pCompound.getBoolean("CustomNameVisible"));
         }
         setWeapon(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Weapon")));

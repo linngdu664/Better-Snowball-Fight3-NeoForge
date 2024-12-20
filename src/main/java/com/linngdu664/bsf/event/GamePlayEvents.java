@@ -75,6 +75,28 @@ public class GamePlayEvents {
     private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), 0.15, AttributeModifier.Operation.ADD_VALUE);
     private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
+    public static void pvpMoney(ServerPlayer winPlayer, ServerPlayer losePlayer, ItemStack winDevice, ItemStack loseDevice) {
+        // 胜者拿走败者20%的钱
+        int deathPlayerPoint = loseDevice.getOrDefault(DataComponentRegister.MONEY, 0);
+        int getPoints = deathPlayerPoint / 5;
+        loseDevice.set(DataComponentRegister.MONEY, deathPlayerPoint - getPoints);
+        PacketDistributor.sendToPlayer(losePlayer, new UpdateScorePayload(0, -getPoints));
+        int killerPlayerPoint = winDevice.getOrDefault(DataComponentRegister.MONEY, 0);
+        winDevice.set(DataComponentRegister.MONEY, killerPlayerPoint + getPoints);
+        PacketDistributor.sendToPlayer(winPlayer, new UpdateScorePayload(0, getPoints));
+    }
+
+    public static void pveWinMoney(ServerPlayer winPlayer, RegionControllerSnowGolemEntity loseGolem, ItemStack winDevice) {
+        // 获取雪人的奖励
+        int killerPlayerRank = winDevice.getOrDefault(DataComponentRegister.RANK, 0);
+        int killerPlayerMoney = winDevice.getOrDefault(DataComponentRegister.MONEY, 0);
+        int getRank = loseGolem.getRank();
+        int getMoney = loseGolem.getMoney();
+        winDevice.set(DataComponentRegister.RANK, killerPlayerRank + getRank);
+        winDevice.set(DataComponentRegister.MONEY, killerPlayerMoney + getMoney);
+        PacketDistributor.sendToPlayer(winPlayer, new UpdateScorePayload(getRank, getMoney));
+    }
+
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
         LivingEntity deathEntity = event.getEntity();
@@ -84,70 +106,45 @@ public class GamePlayEvents {
             BSFTeamSavedData savedData = deathEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             if (killerEntity instanceof ServerPlayer killerPlayer) {
                 if (deathEntity instanceof ServerPlayer deathPlayer) {
-                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
-                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
+                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
                     if (device != null && device1 != null && !savedData.isSameTeam(killerPlayer, deathEntity)) {
-                        RegionData region = device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
-                        RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+                        RegionData region = device.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
+                        RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                         if (region1.equals(region) && region.inRegion(killerPlayer.position()) && region.inRegion(deathPlayer.position())) {
-                            // 胜者拿走败者20%的钱
-                            int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                            int getPoints = deathPlayerPoint / 5;
-                            device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                            PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
-                            int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                            device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
-                            PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(0, getPoints));
+                            pvpMoney(killerPlayer, deathPlayer, device1, device);
                         }
                     }
                 } else if (deathEntity instanceof RegionControllerSnowGolemEntity deathGolem) {
-                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
-                    if (device != null && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(killerPlayer.position())) {
-                        int killerPlayerRank = device.getOrDefault(DataComponentRegister.RANK.get(), 0);
-                        int killerPlayerMoney = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                        int getRank = deathGolem.getRank();
-                        int getMoney = deathGolem.getMoney();
-                        device.set(DataComponentRegister.RANK.get(), killerPlayerRank + getRank);
-                        device.set(DataComponentRegister.MONEY.get(), killerPlayerMoney + getMoney);
-                        PacketDistributor.sendToPlayer(killerPlayer, new UpdateScorePayload(getRank, getMoney));
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
+                    if (device != null && deathGolem.getFixedTeamId() != savedData.getTeam(killerPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY).inRegion(killerPlayer.position())) {
+                        pveWinMoney(killerPlayer, deathGolem, device);
                     }
                 }
             } else if (killerEntity instanceof RegionControllerSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
                 ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
-                if (device != null && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY).inRegion(deathPlayer.position())) {
+                if (device != null && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY).inRegion(deathPlayer.position())) {
                     // 掉10%的钱
-                    int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                    int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY, 0);
                     int getPoints = deathPlayerPoint / 10;
-                    device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                    device.set(DataComponentRegister.MONEY, deathPlayerPoint - getPoints);
                     PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
                 }
             } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && killerGolem.getOwner() instanceof ServerPlayer killerOwner) {
                 if (deathEntity instanceof RegionControllerSnowGolemEntity deathGolem) {
-                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerOwner, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerOwner, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
                     if (device != null && deathGolem.getFixedTeamId() != savedData.getTeam(killerOwner.getUUID())) {
-                        int killerPlayerRank = device.getOrDefault(DataComponentRegister.RANK.get(), 0);
-                        int killerPlayerMoney = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                        int getRank = deathGolem.getRank();
-                        int getMoney = deathGolem.getMoney();
-                        device.set(DataComponentRegister.RANK.get(), killerPlayerRank + getRank);
-                        device.set(DataComponentRegister.MONEY.get(), killerPlayerMoney + getMoney);
-                        PacketDistributor.sendToPlayer(killerOwner, new UpdateScorePayload(getRank, getMoney));
+                        pveWinMoney(killerOwner, deathGolem, device);
                     }
-                }else if(deathEntity instanceof ServerPlayer deathPlayer){
-                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
-                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerOwner, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                } else if (deathEntity instanceof ServerPlayer deathPlayer) {
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
+                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerOwner, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
                     if (device != null && device1 != null && !savedData.isSameTeam(killerOwner, deathEntity)) {
-                        RegionData region = device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
-                        RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+                        RegionData region = device.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
+                        RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                         if (region1.equals(region) && region.inRegion(deathPlayer.position())) {
                             // 胜者拿走败者20%的钱
-                            int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                            int getPoints = deathPlayerPoint / 5;
-                            device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
-                            PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
-                            int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
-                            device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
-                            PacketDistributor.sendToPlayer(killerOwner, new UpdateScorePayload(0, getPoints));
+                            pvpMoney(killerOwner, deathPlayer, device1, device);
                         }
                     }
                 }
@@ -287,7 +284,8 @@ public class GamePlayEvents {
                     String.valueOf(region.end().getY()),
                     String.valueOf(region.end().getZ())
             ).withStyle(ChatFormatting.GRAY));
-            if (!region.inRegion(event.getEntity().position())) {
+            Entity entity = event.getEntity();
+            if (entity != null && !region.inRegion(entity.position())) {
                 list.add(Component.translatable("region_cannot_use.tooltip").withStyle(ChatFormatting.DARK_RED));
             }
         }
