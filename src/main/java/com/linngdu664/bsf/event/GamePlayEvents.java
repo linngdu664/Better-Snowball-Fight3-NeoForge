@@ -121,6 +121,36 @@ public class GamePlayEvents {
                     device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
                     PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
                 }
+            } else if (killerEntity instanceof BSFSnowGolemEntity killerGolem && killerGolem.getOwner() instanceof ServerPlayer killerOwner) {
+                if (deathEntity instanceof RegionControllerSnowGolemEntity deathGolem) {
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(killerOwner, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    if (device != null && deathGolem.getFixedTeamId() != savedData.getTeam(killerOwner.getUUID())) {
+                        int killerPlayerRank = device.getOrDefault(DataComponentRegister.RANK.get(), 0);
+                        int killerPlayerMoney = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                        int getRank = deathGolem.getRank();
+                        int getMoney = deathGolem.getMoney();
+                        device.set(DataComponentRegister.RANK.get(), killerPlayerRank + getRank);
+                        device.set(DataComponentRegister.MONEY.get(), killerPlayerMoney + getMoney);
+                        PacketDistributor.sendToPlayer(killerOwner, new UpdateScorePayload(getRank, getMoney));
+                    }
+                }else if(deathEntity instanceof ServerPlayer deathPlayer){
+                    ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    ItemStack device1 = BSFCommonUtil.findInventoryItemStack(killerOwner, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
+                    if (device != null && device1 != null && !savedData.isSameTeam(killerOwner, deathEntity)) {
+                        RegionData region = device.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+                        RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
+                        if (region1.equals(region) && region.inRegion(deathPlayer.position())) {
+                            // 胜者拿走败者20%的钱
+                            int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                            int getPoints = deathPlayerPoint / 5;
+                            device.set(DataComponentRegister.MONEY.get(), deathPlayerPoint - getPoints);
+                            PacketDistributor.sendToPlayer(deathPlayer, new UpdateScorePayload(0, -getPoints));
+                            int killerPlayerPoint = device1.getOrDefault(DataComponentRegister.MONEY.get(), 0);
+                            device1.set(DataComponentRegister.MONEY.get(), killerPlayerPoint + getPoints);
+                            PacketDistributor.sendToPlayer(killerOwner, new UpdateScorePayload(0, getPoints));
+                        }
+                    }
+                }
             }
         }
     }
