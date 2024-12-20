@@ -243,6 +243,9 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     public void setAliveRange(RegionData region) {
         aliveRange = RegionData.copy(region);
     }
+    public RegionData getAliveRange() {
+        return aliveRange;
+    }
 
     @Override
     public void performRangedAttack(LivingEntity livingEntity, float v) {
@@ -480,11 +483,11 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
                     int y1 = Mth.floor(golemY - r * Mth.sin(phi));
                     int z = Mth.floor(golemZ + r * Mth.sin(initTheta + theta1) * Mth.cos(phi));
                     BlockPos blockPos = new BlockPos(x, y, z);
-                    if (canStandOn(blockPos, level)) {
+                    if (canStandOn(blockPos, level) && aliveRange.inRegion(blockPos)) {
                         return new Vec3(x, y, z);
                     }
                     blockPos = new BlockPos(x, y1, z);
-                    if (canStandOn(blockPos, level)) {
+                    if (canStandOn(blockPos, level) && aliveRange.inRegion(blockPos)) {
                         return new Vec3(x, y1, z);
                     }
                 }

@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.ai.goal;
 
 import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.item.component.ItemData;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
@@ -179,7 +180,8 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
             }
             if (golem.getCore().getItem().equals(ItemRegister.ACTIVE_TELEPORTATION_GOLEM_CORE.get()) && golem.getCoreCoolDown() == 0 && golem.canMoveAndAttack()) {
                 Vec3 vec3 = getTargetBackTeleportPos();
-                if (vec3 != null) {
+                RegionData aliveRange = golem.getAliveRange();
+                if (vec3 != null && (aliveRange==null || aliveRange.inRegion(vec3))) {
                     golem.tpWithParticlesAndResetCD(vec3);
                 }
             }
