@@ -236,7 +236,8 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.has(DataComponentRegister.REGION.get()) && !itemStack.getItem().equals(ItemRegister.REGION_TOOL.get()) && !itemStack.get(DataComponentRegister.REGION.get()).inRegion(event.getHitVec().getLocation())) {
+        Item item = itemStack.getItem();
+        if (itemStack.has(DataComponentRegister.REGION.get()) && !item.equals(ItemRegister.SCORING_DEVICE.get()) && !item.equals(ItemRegister.REGION_TOOL.get()) && !itemStack.get(DataComponentRegister.REGION.get()).inRegion(event.getHitVec().getLocation())) {
             event.setCanceled(true);
         }
     }

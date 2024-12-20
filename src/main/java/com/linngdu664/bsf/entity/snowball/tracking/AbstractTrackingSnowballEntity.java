@@ -13,6 +13,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public abstract class AbstractTrackingSnowballEntity extends AbstractBSFSnowballEntity {
     protected final double range = 10;
     private final boolean isLockFeet;
@@ -132,5 +134,19 @@ public abstract class AbstractTrackingSnowballEntity extends AbstractBSFSnowball
         vz *= adjusted / vNewX;
         //Do not directly use "setDeltaMovement" because it will cause the lagging of texture. Use "push" may avoid this.
         push(vx - velocity.x, vy - velocity.y, vz - velocity.z);
+    }
+
+    protected Entity getNearest(List<? extends Entity> list) {
+        double maxDisSq = Double.MAX_VALUE;
+        Entity entity = null;
+        Vec3 selfPos = getPosition(1F);
+        for (Entity e : list) {
+            double disSqr = selfPos.distanceToSqr(e.getPosition(1F));
+            if (disSqr < maxDisSq) {
+                maxDisSq = disSqr;
+                entity = e;
+            }
+        }
+        return entity;
     }
 }

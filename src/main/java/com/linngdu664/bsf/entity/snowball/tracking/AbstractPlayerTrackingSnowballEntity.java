@@ -9,7 +9,6 @@ import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
@@ -37,9 +36,9 @@ public abstract class AbstractPlayerTrackingSnowballEntity extends AbstractTrack
         AABB aabb = getBoundingBox().inflate(range);
         BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
         if (shooter instanceof Player player) {
-            List<Player> list = level.getEntitiesOfClass(Player.class, aabb, p -> !p.isSpectator() && !p.equals(shooter) && !savedData.isSameTeam(player, p) && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(selfPos)) > 0.5);
+            List<Player> list = level.getEntitiesOfClass(Player.class, aabb, p -> !p.isSpectator() && !p.isCreative() && !p.equals(shooter) && !savedData.isSameTeam(player, p) && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(selfPos)) > 0.5);
             if (!list.isEmpty()) {
-                return level.getNearestEntity(list, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
+                return getNearest(list);
             }
             List<AbstractBSFSnowGolemEntity> list1 = level.getEntitiesOfClass(AbstractBSFSnowGolemEntity.class, aabb, p -> {
                 Vec3 targetPos = p.getPosition(1);
@@ -55,7 +54,7 @@ public abstract class AbstractPlayerTrackingSnowballEntity extends AbstractTrack
                 }
                 return !golem.getOwner().equals(player) && !savedData.isSameTeam(player, golem.getOwner()) && BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
             });
-            return level.getNearestEntity(list1, TargetingConditions.DEFAULT, null, getX(), getY(), getZ());
+            return getNearest(list1);
         }
         if (shooter instanceof AbstractBSFSnowGolemEntity snowGolem) {
             LivingEntity target = snowGolem.getTarget();

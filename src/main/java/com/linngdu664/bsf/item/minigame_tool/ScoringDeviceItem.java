@@ -86,7 +86,7 @@ public class ScoringDeviceItem extends Item {
                     } else {
                         player.getInventory().placeItemBackInInventory(goods);
                         stack.set(DataComponentRegister.MONEY.get(), money - be.getPrice());
-                        player.displayClientMessage(Component.translatable("scoring_device_buy_success.tip"), false);
+//                        player.displayClientMessage(Component.translatable("scoring_device_buy_success.tip"), false);
                     }
                 }
                 Vec3 soundPos = be.getBlockPos().getCenter();
