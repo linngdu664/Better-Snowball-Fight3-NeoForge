@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.ai.goal.target;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -24,7 +25,8 @@ public class BSFGolemOwnerHurtEnemyTeamGoal extends TargetGoal {
             return false;
         }
         ownerLastHurt = owner.getLastHurtMob();
-        if (snowGolem.getLocator() != 2 || !snowGolem.canPassiveAttackInAttackEnemyTeamMode(ownerLastHurt)) {
+        RegionData aliveRange = snowGolem.getAliveRange();
+        if (snowGolem.getLocator() != 2 || aliveRange != null && ownerLastHurt != null && !aliveRange.inRegion(ownerLastHurt.position()) || !snowGolem.canPassiveAttackInAttackEnemyTeamMode(ownerLastHurt)) {
             return false;
         }
         int $$1 = owner.getLastHurtMobTimestamp();

@@ -119,9 +119,9 @@ public class ColdCompressionJetEngineItem extends Item {
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new ToggleMovingSoundPayload(entity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP5.get(), ToggleMovingSoundPayload.PLAY_ONCE));
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new ToggleMovingSoundPayload(entity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP4.get(), ToggleMovingSoundPayload.STOP_LOOP));
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new ToggleMovingSoundPayload(entity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.STOP_LOOP));
-        }
-        if (entity instanceof Player player) {
-            player.awardStat(Stats.ITEM_USED.get(this));
+            if (entity instanceof Player player) {
+                player.awardStat(Stats.ITEM_USED.get(this));
+            }
         }
     }
 

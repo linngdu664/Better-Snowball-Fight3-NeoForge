@@ -33,15 +33,15 @@ public class SnowGolemContainer extends Item {
         if (itemStack.has(DataComponentRegister.SNOW_GOLEM_DATA)) {
             if (!level.isClientSide) {
                 BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(level);
-                snowGolem.readAdditionalSaveData(itemStack.get(DataComponentRegister.SNOW_GOLEM_DATA));
+                snowGolem.load(itemStack.get(DataComponentRegister.SNOW_GOLEM_DATA));
                 BlockPos blockPos = pContext.getClickedPos();
                 snowGolem.moveTo(blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5, 0.0F, 0.0F);
                 snowGolem.setOwnerUUID(player.getUUID());
                 level.addFreshEntity(snowGolem);
                 itemStack.remove(DataComponentRegister.SNOW_GOLEM_DATA);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_PLACE, SoundSource.NEUTRAL, 1.0F, 1.0F);
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
-            player.awardStat(Stats.ITEM_USED.get(this));
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

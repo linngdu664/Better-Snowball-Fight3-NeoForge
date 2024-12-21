@@ -43,16 +43,13 @@ public class RepulsiveFieldGeneratorItem extends AbstractBSFEnhanceableToolItem 
                     projectile.push(dvVec.x, dvVec.y, dvVec.z);
                     ((ServerLevel) pLevel).sendParticles(ParticleRegister.GENERATOR_PUSH.get(), projectile.getX(), projectile.getY(), projectile.getZ(), 1, 0, 0, 0, 0);
                 }
-            }
-            if (!player.getAbilities().instabuild) {
                 pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
-            }
-            player.awardStat(Stats.ITEM_USED.get(this));
-            if (pLevel.isClientSide) {
+                player.awardStat(Stats.ITEM_USED.get(this));
+                pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.FIELD_PUSH.get(), SoundSource.PLAYERS, 0.5F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+            } else {
                 ScreenshakeHandler.addScreenshake((new ScreenshakeInstance(5)).setIntensity(0.5f).setEasing(Easing.EXPO_IN_OUT));
             }
             player.getCooldowns().addCooldown(this, getUseDuration(pStack, pLivingEntity) - pTimeCharged + 20);
-            pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegister.FIELD_PUSH.get(), SoundSource.PLAYERS, 0.5F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
         }
     }
 

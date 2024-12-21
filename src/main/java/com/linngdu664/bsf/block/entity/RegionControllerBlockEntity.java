@@ -163,7 +163,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));
                 Vec3 summonPos = blockPos.above().getBottomCenter();
                 RegionControllerSnowGolemEntity snowGolem = EntityRegister.REGION_CONTROLLER_SNOW_GOLEM.get().create(level);
-                snowGolem.readAdditionalSaveData(snowGolemList.get(i));
+                snowGolem.load(snowGolemList.get(i));
                 snowGolem.setDropEquipment(false);
                 snowGolem.setDropSnowball(false);
                 snowGolem.setFixedTeamId(teamId);
@@ -285,9 +285,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         List<BSFSnowGolemEntity> golemList = level.getEntitiesOfClass(BSFSnowGolemEntity.class, region.toBoundingBox(), p -> true);
         snowGolemList = new ArrayList<>();
         for (BSFSnowGolemEntity golem : golemList) {
-            CompoundTag compoundTag = new CompoundTag();
-            golem.addAdditionalSaveData(compoundTag);
-            snowGolemList.add(compoundTag);
+            snowGolemList.add(golem.getReconstructData());
         }
         snowGolemList.sort(Comparator.comparingInt(e -> e.getInt("Rank")));
         setChanged();

@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.ai.goal.target;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
@@ -19,7 +20,6 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
     private final RegionControllerSnowGolemEntity snowGolem;
     protected LivingEntity target;
 
-
     public RegionControllerGolemNearestAttackableTargetGoal(RegionControllerSnowGolemEntity snowGolem) {
         super(snowGolem, false, false);
         this.snowGolem = snowGolem;
@@ -30,11 +30,15 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
         if (mob.getRandom().nextInt(DEFAULT_RANDOM_INTERVAL) != 0) {
             return false;
         }
-        this.findTarget();
+        findTarget();
         return target != null;
     }
 
     protected AABB getTargetSearchArea() {
+        RegionData aliveRange = snowGolem.getAliveRange();
+        if (aliveRange != null) {
+            return mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE).intersect(aliveRange.toBoundingBox());
+        }
         return mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
     }
 
@@ -59,7 +63,7 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
             }
             return false;
         });
-        target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+        target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
     }
 
     public void start() {

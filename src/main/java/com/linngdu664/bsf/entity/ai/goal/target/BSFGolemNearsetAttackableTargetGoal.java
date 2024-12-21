@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.ai.goal.target;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
@@ -12,7 +13,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 
-import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.Objects;
 
@@ -20,7 +20,6 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     private static final int DEFAULT_RANDOM_INTERVAL = 4;
     private static final int SEARCH_DISTANCE = 50;
     private final BSFSnowGolemEntity snowGolem;
-    @Nullable
     protected LivingEntity target;
 
     public BSFGolemNearsetAttackableTargetGoal(BSFSnowGolemEntity snowGolem) {
@@ -38,7 +37,11 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     }
 
     protected AABB getTargetSearchArea() {
-        return this.mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
+        RegionData aliveRange = snowGolem.getAliveRange();
+        if (aliveRange != null) {
+            return mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE).intersect(aliveRange.toBoundingBox());
+        }
+        return mob.getBoundingBox().inflate(SEARCH_DISTANCE, SEARCH_DISTANCE, SEARCH_DISTANCE);
     }
 
     protected void findTarget() {
@@ -50,7 +53,7 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
         Level level = snowGolem.level();
         if (snowGolem.getLocator() == 0) {
             targetConditions.selector(p -> p instanceof Enemy);
-            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else if (snowGolem.getLocator() == 2) {
             BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
             int teamId = savedData.getTeam(snowGolem.getOwnerUUID());
@@ -75,11 +78,11 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
                 }
                 return false;
             });
-            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else {
             if (snowGolem.getOwner() != null) {
                 targetConditions.selector(p -> !(p instanceof Player) && !snowGolem.isEntityHasSameOwner(p) || p instanceof Player player && !player.isCreative() && !player.isSpectator() && !player.equals(snowGolem.getOwner()));
-                target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p_148152_ -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+                target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
             } else {
                 targetConditions.selector(p -> !p.isSpectator());
                 target = level.getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
@@ -88,7 +91,7 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
     }
 
     public void start() {
-        this.mob.setTarget(this.target);
+        mob.setTarget(this.target);
         super.start();
     }
 }

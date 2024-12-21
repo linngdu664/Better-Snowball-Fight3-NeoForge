@@ -101,11 +101,6 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                     if (d <= 0) {
                         return;
                     }
-//                    Vec3 projPos = pPos.add(cameraVec.scale(-d));
-//                    BlockHitResult blockHitResult = pLevel.clip(new ClipContext(pPos, projPos, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, p));
-//                    if (blockHitResult.getType()!=BlockHitResult.Type.MISS){
-//                        return;
-//                    }
                     double basePower = Math.log(DISTANCE + 1 - d);
                     Vec3 pushVec = cameraVec.scale(basePower * PUSH_POWER);
                     if (p instanceof LivingEntity) {

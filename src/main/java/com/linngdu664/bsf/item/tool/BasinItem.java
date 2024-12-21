@@ -95,8 +95,8 @@ public class BasinItem extends Item {
                 itemStack.remove(DataComponentRegister.BASIN_SNOW_TYPE);
             }
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.POWDER_SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+            pPlayer.awardStat(Stats.ITEM_USED.get(this));
         }
-        pPlayer.awardStat(Stats.ITEM_USED.get(this));
         return InteractionResultHolder.success(itemStack);
     }
 

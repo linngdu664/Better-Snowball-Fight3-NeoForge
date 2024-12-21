@@ -18,7 +18,6 @@ import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -95,11 +94,6 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
-        Component customName = getCustomName();
-        if (customName != null) {
-            pCompound.putString("CustomName", customName.getString());
-        }
-        pCompound.putBoolean("CustomNameVisible", isCustomNameVisible());
         pCompound.put("Weapon", getWeapon().saveOptional(registryAccess()));
         pCompound.put("Ammo", getAmmo().saveOptional(registryAccess()));
         pCompound.put("Core", getCore().saveOptional(registryAccess()));
@@ -121,12 +115,6 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
-        if (pCompound.contains("CustomName")) {
-            setCustomName(Component.literal(pCompound.getString("CustomName")));
-        }
-        if (pCompound.contains("CustomNameVisible")) {
-            setCustomNameVisible(pCompound.getBoolean("CustomNameVisible"));
-        }
         setWeapon(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Weapon")));
         setAmmo(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Ammo")));
         setCore(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Core")));
@@ -243,6 +231,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     public void setAliveRange(RegionData region) {
         aliveRange = RegionData.copy(region);
     }
+
     public RegionData getAliveRange() {
         return aliveRange;
     }
@@ -387,6 +376,14 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
                         playSound(SoundRegister.FIELD_PUSH.get(), 0.5F, 1.0F / (getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                         resetCoreCoolDown();
                     }
+                }
+            }
+            if (aliveRange != null) {
+                if (getTarget() != null && !aliveRange.inRegion(getTarget().position())) {
+                    setTarget(null);
+                }
+                if (!aliveRange.inRegion(position()) && isAlive()) {
+                    hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
                 }
             }
         }

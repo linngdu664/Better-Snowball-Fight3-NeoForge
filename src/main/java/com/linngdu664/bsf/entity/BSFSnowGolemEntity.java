@@ -24,8 +24,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -248,7 +246,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                     ((ServerLevel) level).sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY() + 1, this.getZ(), 7, 0.4, 0.5, 0.4, 0.05);
                     this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 } else {
-                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("potionSickness.tip", null, new Object[]{String.valueOf(getPotionSickness())})), false);
+                    pPlayer.displayClientMessage(Component.translatable("potionSickness.tip", String.valueOf(getPotionSickness())), false);
                 }
             } else if (item.equals(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get())) {
                 int targetMode = itemStack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
@@ -258,14 +256,14 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                 }
                 setLocator((byte) targetMode);
                 setStatus((byte) statusMode);
-                pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("import_state.tip", null, new Object[0])), false);
+                pPlayer.displayClientMessage(Component.translatable("import_state.tip"), false);
                 Vec3 color = new Vec3(0.5, 1, 0.5);
                 PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.TARGET_LOCATOR.get()) && getLocator() == 1) {
                 Entity entity = ((ServerLevel) level).getEntity(itemStack.getOrDefault(DataComponentRegister.TARGET_UUID, new UuidData(new UUID(0, 0))).uuid());
                 if (entity instanceof LivingEntity livingEntity && entity != this) {
-                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("snow_golem_locator_tip", null, new Object[0])), false);
+                    pPlayer.displayClientMessage(Component.translatable("snow_golem_locator_tip"), false);
                     setTarget(livingEntity);
                 }
                 Vec3 color = new Vec3(0.5, 1, 1);
@@ -284,22 +282,18 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                 this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.CREATIVE_SNOW_GOLEM_TOOL.get())) {
                 if (pPlayer.isShiftKeyDown()) {
-                    CompoundTag tag1 = new CompoundTag();
-                    addAdditionalSaveData(tag1);
-                    itemStack.set(DataComponentRegister.SNOW_GOLEM_DATA, tag1);
-                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("copy.tip", null, new Object[0])), false);
+                    itemStack.set(DataComponentRegister.SNOW_GOLEM_DATA, getReconstructData());
+                    pPlayer.displayClientMessage(Component.translatable("copy.tip"), false);
                 } else {
                     setEnhance(!getEnhance());
-                    pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("golem_enhance.tip", null, new Object[]{String.valueOf(getEnhance())})), false);
+                    pPlayer.displayClientMessage(Component.translatable("golem_enhance.tip", String.valueOf(getEnhance())), false);
                     Vec3 color = new Vec3(1, 0.8, 0.5);
                     PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 }
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.SNOW_GOLEM_CONTAINER.get())) {
                 if (!itemStack.has(DataComponentRegister.SNOW_GOLEM_DATA)) {
-                    CompoundTag tag1 = new CompoundTag();
-                    addAdditionalSaveData(tag1);
-                    itemStack.set(DataComponentRegister.SNOW_GOLEM_DATA, tag1);
+                    itemStack.set(DataComponentRegister.SNOW_GOLEM_DATA, getReconstructData());
                     playSound(SoundEvents.SNOW_BREAK);
                     ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY() + 1, this.getZ(), 20, 0, 0.5, 0, 0.05);
                     discard();
@@ -349,11 +343,17 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             } else {
                 entityData.set(TARGET_NAME, Optional.of(target.getName()));
             }
-            if (isAlive() && (aliveRange != null && !aliveRange.inRegion(position()))) {
-                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
-            }
         }
         super.tick();
+    }
+
+    public CompoundTag getReconstructData() {
+        CompoundTag tag1 = new CompoundTag();
+        saveWithoutId(tag1);
+        tag1.remove("Pos");
+        tag1.remove("Motion");
+        tag1.remove("UUID");
+        return tag1;
     }
 
     public boolean isEntityHasSameOwner(@Nullable LivingEntity pTarget) {

@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.ai.goal.target;
 
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
+import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -24,31 +25,26 @@ public class BSFGolemOwnerHurtByTargetGoal extends TargetGoal {
 //     2: enemy player
 //     3: all
     public boolean canUse() {
-        if (snowGolem.getStatus() == 0) {
-            return false;
-        }
         LivingEntity owner = snowGolem.getOwner();
-        if (owner == null) {
+        if (snowGolem.getStatus() == 0 || owner == null) {
             return false;
         }
         ownerLastHurtBy = owner.getLastHurtByMob();
+        RegionData aliveRange = snowGolem.getAliveRange();
+        if (aliveRange != null && ownerLastHurtBy != null && !aliveRange.inRegion(ownerLastHurtBy.position())) {
+            return false;
+        }
         switch (snowGolem.getLocator()) {
             case 0:
-                if (!(ownerLastHurtBy instanceof Enemy)) {
-                    return false;
-                }
+                if (!(ownerLastHurtBy instanceof Enemy)) return false;
                 break;
             case 1:
                 return false;
             case 2:
-                if (!snowGolem.canPassiveAttackInAttackEnemyTeamMode(ownerLastHurtBy)) {
-                    return false;
-                }
+                if (!snowGolem.canPassiveAttackInAttackEnemyTeamMode(ownerLastHurtBy)) return false;
                 break;
             default:
-                if (snowGolem.isEntityHasSameOwner(ownerLastHurtBy)) {
-                    return false;
-                }
+                if (snowGolem.isEntityHasSameOwner(ownerLastHurtBy)) return false;
         }
         int $$1 = owner.getLastHurtByMobTimestamp();
         return $$1 != timestamp && canAttack(ownerLastHurtBy, TargetingConditions.DEFAULT);

@@ -112,7 +112,7 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
             float yaw = player.getYRot();
             if (timer % 9 == 0 && (!isExplosive || timer % 36 == 0)) {
                 Vec3 cameraVec = Vec3.directionFromRotation(pitch, yaw);
-                if (pLevel.isClientSide()) {
+                if (pLevel.isClientSide) {
                     // add push
                     player.push(-cameraVec.x * recoil * 0.25, -cameraVec.y * recoil * 0.25, -cameraVec.z * recoil * 0.25);
                 } else {

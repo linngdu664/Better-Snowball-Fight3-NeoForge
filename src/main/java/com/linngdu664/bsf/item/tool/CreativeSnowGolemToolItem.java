@@ -30,7 +30,7 @@ public class CreativeSnowGolemToolItem extends Item {
             ItemStack stack = pContext.getItemInHand();
             if (stack.has(DataComponentRegister.SNOW_GOLEM_DATA)) {
                 BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(level);
-                snowGolem.readAdditionalSaveData(stack.get(DataComponentRegister.SNOW_GOLEM_DATA));
+                snowGolem.load(stack.get(DataComponentRegister.SNOW_GOLEM_DATA));
                 BlockPos blockPos = pContext.getClickedPos();
                 snowGolem.moveTo(blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5, 0.0F, 0.0F);
                 level.addFreshEntity(snowGolem);

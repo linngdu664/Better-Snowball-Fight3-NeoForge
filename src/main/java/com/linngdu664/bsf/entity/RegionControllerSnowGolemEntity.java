@@ -69,10 +69,8 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
     @Override
     public void tick() {
         Level level = level();
-        if (!level.isClientSide) {
-            if (isAlive() && (aliveRange != null && !aliveRange.inRegion(position()) || getFixedTeamId() >= 0 && lifespan > 0 && --lifespan == 0)) {
-                hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
-            }
+        if (!level.isClientSide && isAlive() && lifespan > 0 && --lifespan == 0) {
+            hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
         }
         super.tick();
     }
