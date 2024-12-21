@@ -51,6 +51,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -73,6 +74,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     protected int lifespan;   // boss寿命
     protected boolean dropEquipment;
     protected boolean dropSnowball;
+    @Nullable
     protected RegionData aliveRange;
 
     protected AbstractBSFSnowGolemEntity(EntityType<? extends PathfinderMob> entityType, Level level) {
@@ -81,7 +83,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(WEAPON, ItemStack.EMPTY);
         builder.define(AMMO, ItemStack.EMPTY);
@@ -232,12 +234,12 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         aliveRange = RegionData.copy(region);
     }
 
-    public RegionData getAliveRange() {
+    public @Nullable RegionData getAliveRange() {
         return aliveRange;
     }
 
     @Override
-    public void performRangedAttack(LivingEntity livingEntity, float v) {
+    public void performRangedAttack(@NotNull LivingEntity livingEntity, float v) {
         Level level = level();
         ItemStack weapon = getWeapon();
         ItemStack ammo = getAmmo();
@@ -396,7 +398,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     }
 
     @Override
-    protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
+    protected void dropCustomDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource damageSource, boolean recentlyHit) {
         // 永远不会掉隐藏的护甲了，同时已经判断掉落gamerule了
         if (dropEquipment) {
             int weaponVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getWeapon());
@@ -480,11 +482,11 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
                     int y1 = Mth.floor(golemY - r * Mth.sin(phi));
                     int z = Mth.floor(golemZ + r * Mth.sin(initTheta + theta1) * Mth.cos(phi));
                     BlockPos blockPos = new BlockPos(x, y, z);
-                    if (canStandOn(blockPos, level) && aliveRange.inRegion(blockPos)) {
+                    if ((aliveRange == null || aliveRange.inRegion(blockPos)) && canStandOn(blockPos, level)) {
                         return new Vec3(x, y, z);
                     }
                     blockPos = new BlockPos(x, y1, z);
-                    if (canStandOn(blockPos, level) && aliveRange.inRegion(blockPos)) {
+                    if ((aliveRange == null || aliveRange.inRegion(blockPos)) && canStandOn(blockPos, level)) {
                         return new Vec3(x, y1, z);
                     }
                 }
@@ -512,7 +514,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         return BSFCommonUtil.radRotationToVector(1, (Mth.lerp(partialTicks, this.yBodyRotO + ((this.yHeadRotO - this.yBodyRotO) * 0.25), this.yBodyRot + ((this.yHeadRot - this.yBodyRot) * 0.25)) + 90 + degreeOffset) * Mth.DEG_TO_RAD, 0);
     }
 
-    public abstract boolean canPassiveAttackInAttackEnemyTeamMode(Entity entity);
+    public abstract boolean canPassiveAttackInAttackEnemyTeamMode(@Nullable Entity entity);
 
     public abstract boolean shouldConsumeAmmo();
 

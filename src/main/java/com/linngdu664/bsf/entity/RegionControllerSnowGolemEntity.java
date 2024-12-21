@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity {
     private static final EntityDataAccessor<Byte> FIXED_TEAM_ID = SynchedEntityData.defineId(RegionControllerSnowGolemEntity.class, EntityDataSerializers.BYTE);
@@ -30,7 +31,7 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(FIXED_TEAM_ID, (byte) -1);
     }
@@ -76,7 +77,7 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
     }
 
     @Override
-    public boolean canPassiveAttackInAttackEnemyTeamMode(Entity entity) {
+    public boolean canPassiveAttackInAttackEnemyTeamMode(@Nullable Entity entity) {
         if (entity == null) {
             return false;
         }

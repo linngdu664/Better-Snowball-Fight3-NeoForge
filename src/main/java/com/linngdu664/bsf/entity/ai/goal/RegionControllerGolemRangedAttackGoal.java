@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.ai.goal;
 
 import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.item.component.ItemData;
+import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.weapon.AbstractBSFWeaponItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
@@ -245,6 +246,7 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
         float initTheta = (float) Mth.atan2(targetZ - golem.getZ(), targetX - golem.getX());
         Vec3 targetPos = target.getEyePosition();
         BlockPos targetBlockPos = new BlockPos(BSFCommonUtil.vec3ToI(targetPos));
+        RegionData aliveRange = golem.getAliveRange();
         for (int r = 4; r <= 10; r++) {
             float step = 1.0F / r;
             for (float theta = 0; theta < Mth.PI * 0.25F; theta += step) {
@@ -256,19 +258,19 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
                     int y1 = Mth.floor(targetY + r * Mth.sin(-phi));
                     int z1 = Mth.floor(targetZ + r * Mth.sin(initTheta - theta) * Mth.cos(phi));
                     BlockPos blockPos = new BlockPos(x, y, z);
-                    if (golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
+                    if ((aliveRange == null || aliveRange.inRegion(blockPos)) && golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
                         return new Vec3(x, y, z);
                     }
                     blockPos = new BlockPos(x1, y, z1);
-                    if (golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
+                    if ((aliveRange == null || aliveRange.inRegion(blockPos)) && golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
                         return new Vec3(x1, y, z1);
                     }
                     blockPos = new BlockPos(x1, y1, z1);
-                    if (golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
+                    if ((aliveRange == null || aliveRange.inRegion(blockPos)) && golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
                         return new Vec3(x1, y1, z1);
                     }
                     blockPos = new BlockPos(x, y1, z);
-                    if (golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
+                    if ((aliveRange == null || aliveRange.inRegion(blockPos)) && golem.canStandOn(blockPos, level) && level.clip(new ClipContext(blockPos.above().getCenter(), targetPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, golem)).getBlockPos().equals(targetBlockPos)) {
                         return new Vec3(x, y1, z);
                     }
                 }

@@ -74,7 +74,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(@NotNull SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(STATUS_FLAG, (byte) 0);
         builder.define(LOCATOR_FLAG, (byte) 0);
@@ -364,7 +364,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     }
 
     @Override
-    public boolean canPassiveAttackInAttackEnemyTeamMode(Entity entity) {
+    public boolean canPassiveAttackInAttackEnemyTeamMode(@Nullable Entity entity) {
         if (entity == null) {
             return false;
         }
