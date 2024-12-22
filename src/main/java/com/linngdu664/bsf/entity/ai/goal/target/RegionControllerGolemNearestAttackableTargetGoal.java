@@ -56,9 +56,6 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
                 return teamId != snowGolem1.getFixedTeamId();
             }
             if (p instanceof Player player) {
-                if (player.isCreative() || player.isSpectator()) {
-                    return false;
-                }
                 return teamId != savedData.getTeam(player.getUUID());
             }
             return false;

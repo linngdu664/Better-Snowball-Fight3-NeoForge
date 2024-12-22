@@ -60,12 +60,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements OwnableEntity {
-    private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Byte> STATUS_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Byte> LOCATOR_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> POTION_SICKNESS = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<Component>> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private boolean isSpecialMode;
 
     public BSFSnowGolemEntity(EntityType<? extends AbstractBSFSnowGolemEntity> entityType, Level level) {
         super(entityType, level);
@@ -79,7 +79,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         builder.define(STATUS_FLAG, (byte) 0);
         builder.define(LOCATOR_FLAG, (byte) 0);
         builder.define(POTION_SICKNESS, 0);
-        builder.define(ENHANCE, false);
         builder.define(TARGET_NAME, Optional.empty());
         builder.define(DATA_OWNERUUID_ID, Optional.empty());
     }
@@ -91,6 +90,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         pCompound.putByte("Locator", getLocator());
         pCompound.putBoolean("Enhance", getEnhance());
         pCompound.putInt("PotionSickness", getPotionSickness());
+        pCompound.putBoolean("SpecialMode", isSpecialMode);
         if (getOwnerUUID() != null) {
             pCompound.putUUID("Owner", getOwnerUUID());
         }
@@ -103,6 +103,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         setLocator(pCompound.getByte("Locator"));
         setEnhance(pCompound.getBoolean("Enhance"));
         setPotionSickness(pCompound.getInt("PotionSickness"));
+        isSpecialMode = pCompound.getBoolean("SpecialMode");
         UUID uuid;
         if (pCompound.hasUUID("Owner")) {
             uuid = pCompound.getUUID("Owner");
@@ -141,12 +142,8 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         entityData.set(POTION_SICKNESS, sickness);
     }
 
-    public boolean getEnhance() {
-        return entityData.get(ENHANCE);
-    }
-
-    public void setEnhance(boolean enhance0) {
-        entityData.set(ENHANCE, enhance0);
+    public boolean isSpecialMode() {
+        return isSpecialMode;
     }
 
     @Override
@@ -326,14 +323,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     public void tick() {
         Level level = level();
         if (!level.isClientSide) {
-            int coreCooldown = getCoreCoolDown();
-            if (getEnhance()) {
-                heal(1);
-                addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 2, 3));
-                if (coreCooldown > 0) {
-                    setCoreCoolDown(Math.max(getCoreCoolDown() - 5, 0));
-                }
-            }
             if (getPotionSickness() > 0) {
                 setPotionSickness(getPotionSickness() - 1);
             }
@@ -381,7 +370,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             }
             return savedData.getTeam(getOwnerUUID()) != snowGolem.getFixedTeamId();
         }
-        if (entity.getType().equals(EntityType.PLAYER)) {
+        if (entity instanceof Player) {
             return !savedData.isSameTeam(getOwner(), entity);
         }
         return false;
@@ -389,14 +378,14 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
 
     @Override
     public boolean shouldConsumeAmmo() {
-        return !(getAmmo().has(DataComponents.UNBREAKABLE) || getEnhance() || getOwner() == null);
+        return !(getAmmo().has(DataComponents.UNBREAKABLE) || getEnhance() || isSpecialMode);
     }
 
     @Override
     public boolean shouldDamageWeapon() {
         ItemStack weapon = getWeapon();
         float damageChance = 1.0F / (1.0F + EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.UNBREAKING), weapon));
-        return !(weapon.has(DataComponents.UNBREAKABLE) || getEnhance() || getOwner() == null || getRandom().nextFloat() > damageChance);
+        return !(weapon.has(DataComponents.UNBREAKABLE) || getEnhance() || isSpecialMode || getRandom().nextFloat() > damageChance);
     }
 
     @Override

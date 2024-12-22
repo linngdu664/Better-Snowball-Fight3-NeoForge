@@ -134,7 +134,7 @@ public class RegionControllerGolemRangedAttackGoal extends Goal {
         }
         dx = dx / x * cosTheta;
         dz = dz / x * cosTheta;
-        List<LivingEntity> list = golem.level().getEntitiesOfClass(LivingEntity.class, golem.getBoundingBox().inflate(x), p -> !golem.equals(p) && !pTarget.equals(p));
+        List<LivingEntity> list = golem.level().getEntitiesOfClass(LivingEntity.class, golem.getBoundingBox().inflate(x), p -> !p.isSpectator() && !golem.equals(p) && !pTarget.equals(p));
         for (LivingEntity entity : list) {
             double dx1 = entity.getX() - golem.getX();
             double dz1 = entity.getZ() - golem.getZ();

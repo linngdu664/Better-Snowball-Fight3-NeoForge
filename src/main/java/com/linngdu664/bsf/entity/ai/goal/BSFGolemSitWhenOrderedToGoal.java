@@ -26,12 +26,11 @@ public class BSFGolemSitWhenOrderedToGoal extends Goal {
         } else if (!golem.onGround()) {
             return false;
         } else {
-            LivingEntity livingentity = golem.getOwner();
+            LivingEntity livingentity = golem.getOwner();   // 主人下线也为null
             if (livingentity == null) {
-                return true;
-            } else {
-                return (!(golem.distanceToSqr(livingentity) < 144.0) || livingentity.getLastHurtByMob() == null) && golem.getStatus() == 0;
+                return !golem.isSpecialMode() || golem.getStatus() == 0;    // 特殊模式无视主人
             }
+            return golem.getStatus() == 0;
         }
     }
 

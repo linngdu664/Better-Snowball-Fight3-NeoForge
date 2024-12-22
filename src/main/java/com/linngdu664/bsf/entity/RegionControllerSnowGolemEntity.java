@@ -88,7 +88,7 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
         if (entity instanceof RegionControllerSnowGolemEntity snowGolem) {
             return getFixedTeamId() != snowGolem.getFixedTeamId();
         }
-        if (entity.getType().equals(EntityType.PLAYER)) {
+        if (entity instanceof Player) {
             return getFixedTeamId() != savedData.getTeam(entity.getUUID());
         }
         return false;

@@ -71,9 +71,6 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
                     return teamId != snowGolem1.getFixedTeamId();
                 }
                 if (p instanceof Player player) {
-                    if (player.isCreative() || player.isSpectator()) {
-                        return false;
-                    }
                     return !savedData.isSameTeam(snowGolem.getOwner(), player);
                 }
                 return false;
@@ -81,10 +78,14 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
             target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
         } else {
             if (snowGolem.getOwner() != null) {
-                targetConditions.selector(p -> !(p instanceof Player) && !snowGolem.isEntityHasSameOwner(p) || p instanceof Player player && !player.isCreative() && !player.isSpectator() && !player.equals(snowGolem.getOwner()));
+                targetConditions.selector(p -> {
+                    if (p instanceof Player) {
+                        return !p.equals(snowGolem.getOwner());
+                    }
+                    return !snowGolem.isEntityHasSameOwner(p);
+                });
                 target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
             } else {
-                targetConditions.selector(p -> !p.isSpectator());
                 target = level.getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
             }
         }

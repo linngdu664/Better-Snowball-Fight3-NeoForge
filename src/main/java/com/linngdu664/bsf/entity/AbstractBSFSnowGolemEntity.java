@@ -63,6 +63,8 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     private static final EntityDataAccessor<Integer> WEAPON_ANG = SynchedEntityData.defineId(AbstractBSFSnowGolemEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Byte> STYLE = SynchedEntityData.defineId(AbstractBSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> CORE_COOL_DOWN = SynchedEntityData.defineId(AbstractBSFSnowGolemEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> ENHANCE = SynchedEntityData.defineId(AbstractBSFSnowGolemEntity.class, EntityDataSerializers.BOOLEAN);
+
     // server only
     protected float launchVelocity;
     protected float launchAccuracy;
@@ -91,6 +93,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         builder.define(WEAPON_ANG, 0);
         builder.define(STYLE, (byte) 0);
         builder.define(CORE_COOL_DOWN, 0);
+        builder.define(ENHANCE, false);
     }
 
     @Override
@@ -174,6 +177,22 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         entityData.set(STYLE, style);
     }
 
+    public boolean getEnhance() {
+        return entityData.get(ENHANCE);
+    }
+
+    public void setEnhance(boolean enhance) {
+        entityData.set(ENHANCE, enhance);
+    }
+
+    public int getCoreCoolDown() {
+        return entityData.get(CORE_COOL_DOWN);
+    }
+
+    public void setCoreCoolDown(int coolDown) {
+        entityData.set(CORE_COOL_DOWN, coolDown);
+    }
+
     public void setLaunchVelocity(float launchVelocity) {
         this.launchVelocity = launchVelocity;
     }
@@ -192,14 +211,6 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
 
     public void setShootZ(double shootZ) {
         this.shootZ = shootZ;
-    }
-
-    public int getCoreCoolDown() {
-        return entityData.get(CORE_COOL_DOWN);
-    }
-
-    public void setCoreCoolDown(int coolDown) {
-        entityData.set(CORE_COOL_DOWN, coolDown);
     }
 
     public void setDropEquipment(boolean b) {
@@ -347,6 +358,13 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
             int coreCooldown = getCoreCoolDown();
             if (getWeaponAng() > 0) {
                 setWeaponAng(getWeaponAng() - 60);
+            }
+            if (getEnhance()) {
+                heal(1);
+                addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 2, 3));
+                if (coreCooldown > 0) {
+                    setCoreCoolDown(Math.max(getCoreCoolDown() - 5, 0));
+                }
             }
             Item core = getCore().getItem();
             if (core.equals(ItemRegister.SWIFTNESS_GOLEM_CORE.get())) {
