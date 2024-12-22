@@ -104,6 +104,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         pCompound.put("Core", getCore().saveOptional(registryAccess()));
         pCompound.putByte("Style", getStyle());
         pCompound.putInt("CoreCoolDown", getCoreCoolDown());
+        pCompound.putBoolean("Enhance", getEnhance());
         pCompound.putBoolean("DropEquipment", dropEquipment);
         pCompound.putBoolean("DropSnowball", dropSnowball);
         pCompound.putInt("Rank", rank);
@@ -126,6 +127,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         setWeaponAng(pCompound.getInt("WeaponAng"));
         setStyle(pCompound.getByte("Style"));
         setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
+        setEnhance(pCompound.getBoolean("Enhance"));
         dropEquipment = pCompound.getBoolean("DropEquipment");
         dropSnowball = pCompound.getBoolean("DropSnowball");
         rank = pCompound.getInt("Rank");

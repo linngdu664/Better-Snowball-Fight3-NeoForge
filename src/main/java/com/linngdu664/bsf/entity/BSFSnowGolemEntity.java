@@ -88,7 +88,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         super.addAdditionalSaveData(pCompound);
         pCompound.putByte("Status", getStatus());
         pCompound.putByte("Locator", getLocator());
-        pCompound.putBoolean("Enhance", getEnhance());
         pCompound.putInt("PotionSickness", getPotionSickness());
         pCompound.putBoolean("SpecialMode", isSpecialMode);
         if (getOwnerUUID() != null) {
@@ -101,7 +100,6 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         super.readAdditionalSaveData(pCompound);
         setStatus(pCompound.getByte("Status"));
         setLocator(pCompound.getByte("Locator"));
-        setEnhance(pCompound.getBoolean("Enhance"));
         setPotionSickness(pCompound.getInt("PotionSickness"));
         isSpecialMode = pCompound.getBoolean("SpecialMode");
         UUID uuid;
