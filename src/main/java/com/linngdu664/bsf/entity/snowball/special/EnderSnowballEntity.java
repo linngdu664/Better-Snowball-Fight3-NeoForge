@@ -16,7 +16,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -43,7 +42,8 @@ public class EnderSnowballEntity extends AbstractBSFSnowballEntity {
         Level level = level();
         if (!isCaught && !level.isClientSide) {
             Entity entity = pResult.getEntity();
-            if (getOwner() != null && (entity instanceof Player || entity instanceof Mob)) {
+            EntityType<?> type = entity.getType();
+            if (getOwner() != null && (type.equals(EntityType.PLAYER) || entity instanceof Mob && !(type.equals(EntityRegister.BSF_DUMMY.get())))) {
                 Entity owner = getOwner();
                 generateTpParticles(entity, level);
                 generateTpParticles(owner, level);

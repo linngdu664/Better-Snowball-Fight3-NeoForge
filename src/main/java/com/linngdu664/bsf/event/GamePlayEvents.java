@@ -78,7 +78,7 @@ public class GamePlayEvents {
     public static void pvpMoney(ServerPlayer winPlayer, ServerPlayer losePlayer, ItemStack winDevice, ItemStack loseDevice) {
         // 胜者拿走败者20%的钱
         int deathPlayerPoint = loseDevice.getOrDefault(DataComponentRegister.MONEY, 0);
-        int getPoints = deathPlayerPoint / 5;
+        int getPoints = deathPlayerPoint / 2;
         loseDevice.set(DataComponentRegister.MONEY, deathPlayerPoint - getPoints);
         PacketDistributor.sendToPlayer(losePlayer, new UpdateScorePayload(0, -getPoints));
         int killerPlayerPoint = winDevice.getOrDefault(DataComponentRegister.MONEY, 0);

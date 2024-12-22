@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.entity.snowball.tracking;
 
 import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
+import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.RegionControllerSnowGolemEntity;
 import com.linngdu664.bsf.item.component.RegionData;
@@ -54,7 +55,11 @@ public abstract class AbstractPlayerTrackingSnowballEntity extends AbstractTrack
                 }
                 return !golem.getOwner().equals(player) && !savedData.isSameTeam(player, golem.getOwner()) && BSFCommonUtil.vec3AngleCos(velocity, targetPos.subtract(selfPos)) > 0.5;
             });
-            return getNearest(list1);
+            if (!list1.isEmpty()) {
+                return getNearest(list1);
+            }
+            List<BSFDummyEntity> list2 = level.getEntitiesOfClass(BSFDummyEntity.class, aabb, p -> true);
+            return getNearest(list2);
         }
         if (shooter instanceof AbstractBSFSnowGolemEntity snowGolem) {
             LivingEntity target = snowGolem.getTarget();

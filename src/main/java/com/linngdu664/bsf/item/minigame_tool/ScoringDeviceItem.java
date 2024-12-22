@@ -11,7 +11,7 @@ import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFColorUtil;
 import com.linngdu664.bsf.util.BSFCommonUtil;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,7 +19,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
@@ -48,28 +47,31 @@ public class ScoringDeviceItem extends Item {
                 ItemStack goods = be.getGoods();
                 if (player.isShiftKeyDown()) {
                     if (be.isCanSell()) {
-                        List<ItemStack> stacks = BSFCommonUtil.findInventoryItemStacks(player, p -> goods.getItem().equals(p.getItem()));
+                        List<ItemStack> stacks = BSFCommonUtil.findInventoryItemStacks(player, p -> {
+                            if (!goods.getItem().equals(p.getItem())) {
+                                return false;
+                            }
+                            for (TypedDataComponent<?> component : goods.getComponents()) {
+                                if (!p.has(component.type())) {
+                                    return false;
+                                }
+                                if (!component.value().equals(p.get(component.type()))) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
                         if (stacks.isEmpty()) {
                             player.displayClientMessage(Component.translatable("scoring_device_no_item_to_sell.tip"), false);
                         } else {
                             // 退款成功
                             int addMoney = 0;
-                            if (goods.isDamageableItem()) {
-                                int maxDamage = goods.getMaxDamage();
-                                for (ItemStack stack1 : stacks) {
-                                    addMoney += (int) ((float) (maxDamage - stack1.getOrDefault(DataComponents.DAMAGE, 0)) / (float) maxDamage * (float) be.getPrice());
-                                }
-                            } else {
-                                for (ItemStack stack1 : stacks) {
-                                    addMoney += stack1.getCount() * be.getPrice();
-                                }
+                            for (ItemStack stack1 : stacks) {
+                                addMoney += stack1.getCount() * be.getPrice();
                             }
                             stack.set(DataComponentRegister.MONEY.get(), money + addMoney);
-                            Inventory inventory = player.getInventory();
-                            for (int i = 0, k = inventory.getContainerSize(); i < k; i++) {
-                                if (inventory.getItem(i).getItem().equals(goods.getItem())) {
-                                    inventory.setItem(i, ItemStack.EMPTY);
-                                }
+                            for (ItemStack stack1 : stacks) {
+                                stack1.setCount(0);
                             }
                             player.displayClientMessage(Component.translatable("scoring_device_sell_success.tip", String.valueOf(addMoney)), false);
                         }
