@@ -46,7 +46,8 @@ public class RenderGuiEventHandler {
         } else if (pickType == HitResult.Type.BLOCK) {
             BlockEntity blockEntity = player.level().getBlockEntity(((BlockHitResult) pick).getBlockPos());
             GuiHandler.pickBlockEntityVendingMachine(guiGraphics, converter, blockEntity, mainHandItem, partialTick);
-            GuiHandler.pickBlockEntityZoneController(guiGraphics, converter, blockEntity, partialTick);
+            GuiHandler.pickBlockEntityRegionController(guiGraphics, converter, blockEntity, partialTick);
+            GuiHandler.pickBlockEntityRegionViewController(guiGraphics, converter, blockEntity, partialTick);
         }
         if (!player.isSpectator()) {
             GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varObj);

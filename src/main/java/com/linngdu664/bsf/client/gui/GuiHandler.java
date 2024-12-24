@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.client.gui;
 
 import com.linngdu664.bsf.block.entity.RegionControllerBlockEntity;
+import com.linngdu664.bsf.block.entity.RegionControllerViewBlockEntity;
 import com.linngdu664.bsf.block.entity.VendingMachineBlockEntity;
 import com.linngdu664.bsf.entity.BSFDummyEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
@@ -210,7 +211,7 @@ public class GuiHandler {
         }
     }
 
-    public static void pickBlockEntityZoneController(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, float partialTick) {
+    public static void pickBlockEntityRegionController(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, float partialTick) {
         if (blockEntity instanceof RegionControllerBlockEntity zoneController) {
             Minecraft instance = Minecraft.getInstance();
             Window window = instance.getWindow();
@@ -225,6 +226,23 @@ public class GuiHandler {
             guiGraphics.drawString(instance.font, Component.translatable("region_controller_strength.tip", String.format("%.2f", zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
             guiGraphics.drawString(instance.font, Component.translatable("region_controller_player_num.tip", String.format("%d", zoneController.getPlayerNum())), v2I.x, v2I.y+10, 0xffffffff);
             guiGraphics.drawString(instance.font, Component.translatable("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 20, 0xffffffff);
+        }
+    }
+    public static void pickBlockEntityRegionViewController(GuiGraphics guiGraphics, CoordinateConverter converter, BlockEntity blockEntity, float partialTick) {
+        if (blockEntity instanceof RegionControllerViewBlockEntity zoneController) {
+            Minecraft instance = Minecraft.getInstance();
+            Window window = instance.getWindow();
+            //显示队伍
+            converter.convertAndConsume(new Pair<>(zoneController.getBlockPos().getCenter(), v2 -> {
+                V2I v2IRatio = v2IRatio(window, EQUIPMENT_SLOT_FRAME_GUI.width, EQUIPMENT_SLOT_FRAME_GUI.height, 0.3, 0.3);
+                byte teamId = zoneController.getTeamId();
+                renderEquipIntroduced(guiGraphics, v2, v2IRatio.getVec2(), widthWinRatio(window, 0.1), DyeColor.byId(teamId).getTextColor() | 0xff000000, TeamLinkerItem.getItemStackById(teamId), instance.font, BSFColorUtil.getColorTransNameById(teamId));
+            }), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            //显示操作提示文字
+            V2I v2I = v2IRatio(window, 0.6, 0.4);
+            guiGraphics.drawString(instance.font, Component.translatable("region_controller_strength.tip", String.format("%.2f", zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("region_controller_player_num.tip", String.format("%d", zoneController.getPlayerNum())), v2I.x, v2I.y+10, 0xffffffff);
+//            guiGraphics.drawString(instance.font, Component.translatable("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 20, 0xffffffff);
         }
     }
 
