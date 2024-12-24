@@ -223,7 +223,8 @@ public class GuiHandler {
             //显示操作提示文字
             V2I v2I = v2IRatio(window, 0.6, 0.4);
             guiGraphics.drawString(instance.font, Component.translatable("region_controller_strength.tip", String.format("%.2f", zoneController.getCurrentStrength())), v2I.x, v2I.y, 0xffffffff);
-            guiGraphics.drawString(instance.font, Component.translatable("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 10, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("region_controller_player_num.tip", String.format("%d", zoneController.getPlayerNum())), v2I.x, v2I.y+10, 0xffffffff);
+            guiGraphics.drawString(instance.font, Component.translatable("region_controller_enter.tip", instance.options.keyUse.getTranslatedKeyMessage()), v2I.x, v2I.y + 20, 0xffffffff);
         }
     }
 

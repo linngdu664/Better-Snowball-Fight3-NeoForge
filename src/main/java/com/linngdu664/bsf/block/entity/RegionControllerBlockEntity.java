@@ -48,6 +48,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
     private float slowestStrength;
     private int enemyTeamNum;
     private int maxGolem;
+    private int playerNum;
 
     private int timer;                // 定时器，不需要持久化
     private float probability;        // 刷新概率，不需要持久化
@@ -81,6 +82,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         for (RegionControllerSnowGolemEntity golem : enemyGolemList) {
             enemyGolemStrength += golem.getRank();
         }
+        int playerNum=0;
         for (Player player : playerList) {
             if (!be.region.inRegion(player.position()) || player.isCreative() || player.isSpectator()) {
                 continue;
@@ -100,6 +102,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 } else {
                     for (ItemStack scoringDevice : scoringDevices) {
                         friendlyPlayerStrength += scoringDevice.getOrDefault(DataComponentRegister.RANK, 0);
+                        playerNum++;
                     }
                     // 扫描自己队伍的背包，把偷渡的东西全部清了
                     List<ItemStack> bannedItems = BSFCommonUtil.findInventoryItemStacks(player, p -> !be.region.equals(p.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY)));
@@ -109,6 +112,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 }
             }
         }
+        be.playerNum = playerNum;
         be.currentStrength = be.golemMultiplier * (Mth.sqrt(enemyGolemStrength / be.enemyTeamNum) - Mth.sqrt(friendlyGolemStrength)) + be.playerMultiplier * (Mth.sqrt(enemyPlayerStrength / be.enemyTeamNum) - Mth.sqrt(friendlyPlayerStrength));
         level.sendBlockUpdated(pos, state, state, 2);       // 强度同步到客户端
 
@@ -205,6 +209,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         maxGolem = tag.getInt("MaxGolem");
         currentStrength = tag.getFloat("CurrentStrength");
         teamId = tag.getByte("TeamId");
+        playerNum = tag.getInt("PlayerNum");
     }
 
     @Override
@@ -234,6 +239,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         tag.putInt("MaxGolem", maxGolem);
         tag.putFloat("CurrentStrength", currentStrength);
         tag.putByte("TeamId", teamId);
+        tag.putInt("PlayerNum", playerNum);
     }
 
     @Override
@@ -242,6 +248,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putByte("TeamId", teamId);
         tag.putFloat("CurrentStrength", currentStrength);
+        tag.putInt("PlayerNum",playerNum);
         return tag;
     }
 
@@ -251,6 +258,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         super.handleUpdateTag(tag, lookupProvider);
         teamId = tag.getByte("TeamId");
         currentStrength = tag.getFloat("CurrentStrength");
+        playerNum = tag.getInt("PlayerNum");
     }
 
     @Override
@@ -383,5 +391,9 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public float getCurrentStrength() {
         return currentStrength;
+    }
+
+    public int getPlayerNum() {
+        return playerNum;
     }
 }

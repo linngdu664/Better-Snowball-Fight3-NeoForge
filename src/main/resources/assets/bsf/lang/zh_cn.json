@@ -477,6 +477,7 @@
   "vending_sell.tip": "手持积分器 <%1$s+%2$s> 回收全部",
   "region_controller_enter.tip": "<%1$s> 进入区域",
   "region_controller_strength.tip": "强度指数：%1$s",
+  "region_controller_player_num.tip": "我方玩家数量：%1$s",
   "region_controller_no_team_tip": "你必须加入一个队伍以进入该区域",
   "weapon.tip": "武器",
   "snowball.tip": "雪球",
