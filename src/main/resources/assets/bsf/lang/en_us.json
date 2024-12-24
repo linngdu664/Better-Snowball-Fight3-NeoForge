@@ -428,8 +428,6 @@
   "effect.bsf.weapon_jam": "Weapon Jam",
   "effect.bsf.wallhack": "Wallhack",
 
-  "entity.bsf.bsf_snowball": "snowball",
-
   "tweaker_target.tip": "Target: [%1$s]",
   "tweaker_status.tip": "Behavior: [%1$s]",
   "tweaker_target_now.tip": "Aim: [%1$s]",
@@ -489,6 +487,7 @@
   "block.bsf.snow_trap": "Snow",
   "block.bsf.vending_machine": "Vending Machine",
   "block.bsf.region_controller": "Region Controller",
+  "block.bsf.region_controller_view": "Region Controller Terminal",
 
   "key.bsf.ammo_switch_prev": "Switch to Previous Ammo",
   "key.bsf.ammo_switch_next": "Switch to Next Ammo",

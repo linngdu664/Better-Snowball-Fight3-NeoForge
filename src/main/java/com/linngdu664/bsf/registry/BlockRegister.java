@@ -19,4 +19,5 @@ public class BlockRegister {
     public static final DeferredHolder<Block, CriticalSnow> CRITICAL_SNOW = BLOCKS.register("critical_snow", CriticalSnow::new);
     public static final DeferredHolder<Block, VendingMachineBlock> VENDING_MACHINE_BLOCK = BLOCKS.register("vending_machine", VendingMachineBlock::new);
     public static final DeferredHolder<Block, RegionControllerBlock> REGION_CONTROLLER_BLOCK = BLOCKS.register("region_controller", RegionControllerBlock::new);
+    public static final DeferredHolder<Block, RegionControllerViewBlock> REGION_CONTROLLER_VIEW_BLOCK = BLOCKS.register("region_controller_view", RegionControllerViewBlock::new);
 }

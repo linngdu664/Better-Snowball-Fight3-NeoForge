@@ -6,6 +6,7 @@ import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.component.UuidData;
 import com.linngdu664.bsf.network.CustomStreamCodecs;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -85,5 +86,10 @@ public class DataComponentRegister {
             DATA_COMPONENTS.registerComponentType(
                     "team",
                     builder -> builder.persistent(Codec.BYTE).networkSynchronized(ByteBufCodecs.BYTE)
+            );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> BIND_POS =
+            DATA_COMPONENTS.registerComponentType(
+                    "bind_pos",
+                    builder -> builder.persistent(BlockPos.CODEC).networkSynchronized(BlockPos.STREAM_CODEC)
             );
 }

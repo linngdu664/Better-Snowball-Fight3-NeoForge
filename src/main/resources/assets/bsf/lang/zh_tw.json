@@ -428,8 +428,6 @@
   "effect.bsf.weapon_jam": "武器堵塞",
   "effect.bsf.wallhack": "透視",
 
-  "entity.bsf.bsf_snowball": "雪球",
-
   "tweaker_target.tip": "目標：[%1$s]",
   "tweaker_status.tip": "行爲：[%1$s]",
   "tweaker_target_now.tip": "瞄準：[%1$s]",
@@ -489,6 +487,7 @@
   "block.bsf.snow_trap": "雪",
   "block.bsf.vending_machine": "售貨機",
   "block.bsf.region_controller": "區域控製器",
+  "block.bsf.region_controller_view": "區域控製器終端",
 
   "key.bsf.ammo_switch_prev": "向前循環切換彈藥",
   "key.bsf.ammo_switch_next": "向後循環切換彈藥",

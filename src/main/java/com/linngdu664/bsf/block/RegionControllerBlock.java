@@ -18,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class RegionControllerBlock extends Block implements EntityBlock {
-    protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
+    private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
 
     public RegionControllerBlock() {
         super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
@@ -91,7 +92,8 @@ public class RegionControllerBlock extends Block implements EntityBlock {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof RegionControllerBlockEntity regionControllerBlockEntity && player.getAbilities().instabuild) {
-            if (stack.getItem().equals(ItemRegister.REGION_TOOL.get())) {
+            Item item = stack.getItem();
+            if (item.equals(ItemRegister.REGION_TOOL.get())) {
                 if (!level.isClientSide()) {
                     RegionData regionData = stack.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                     if (regionData.start().getY() < regionData.end().getY()) {
@@ -104,12 +106,19 @@ public class RegionControllerBlock extends Block implements EntityBlock {
                 }
                 return ItemInteractionResult.SUCCESS;
             }
-            if (stack.getItem() instanceof TeamLinkerItem teamLinkerItem) {
+            if (item instanceof TeamLinkerItem teamLinkerItem) {
                 if (!level.isClientSide()) {
                     byte teamId = teamLinkerItem.getTeamId();
                     regionControllerBlockEntity.setTeamId(teamId);
                     level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set controller team to " + DyeColor.byId(teamId).getName()), false);
+                }
+                return ItemInteractionResult.SUCCESS;
+            }
+            if (item.equals(ItemRegister.REGION_CONTROLLER_VIEW.get())) {
+                if (!level.isClientSide()) {
+                    stack.set(DataComponentRegister.BIND_POS, pos);
+                    player.displayClientMessage(Component.literal("Bind to view item"), false);
                 }
                 return ItemInteractionResult.SUCCESS;
             }

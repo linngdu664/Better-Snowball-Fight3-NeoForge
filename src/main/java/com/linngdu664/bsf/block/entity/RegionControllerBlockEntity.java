@@ -48,11 +48,11 @@ public class RegionControllerBlockEntity extends BlockEntity {
     private float slowestStrength;
     private int enemyTeamNum;
     private int maxGolem;
-    private int playerNum;
 
     private int timer;                // 定时器，不需要持久化
     private float probability;        // 刷新概率，不需要持久化
     private float currentStrength;    // 同步到客户端
+    private int playerNum;
     private byte teamId;              // 同步到客户端
 
     public RegionControllerBlockEntity(BlockPos pos, BlockState blockState) {
@@ -82,7 +82,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         for (RegionControllerSnowGolemEntity golem : enemyGolemList) {
             enemyGolemStrength += golem.getRank();
         }
-        int playerNum=0;
+        int playerNum = 0;
         for (Player player : playerList) {
             if (!be.region.inRegion(player.position()) || player.isCreative() || player.isSpectator()) {
                 continue;
