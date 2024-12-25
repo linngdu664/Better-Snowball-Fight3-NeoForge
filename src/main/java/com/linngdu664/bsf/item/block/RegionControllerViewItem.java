@@ -31,7 +31,7 @@ public class RegionControllerViewItem extends BlockItem {
         InteractionResult result = super.place(context);
         if (result != InteractionResult.FAIL && !level.isClientSide && level.getBlockEntity(context.getClickedPos()) instanceof RegionControllerViewBlockEntity be) {
             // 设置方块实体绑定
-            be.setControllerBE(itemStack.get(DataComponentRegister.BIND_POS));
+            be.setControllerBlockPos(itemStack.get(DataComponentRegister.BIND_POS));
         }
         return result;
     }

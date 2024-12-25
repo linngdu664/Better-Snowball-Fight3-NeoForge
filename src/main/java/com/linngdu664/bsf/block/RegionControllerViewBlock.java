@@ -33,7 +33,7 @@ public class RegionControllerViewBlock extends Block implements EntityBlock {
         if (player.isCreative() && level.getBlockEntity(pos) instanceof RegionControllerViewBlockEntity be) {
             // 空手点击时的逻辑
             if (!level.isClientSide) {
-                BlockPos blockPos = be.getControllerBEBlockPos();
+                BlockPos blockPos = be.getControllerBlockPos();
                 player.displayClientMessage(Component.literal(String.format("Bind to (%d, %d, %d)", blockPos.getX(), blockPos.getY(), blockPos.getZ())), false);
             }
             return InteractionResult.SUCCESS;

@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RegionControllerViewBlockEntity extends BlockEntity {
-    private RegionControllerBlockEntity controllerBE;
+    private BlockPos controllerBlockPos;
     // below are all client side
     private int timer;
     private float currentStrength;
@@ -24,38 +24,42 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (!level.isClientSide || !(blockEntity instanceof RegionControllerViewBlockEntity be) || be.controllerBE == null) {
+        if (!level.isClientSide || !(blockEntity instanceof RegionControllerViewBlockEntity be) || be.controllerBlockPos == null) {
             return;
         }
         if (be.timer < 20) {
             be.timer++;
             return;
         }
-        be.currentStrength = be.controllerBE.getCurrentStrength();
-        be.playerNum = be.controllerBE.getPlayerNum();
-        be.teamId = be.controllerBE.getTeamId();
+        if (level.getBlockEntity(be.controllerBlockPos) instanceof RegionControllerBlockEntity controllerBE) {
+            be.currentStrength = controllerBE.getCurrentStrength();
+            be.playerNum = controllerBE.getPlayerNum();
+            be.teamId = controllerBE.getTeamId();
+        }
         be.timer = 0;
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        if (level.getBlockEntity(BlockPos.of(tag.getLong("Bind"))) instanceof RegionControllerBlockEntity be) {
-            controllerBE = be;
-        }
+        controllerBlockPos = BlockPos.of(tag.getLong("Bind"));
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putLong("Bind", controllerBE.getBlockPos().asLong());
+        if (controllerBlockPos != null) {
+            tag.putLong("Bind", controllerBlockPos.asLong());
+        }
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         // send these data to client
         CompoundTag tag = super.getUpdateTag(registries);
-        tag.putLong("Bind", controllerBE.getBlockPos().asLong());
+        if (controllerBlockPos != null) {
+            tag.putLong("Bind", controllerBlockPos.asLong());
+        }
         return tag;
     }
 
@@ -63,9 +67,7 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
         // in client these fields are valid
         super.handleUpdateTag(tag, lookupProvider);
-        if (level.getBlockEntity(BlockPos.of(tag.getLong("Bind"))) instanceof RegionControllerBlockEntity be) {
-            controllerBE = be;
-        }
+        controllerBlockPos = BlockPos.of(tag.getLong("Bind"));
     }
 
     @Override
@@ -73,18 +75,13 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    public void setControllerBE(BlockPos blockPos) {
-        if (level.getBlockEntity(blockPos) instanceof RegionControllerBlockEntity be) {
-            this.controllerBE = be;
-            setChanged();
-        }
+    public void setControllerBlockPos(BlockPos blockPos) {
+        this.controllerBlockPos = blockPos;
+        setChanged();
     }
 
-    public BlockPos getControllerBEBlockPos() {
-        if (controllerBE == null) {
-            return null;
-        }
-        return controllerBE.getBlockPos();
+    public BlockPos getControllerBlockPos() {
+        return controllerBlockPos;
     }
 
     public float getCurrentStrength() {
