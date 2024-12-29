@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import org.jetbrains.annotations.NotNull;
 
 public class BSFDummyEntity extends Mob {
@@ -66,10 +67,9 @@ public class BSFDummyEntity extends Mob {
     }
 
     @Override
-    protected void actuallyHurt(DamageSource damageSource, float damageAmount) {
-        super.actuallyHurt(damageSource, damageAmount);
-        if (!damageSource.is(DamageTypes.GENERIC_KILL)) {
-            damage = damageAmount;
+    public void onDamageTaken(DamageContainer damageContainer) {
+        if (!damageContainer.getSource().is(DamageTypes.GENERIC_KILL)) {
+            damage += damageContainer.getNewDamage();
             setHealth(Float.MAX_VALUE);
         }
     }
@@ -90,7 +90,11 @@ public class BSFDummyEntity extends Mob {
                 entityData.set(DPS, sum);
                 damage = 0F;
             }
-            setCustomName(Component.literal(String.format(getDPS() < 10 ? "DPS: %.2f" : "DPS: %.3g", getDPS())));
+            final float currentDps = getDPS();
+            final boolean dpsTooSmall = currentDps > 0.0 && currentDps < 0.01;
+            final boolean dpsTooBig = currentDps >= 10.0;
+            final boolean showNormal = !dpsTooSmall && !dpsTooBig;
+            setCustomName(Component.literal(String.format(showNormal ? "DPS: %.2f" : "DPS: %.3g", currentDps)));
         }
     }
 
