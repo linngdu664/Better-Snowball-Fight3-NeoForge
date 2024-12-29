@@ -29,6 +29,7 @@ public class BSFDummyEntity extends Mob {
     private final float[] damages = new float[20];
     private float damage = 0F;
     private int ptr = 0;
+    private int showNameTime = 0;
 
     public BSFDummyEntity(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -71,6 +72,10 @@ public class BSFDummyEntity extends Mob {
         if (!damageContainer.getSource().is(DamageTypes.GENERIC_KILL)) {
             damage += damageContainer.getNewDamage();
             setHealth(Float.MAX_VALUE);
+            if (!level().isClientSide) {
+                this.setCustomNameVisible(true);
+                this.showNameTime = 40;
+            }
         }
     }
 
@@ -95,6 +100,11 @@ public class BSFDummyEntity extends Mob {
             final boolean dpsTooBig = currentDps >= 10.0;
             final boolean showNormal = !dpsTooSmall && !dpsTooBig;
             setCustomName(Component.literal(String.format(showNormal ? "DPS: %.2f" : "DPS: %.3g", currentDps)));
+            if (this.showNameTime > 0) {
+                this.showNameTime--;
+            }else if (this.isCustomNameVisible()){
+                this.setCustomNameVisible(false);
+            }
         }
     }
 
