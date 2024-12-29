@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -86,15 +87,16 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
         Level level = level();
         if (!level.isClientSide) {
             AABB aabb = getBoundingBox().inflate(2.5);
-            level.getEntities(this, aabb, p -> p instanceof Absorbable).forEach(p -> {
-                Absorbable absorbable = (Absorbable) p;
+            List<Entity> list1 = level.getEntities(this, aabb, p -> p instanceof Absorbable);
+            for (Entity entity : list1) {
+                Absorbable absorbable = (Absorbable) entity;
                 if (release) {
                     Item item = absorbable.getSnowballItem().getItem();
                     snowballCount.put(item, snowballCount.getOrDefault(item, 0) + 1);
                 }
-                ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, p.getX(), p.getY(), p.getZ(), 8, 0, 0, 0, 0.05);
-                p.discard();
-                if (p instanceof SubspaceSnowballEntity) {
+                ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, entity.getX(), entity.getY(), entity.getZ(), 8, 0, 0, 0, 0.05);
+                entity.discard();
+                if (entity instanceof SubspaceSnowballEntity) {
                     ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 16, 0, 0, 0, 0.05);
                     this.discard();
                 }
@@ -105,21 +107,22 @@ public class SubspaceSnowballEntity extends AbstractBSFSnowballEntity {
                     this.push(vec3.x, vec3.y, vec3.z);
                 }
                 level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegister.SUBSPACE_SNOWBALL_CUT.get(), SoundSource.PLAYERS, 1.3F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-            });
-            level.getEntitiesOfClass(Snowball.class, aabb, p -> true).forEach(p -> {
+            }
+            List<Snowball> list2 = level.getEntitiesOfClass(Snowball.class, aabb, p -> true);
+            for (Snowball snowball : list2) {
                 if (release) {
-                    Item item = p.getItem().getItem();
+                    Item item = snowball.getItem().getItem();
                     snowballCount.put(item, snowballCount.getOrDefault(item, 0) + 1);
                 }
-                ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, p.getX(), p.getY(), p.getZ(), 8, 0, 0, 0, 0.05);
-                p.discard();
+                ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, snowball.getX(), snowball.getY(), snowball.getZ(), 8, 0, 0, 0, 0.05);
+                snowball.discard();
                 if (!release) {
                     setDamage(getDamage() + 1);
                     setBlazeDamage(getBlazeDamage() + 1);
                     Vec3 vec3 = this.getDeltaMovement().scale(0.05);
                     this.push(vec3.x, vec3.y, vec3.z);
                 }
-            });
+            }
             if (timer == 150) {
                 generateItemEntities();
                 ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 16, 0, 0, 0, 0.05);

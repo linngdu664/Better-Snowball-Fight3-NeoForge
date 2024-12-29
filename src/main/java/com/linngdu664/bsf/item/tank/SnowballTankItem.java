@@ -5,6 +5,7 @@ import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -45,7 +46,7 @@ public class SnowballTankItem extends Item {
             Inventory inventory = pPlayer.getInventory();
             if (pPlayer.isShiftKeyDown() || damageValue >= maxDamage - 16) {
                 int k = maxDamage - damageValue;
-                if (!pPlayer.getAbilities().instabuild) {
+                if (!pPlayer.getAbilities().instabuild && !itemStack.has(DataComponents.UNBREAKABLE)) {
                     itemStack.setDamageValue(maxDamage);
                     itemStack.remove(DataComponentRegister.AMMO_ITEM);
                 }
@@ -62,7 +63,7 @@ public class SnowballTankItem extends Item {
                 }
                 inventory.placeItemBackInInventory(stack, true);
             } else {
-                if (!pPlayer.getAbilities().instabuild) {
+                if (!pPlayer.getAbilities().instabuild && !itemStack.has(DataComponents.UNBREAKABLE)) {
                     itemStack.setDamageValue(damageValue + 16);
                 }
                 ItemStack stack = new ItemStack(item, 16);

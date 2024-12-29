@@ -51,7 +51,7 @@ import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_PREV;
 public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
     public static final int TYPE_FLAG = 64;
     public static final int DISTANCE = 24;
-    public static final int RADIUM = 5;
+    public static final int RADIUS = 5;
     public static final double PUSH_POWER = 1;
     public static final double HURT_POWER = 1;
     public static final double RECOIL = 0.5;
@@ -77,10 +77,10 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                     Vec3 paPos = eyePosition.add(cameraVec.scale(l));
                     PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ImplosionSnowballCannonParticlesPayload(paPos.x, paPos.y, paPos.z, cameraVec.x, cameraVec.y, cameraVec.z));
                 }
-                AABB aabb = pPlayer.getBoundingBox().inflate(RADIUM).expandTowards(cameraVec.scale(DISTANCE + RADIUM));
+                AABB aabb = pPlayer.getBoundingBox().inflate(RADIUS).expandTowards(cameraVec.scale(DISTANCE + RADIUS));
 
                 BlockPos.betweenClosedStream(aabb)
-                        .filter(p -> serverLevel.getBlockState(p).getBlock() instanceof LooseSnowBlock || serverLevel.getBlockState(p).getBlock() instanceof CriticalSnow && BSFCommonUtil.pointOnTheFrontConeArea(pPlayer.getViewVector(1f), eyePosition, p.getCenter(), RADIUM, DISTANCE))
+                        .filter(p -> serverLevel.getBlockState(p).getBlock() instanceof LooseSnowBlock || serverLevel.getBlockState(p).getBlock() instanceof CriticalSnow && BSFCommonUtil.pointOnTheFrontConeArea(pPlayer.getViewVector(1f), eyePosition, p.getCenter(), RADIUS, DISTANCE))
                         .forEach(p -> {
                             serverLevel.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
                             BlockState snow = Blocks.SNOW.defaultBlockState();
@@ -91,26 +91,21 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(new Vec3(p.getX(), p.getY(), p.getZ()), new Vec3(p.getX() + 1, p.getY() + 1, p.getZ() + 1), cameraVec, 0.2, 0.6, 10), BSFParticleType.SNOWFLAKE.ordinal()));
                         });
 
-                serverLevel.getEntitiesOfClass(
-                        Entity.class,
-                        aabb,
-                        p -> !pPlayer.equals(p) && BSFCommonUtil.pointOnTheFrontConeArea(pPlayer.getViewVector(1f), eyePosition, p.getBoundingBox().getCenter(), RADIUM, DISTANCE)
-                ).forEach(p -> {
-                    Vec3 pPos = p.getBoundingBox().getCenter();
-                    double d = BSFCommonUtil.vec3Projection(pPos.subtract(eyePosition), cameraVec);
-                    if (d <= 0) {
-                        return;
+                List<Entity> list = serverLevel.getEntitiesOfClass(Entity.class, aabb, p -> !pPlayer.equals(p) && !p.isSpectator() && BSFCommonUtil.pointOnTheFrontConeArea(pPlayer.getViewVector(1f), eyePosition, p.getBoundingBox().getCenter(), RADIUS, DISTANCE));
+                for (Entity entity : list) {
+                    double d = BSFCommonUtil.vec3Projection(entity.getBoundingBox().getCenter().subtract(eyePosition), cameraVec);
+                    if (d > 0) {
+                        double basePower = Math.log(DISTANCE + 1 - d);
+                        Vec3 pushVec = cameraVec.scale(basePower * PUSH_POWER);
+                        if (entity instanceof LivingEntity) {
+                            entity.hurt(serverLevel.damageSources().flyIntoWall(), (float) (basePower * HURT_POWER));
+                        }
+                        entity.push(pushVec.x, pushVec.y, pushVec.z);
+                        if (entity instanceof ServerPlayer serverPlayer) {
+                            serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(entity));
+                        }
                     }
-                    double basePower = Math.log(DISTANCE + 1 - d);
-                    Vec3 pushVec = cameraVec.scale(basePower * PUSH_POWER);
-                    if (p instanceof LivingEntity) {
-                        p.hurt(serverLevel.damageSources().flyIntoWall(), (float) (basePower * HURT_POWER));
-                    }
-                    p.push(pushVec.x, pushVec.y, pushVec.z);
-                    if (p instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(p));
-                    }
-                });
+                }
                 itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
 
                 pPlayer.getCooldowns().addCooldown(this, 60);

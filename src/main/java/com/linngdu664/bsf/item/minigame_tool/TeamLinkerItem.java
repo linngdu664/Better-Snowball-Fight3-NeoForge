@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class TeamLinkerItem extends Item {
@@ -74,41 +73,46 @@ public class TeamLinkerItem extends Item {
             Object[] oldNameParam = new Object[]{playerName, BSFColorUtil.getColorTransNameById(oldId)};
             Object[] newNameParam = new Object[]{playerName, BSFColorUtil.getColorTransNameById(teamId)};
             HashSet<UUID> oldMembers = savedData.getMembers(oldId);
-            oldMembers.stream()
-                    .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))
-                    .filter(Objects::nonNull)
-                    .forEach(p -> p.displayClientMessage(MutableComponent.create(new TranslatableContents("leave_bsf_team.tip", null, oldNameParam)), false));
+            for (UUID uuid1 : oldMembers) {
+                ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
+                if (serverPlayer != null) {
+                    serverPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("leave_bsf_team.tip", null, oldNameParam)), false);
+                }
+            }
             if (oldId == teamId) {
                 // 退队
                 savedData.exitTeam(uuid);       // 此时oldMembers已经不含自己了
-                oldMembers.stream()
-                        .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))
-                        .filter(Objects::nonNull)
-                        .forEach(p -> PacketDistributor.sendToPlayer(p, new TeamMembersPayload(oldMembers)));
+                for (UUID uuid1 : oldMembers) {
+                    ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
+                    if (serverPlayer != null) {
+                        PacketDistributor.sendToPlayer(serverPlayer, new TeamMembersPayload(oldMembers));
+                    }
+                }
                 PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new TeamMembersPayload(new HashSet<>()));
                 PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new CurrentTeamPayload((byte) -1));
             } else {
                 // 退队后进队
                 savedData.joinTeam(uuid, teamId);
-                oldMembers.stream()
-                        .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))
-                        .filter(Objects::nonNull)
-                        .forEach(p -> PacketDistributor.sendToPlayer(p, new TeamMembersPayload(oldMembers)));
+                for (UUID uuid1 : oldMembers) {
+                    ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
+                    if (serverPlayer != null) {
+                        PacketDistributor.sendToPlayer(serverPlayer, new TeamMembersPayload(oldMembers));
+                    }
+                }
                 HashSet<UUID> newMembers = savedData.getMembers(teamId);
-                newMembers.stream()
-                        .map(p -> (ServerPlayer) pLevel.getPlayerByUUID(p))
-                        .filter(Objects::nonNull)
-                        .forEach(p -> {
-                            p.displayClientMessage(MutableComponent.create(new TranslatableContents("join_bsf_team.tip", null, newNameParam)), false);
-                            PacketDistributor.sendToPlayer(p, new TeamMembersPayload(newMembers));
-                        });
+                for (UUID uuid1 : newMembers) {
+                    ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
+                    if (serverPlayer != null) {
+                        serverPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("join_bsf_team.tip", null, newNameParam)), false);
+                        PacketDistributor.sendToPlayer(serverPlayer, new TeamMembersPayload(newMembers));
+                    }
+                }
                 PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new CurrentTeamPayload((byte) teamId));
             }
             savedData.setDirty();
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
         return InteractionResultHolder.success(itemstack);
-
     }
 
     @Override

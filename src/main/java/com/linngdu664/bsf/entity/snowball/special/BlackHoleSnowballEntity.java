@@ -89,7 +89,9 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
 
     private void startBlackHole() {
         List<Player> nearbyPlayers = level().getNearbyPlayers(TargetingConditions.forNonCombat(), null, getBoundingBox().inflate(100));
-        nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenshakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.6F)));
+        for (Player player : nearbyPlayers) {
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new ScreenshakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.6F));
+        }
         discard();
         Level level = level();
         Vec3 vec3 = getDeltaMovement();
