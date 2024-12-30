@@ -103,7 +103,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         float f1 = -Mth.sin((x + z) * 0.017453292F);
         float f2 = Mth.cos(y * 0.017453292F) * Mth.cos(x * 0.017453292F);
         this.shoot(f, f1, f2, velocity, inaccuracy);
-        Vec3 vec3 = ServerConfig.SHOOTING_INERTIA.getConfigValue() ? shooter.getKnownMovement() : shooter.getDeltaMovement();
+        Vec3 vec3 = ServerConfig.SHOOTING_INERTIA.getConfigValue() ? shooter.getKnownMovement() : new Vec3(0,shooter.getDeltaMovement().y,0);
         this.setDeltaMovement(this.getDeltaMovement().add(vec3.x, shooter.onGround() ? 0.0 : vec3.y, vec3.z));
     }
 
