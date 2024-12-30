@@ -489,6 +489,7 @@
   "block.bsf.vending_machine": "售貨機",
   "block.bsf.region_controller": "區域控製器",
   "block.bsf.region_controller_view": "區域控製器終端",
+  "block.bsf.region_player_inspector": "區域玩家安檢器",
 
   "key.bsf.ammo_switch_prev": "向前循環切換彈藥",
   "key.bsf.ammo_switch_next": "向後循環切換彈藥",
