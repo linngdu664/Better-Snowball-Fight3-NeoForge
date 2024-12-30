@@ -318,12 +318,13 @@ public class GuiHandler {
         if (player.hasEffect(EffectRegister.WALLHACK)) {
             Window window = mc.getWindow();
             Level level = player.level();
-            level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), p -> !TeamMembersPayload.isFriendly(p) && (p instanceof Enemy || p.getType().equals(EntityType.PLAYER) || p.getType().equals(EntityRegister.REGION_CONTROLLER_SNOW_GOLEM.get()) || p.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get()))).forEach(livingEntity -> {
+            List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(64), p -> !TeamMembersPayload.isFriendly(p) && (p instanceof Enemy || p.getType().equals(EntityType.PLAYER) || p.getType().equals(EntityRegister.REGION_CONTROLLER_SNOW_GOLEM.get()) || p.getType().equals(EntityRegister.BSF_SNOW_GOLEM.get())));
+            for (LivingEntity livingEntity : list) {
                 Vec2 boxBottom = renderHackBox(guiGraphics, converter, window, livingEntity, 0xffff0000, partialTick);
                 if (boxBottom != null) {
                     renderLineTool(guiGraphics, boxBottom, v2IRatio(window, 0.5, 1.1).getVec2(), 0.5f, 0xff0000ff, true, 0, 0xff0000ff);
                 }
-            });
+            }
         }
     }
 }

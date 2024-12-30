@@ -156,17 +156,17 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
                             level.setBlockAndUpdate(p, Blocks.AIR.defaultBlockState());
                         });
             }
-            targetList.stream()
-                    .filter(p -> p.distanceToSqr(pos) < damageR2)
-                    .forEach(p -> {
-                        if (p instanceof BlackHoleExecutor blackHoleExecutor) {
-                            merge(blackHoleExecutor);
-                        } else if (p instanceof FallingBlockEntity) {
-                            p.discard();
-                        } else if (!p.isInvulnerable()) {
-                            p.hurt(level.damageSources().fellOutOfWorld(), damage);
-                        }
-                    });
+            for (Entity entity : targetList) {
+                if (entity.distanceToSqr(pos) < damageR2) {
+                    if (entity instanceof BlackHoleExecutor blackHoleExecutor) {
+                        merge(blackHoleExecutor);
+                    } else if (entity instanceof FallingBlockEntity) {
+                        entity.discard();
+                    } else if (!entity.isInvulnerable()) {
+                        entity.hurt(level.damageSources().fellOutOfWorld(), damage);
+                    }
+                }
+            }
         } else {
             //for modify model size
             double modelMaxT = Math.sqrt(tmpRank) * 1.7f;

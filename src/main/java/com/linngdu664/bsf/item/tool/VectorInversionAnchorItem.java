@@ -37,20 +37,20 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (!pLevel.isClientSide) {
-            pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p -> p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10)
-                    .forEach(p -> {
-                        p.setDeltaMovement(p.getDeltaMovement().reverse());
-                        AABB aabb = p.getBoundingBox();
-                        Vec3 center = aabb.getCenter();
-                        double x = 0.5 * (aabb.maxX - aabb.minX);
-                        double y = 0.5 * (aabb.maxY - aabb.minY);
-                        double z = 0.5 * (aabb.maxZ - aabb.minZ);
-                        ((ServerLevel) pLevel).sendParticles(ParticleTypes.ENCHANT, center.x, center.y, center.z, (int) (400 * z * x * y), x, y, z, 0.3);
-                        if (p instanceof ServerPlayer player) {
-                            PacketDistributor.sendToPlayer(player, new VelocityInversePayload());
-                            PacketDistributor.sendToPlayer(player, new ScreenshakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
-                        }
-                    });
+            List<Entity> list = pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p -> p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10);
+            for (Entity entity : list) {
+                entity.setDeltaMovement(entity.getDeltaMovement().reverse());
+                AABB aabb = entity.getBoundingBox();
+                Vec3 center = aabb.getCenter();
+                double x = 0.5 * (aabb.maxX - aabb.minX);
+                double y = 0.5 * (aabb.maxY - aabb.minY);
+                double z = 0.5 * (aabb.maxZ - aabb.minZ);
+                ((ServerLevel) pLevel).sendParticles(ParticleTypes.ENCHANT, center.x, center.y, center.z, (int) (400 * z * x * y), x, y, z, 0.3);
+                if (entity instanceof ServerPlayer player) {
+                    PacketDistributor.sendToPlayer(player, new VelocityInversePayload());
+                    PacketDistributor.sendToPlayer(player, new ScreenshakePayload(5).setEasing(Easing.EXPO_IN_OUT).setIntensity(0.8F));
+                }
+            }
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new VectorInversionParticlesPayload(pPlayer.getX(), pPlayer.getEyeY(), pPlayer.getZ(), 10, 0.24, 400));
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.VECTOR_INVERSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));

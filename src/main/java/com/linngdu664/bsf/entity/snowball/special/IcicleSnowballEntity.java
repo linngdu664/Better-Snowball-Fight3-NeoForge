@@ -153,7 +153,9 @@ public class IcicleSnowballEntity extends AbstractSnowStorageSnowballEntity {
 
     private void icicleInit(Level level) {
         List<Player> nearbyPlayers = level.getNearbyPlayers(TargetingConditions.forNonCombat(), null, getBoundingBox().inflate(100));
-        nearbyPlayers.forEach(p -> PacketDistributor.sendToPlayer((ServerPlayer) p, new ScreenshakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.5F)));
+        for (Player player : nearbyPlayers) {
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new ScreenshakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.5F));
+        }
         this.setDeltaMovement(0, 0, 0);
         this.setNoGravity(true);
         RandomSource randomSource = level.random;

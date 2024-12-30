@@ -70,7 +70,7 @@ public class ImplosionSnowballCannonParticle extends TextureSheetParticle {
             float f = randomSource.nextFloat() * 0.6F + 0.4F;
             double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);
             double phi = Math.acos(BSFCommonUtil.randDouble(randomSource, -1, 1)) - Mth.HALF_PI;
-            return new ImplosionSnowballCannonParticle(pLevel, new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(ImplosionSnowballCannonItem.RADIUM, theta, phi), new Vec3(pXSpeed, pYSpeed, pZSpeed).normalize(), f * 0.7F, f * 0.7F, f * 0.9F, this.sprite);
+            return new ImplosionSnowballCannonParticle(pLevel, new Vec3(pX, pY, pZ), BSFCommonUtil.radRotationToVector(ImplosionSnowballCannonItem.RADIUS, theta, phi), new Vec3(pXSpeed, pYSpeed, pZSpeed).normalize(), f * 0.7F, f * 0.7F, f * 0.9F, this.sprite);
         }
     }
 

@@ -8,6 +8,7 @@ import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.tank.SnowballTankItem;
 import com.linngdu664.bsf.network.to_server.AmmoTypePayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -52,9 +53,11 @@ public abstract class AbstractBSFWeaponItem extends Item {
     protected void consumeAmmo(ItemStack itemStack, Player player) {
         if (!player.getAbilities().instabuild) {
             if (itemStack.getItem() instanceof SnowballTankItem) {
-                itemStack.setDamageValue(itemStack.getDamageValue() + 1);
-                if (itemStack.getDamageValue() == itemStack.getMaxDamage()) {
-                    itemStack.remove(DataComponentRegister.AMMO_ITEM);
+                if (!itemStack.has(DataComponents.UNBREAKABLE)) {
+                    itemStack.setDamageValue(itemStack.getDamageValue() + 1);
+                    if (itemStack.getDamageValue() == itemStack.getMaxDamage()) {
+                        itemStack.remove(DataComponentRegister.AMMO_ITEM);
+                    }
                 }
             } else {
                 itemStack.shrink(1);
