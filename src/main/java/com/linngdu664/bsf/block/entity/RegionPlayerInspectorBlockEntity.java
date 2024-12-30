@@ -5,6 +5,7 @@ import com.linngdu664.bsf.misc.BSFTeamSavedData;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -47,7 +48,7 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
                 if (playerTeamId < 0 || (be.permittedTeams & (1 << playerTeamId)) == 0) {
                     // 没加队伍或队伍不对的，传送走
                     player.teleportTo(be.kickPos.getX() + 0.5, be.kickPos.getY() + 1.0, be.kickPos.getZ() + 0.5);
-                    player.displayClientMessage(Component.translatable("region_player_inspector_team_kick.tip"), false);
+                    player.displayClientMessage(Component.translatable("region_player_inspector_team_kick.tip").withStyle(ChatFormatting.RED), false);
                 }
             }
         }
@@ -56,7 +57,7 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
                 if (BSFCommonUtil.findInventoryItemStack(player, p -> !p.isEmpty() && !be.region.equals(p.get(DataComponentRegister.REGION))) != null) {
                     // 如果有区域不符的物品，传送走
                     player.teleportTo(be.kickPos.getX() + 0.5, be.kickPos.getY() + 1.0, be.kickPos.getZ() + 0.5);
-                    player.displayClientMessage(Component.translatable("region_player_inspector_item_kick.tip"), false);
+                    player.displayClientMessage(Component.translatable("region_player_inspector_item_kick.tip").withStyle(ChatFormatting.RED), false);
                 }
             }
         }
