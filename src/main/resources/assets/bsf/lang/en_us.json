@@ -489,6 +489,7 @@
   "block.bsf.vending_machine": "Vending Machine",
   "block.bsf.region_controller": "Region Controller",
   "block.bsf.region_controller_view": "Region Controller Terminal",
+  "block.bsf.region_player_inspector": "Region Player Inspector",
 
   "key.bsf.ammo_switch_prev": "Switch to Previous Ammo",
   "key.bsf.ammo_switch_next": "Switch to Next Ammo",
