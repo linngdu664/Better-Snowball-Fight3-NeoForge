@@ -8,6 +8,7 @@ import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -39,6 +40,9 @@ public class ExplosivePlayerTrackingSnowballItem extends AbstractBSFSnowballItem
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.isShiftKeyDown()) {
             ItemStack newStack = new ItemStack(ItemRegister.EXPLOSIVE_MONSTER_TRACKING_SNOWBALL.get(), itemStack.getCount());
+            if (itemStack.has(DataComponentRegister.REGION)) {
+                newStack.set(DataComponentRegister.REGION, itemStack.get(DataComponentRegister.REGION));
+            }
             pPlayer.setItemInHand(pUsedHand, newStack);
         } else {
             storageInTank(pPlayer);

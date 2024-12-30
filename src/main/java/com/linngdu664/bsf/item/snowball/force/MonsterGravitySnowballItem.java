@@ -30,8 +30,8 @@ public class MonsterGravitySnowballItem extends AbstractBSFSnowballItem {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.isShiftKeyDown()) {
             ItemStack newStack = new ItemStack(ItemRegister.PROJECTILE_GRAVITY_SNOWBALL.get(), itemStack.getCount());
-            if (itemStack.has(DataComponentRegister.REGION.get())) {
-                newStack.set(DataComponentRegister.REGION.get(), itemStack.get(DataComponentRegister.REGION.get()));
+            if (itemStack.has(DataComponentRegister.REGION)) {
+                newStack.set(DataComponentRegister.REGION, itemStack.get(DataComponentRegister.REGION));
             }
             pPlayer.setItemInHand(pUsedHand, newStack);
         } else if (!storageInTank(pPlayer)) {
