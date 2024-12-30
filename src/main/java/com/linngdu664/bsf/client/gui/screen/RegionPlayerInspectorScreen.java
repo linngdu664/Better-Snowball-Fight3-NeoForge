@@ -92,6 +92,7 @@ public class RegionPlayerInspectorScreen extends Screen {
         permittedTeamsEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 75, inputWidth, 20, permittedTeamsComponent));
         kickPosEdit.setValue(kickPosStr);
         permittedTeamsEdit.setValue(permittedTeamsStr);
+        permittedTeamsEdit.setMaxLength(48);
     }
 
     @Override
