@@ -29,12 +29,12 @@ public class RegionToolItem extends Item {
         if (!level.isClientSide) {
             BlockPos blockPos = context.getClickedPos();
             RegionData regionData = itemInHand.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
-            if (player.isShiftKeyDown()) {
+            if (!player.isShiftKeyDown()) {
                 itemInHand.set(DataComponentRegister.REGION, new RegionData(blockPos, regionData.end()));
-                player.displayClientMessage(Component.literal("Start pos recorded"), false);
+                player.displayClientMessage(Component.literal("start: (" + blockPos.toShortString() + ")"), false);
             } else {
                 itemInHand.set(DataComponentRegister.REGION, new RegionData(regionData.start(), blockPos));
-                player.displayClientMessage(Component.literal("start=" + regionData.start() + ", end=" + blockPos), false);
+                player.displayClientMessage(Component.literal("end: (" + blockPos.toShortString() + ")"), false);
             }
         }
         return InteractionResult.SUCCESS;

@@ -1,3 +1,6 @@
 {
-  "parent": "minecraft:item/stick"
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "bsf:item/region_tool"
+  }
 }
