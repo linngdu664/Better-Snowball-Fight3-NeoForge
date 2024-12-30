@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 
 public class RegionControllerViewItem extends BlockItem {
     public RegionControllerViewItem() {
-        super(BlockRegister.REGION_CONTROLLER_VIEW_BLOCK.get(), new Properties().rarity(Rarity.UNCOMMON));
+        super(BlockRegister.REGION_CONTROLLER_VIEW.get(), new Properties().rarity(Rarity.UNCOMMON));
     }
 
     @Override

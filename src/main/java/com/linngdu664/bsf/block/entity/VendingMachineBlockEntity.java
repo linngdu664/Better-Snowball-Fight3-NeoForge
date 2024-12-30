@@ -20,7 +20,7 @@ public class VendingMachineBlockEntity extends BlockEntity {
     private boolean canSell;
 
     public VendingMachineBlockEntity(BlockPos pos, BlockState blockState) {
-        super(BlockEntityRegister.VENDING_MACHINE_BLOCK_ENTITY.get(), pos, blockState);
+        super(BlockEntityRegister.VENDING_MACHINE.get(), pos, blockState);
     }
 
     @Override

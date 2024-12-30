@@ -1,10 +1,7 @@
 package com.linngdu664.bsf.registry;
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.item.block.RegionControllerItem;
-import com.linngdu664.bsf.item.block.RegionControllerViewItem;
-import com.linngdu664.bsf.item.block.SmartSnowBlockItem;
-import com.linngdu664.bsf.item.block.VendingMachineItem;
+import com.linngdu664.bsf.item.block.*;
 import com.linngdu664.bsf.item.minigame_tool.RegionToolItem;
 import com.linngdu664.bsf.item.minigame_tool.ScoringDeviceItem;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
@@ -163,4 +160,5 @@ public class ItemRegister {
     public static final DeferredItem<Item> VENDING_MACHINE = ITEMS.register("vending_machine", VendingMachineItem::new);
     public static final DeferredItem<Item> REGION_CONTROLLER = ITEMS.register("region_controller", RegionControllerItem::new);
     public static final DeferredItem<Item> REGION_CONTROLLER_VIEW = ITEMS.register("region_controller_view", RegionControllerViewItem::new);
+    public static final DeferredItem<Item> REGION_PLAYER_INSPECTOR = ITEMS.register("region_player_inspector", RegionPlayerInspectorItem::new);
 }

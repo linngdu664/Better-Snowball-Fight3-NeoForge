@@ -144,7 +144,7 @@ public class EntityRegister {
             event.registerEntityRenderer(GHOST_SNOWBALL.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(SCULK_SNOWBALL.get(), ThrownItemRenderer::new);
             event.registerEntityRenderer(DUCK_SNOWBALL.get(), ThrownItemRenderer::new);
-            event.registerBlockEntityRenderer(BlockEntityRegister.VENDING_MACHINE_BLOCK_ENTITY.get(), VendingMachineEntityRenderer::new);
+            event.registerBlockEntityRenderer(BlockEntityRegister.VENDING_MACHINE.get(), VendingMachineEntityRenderer::new);
         }
     }
 

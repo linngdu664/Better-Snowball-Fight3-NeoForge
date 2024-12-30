@@ -41,7 +41,7 @@ public class CriticalSnow extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return pBlockEntityType == BlockEntityRegister.CRITICAL_SNOW_ENTITY.get() ? CriticalSnowEntity::tick : null;
+        return pBlockEntityType == BlockEntityRegister.CRITICAL_SNOW.get() ? CriticalSnowEntity::tick : null;
     }
 
     @Override

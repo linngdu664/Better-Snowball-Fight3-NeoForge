@@ -20,7 +20,7 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
     private byte teamId;
 
     public RegionControllerViewBlockEntity(BlockPos pos, BlockState blockState) {
-        super(BlockEntityRegister.REGION_CONTROLLER_VIEW_BLOCK_ENTITY.get(), pos, blockState);
+        super(BlockEntityRegister.REGION_CONTROLLER_VIEW.get(), pos, blockState);
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {

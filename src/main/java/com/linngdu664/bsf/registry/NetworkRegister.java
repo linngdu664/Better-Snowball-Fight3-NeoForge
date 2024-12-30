@@ -27,6 +27,7 @@ public class NetworkRegister {
         registrar.playToClient(VelocityInversePayload.TYPE, VelocityInversePayload.STREAM_CODEC, VelocityInversePayload::handleDataInClient);
         registrar.playToClient(ShowRegionControllerScreenPayload.TYPE, ShowRegionControllerScreenPayload.STREAM_CODEC, ShowRegionControllerScreenPayload::handleDataInClient);
         registrar.playToClient(ShowGolemRankScreenPayload.TYPE, ShowGolemRankScreenPayload.STREAM_CODEC, ShowGolemRankScreenPayload::handleDataInClient);
+        registrar.playToClient(ShowRegionPlayerInspectorScreenPayload.TYPE, ShowRegionPlayerInspectorScreenPayload.STREAM_CODEC, ShowRegionPlayerInspectorScreenPayload::handleDataInClient);
 
         registrar.playToServer(AmmoTypePayload.TYPE, AmmoTypePayload.STREAM_CODEC, AmmoTypePayload::handleDataInServer);
         registrar.playToServer(SculkSnowballLauncherSwitchSoundPayload.TYPE, SculkSnowballLauncherSwitchSoundPayload.STREAM_CODEC, SculkSnowballLauncherSwitchSoundPayload::handleDataInServer);
@@ -35,5 +36,6 @@ public class NetworkRegister {
         registrar.playToServer(UpdateRegionControllerPayload.TYPE, UpdateRegionControllerPayload.STREAM_CODEC, UpdateRegionControllerPayload::handleDataInServer);
         registrar.playToServer(UpdateVendingMachinePayload.TYPE, UpdateVendingMachinePayload.STREAM_CODEC, UpdateVendingMachinePayload::handleDataInServer);
         registrar.playToServer(UpdateGolemRankPayload.TYPE, UpdateGolemRankPayload.STREAM_CODEC, UpdateGolemRankPayload::handleDataInServer);
+        registrar.playToServer(UpdateRegionPlayerInspectorPayload.TYPE, UpdateRegionPlayerInspectorPayload.STREAM_CODEC, UpdateRegionPlayerInspectorPayload::handleDataInServer);
     }
 }

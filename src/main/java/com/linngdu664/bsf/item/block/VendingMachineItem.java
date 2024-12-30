@@ -6,6 +6,6 @@ import net.minecraft.world.item.Rarity;
 
 public class VendingMachineItem extends BlockItem {
     public VendingMachineItem() {
-        super(BlockRegister.VENDING_MACHINE_BLOCK.get(), new Properties().rarity(Rarity.UNCOMMON));
+        super(BlockRegister.VENDING_MACHINE.get(), new Properties().rarity(Rarity.UNCOMMON));
     }
 }

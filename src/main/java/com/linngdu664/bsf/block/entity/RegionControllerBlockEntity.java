@@ -14,7 +14,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -56,7 +55,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
     private byte teamId;              // 同步到客户端
 
     public RegionControllerBlockEntity(BlockPos pos, BlockState blockState) {
-        super(BlockEntityRegister.REGION_CONTROLLER_BLOCK_ENTITY.get(), pos, blockState);
+        super(BlockEntityRegister.REGION_CONTROLLER.get(), pos, blockState);
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
@@ -88,11 +87,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 continue;
             }
             int playerTeamId = savedData.getTeam(player.getUUID());
-            if (playerTeamId == -1) {
-                // 没加队伍的，传送走
-                player.teleportTo(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
-                player.displayClientMessage(Component.translatable("region_controller_no_team_tip"), false);
-            } else {
+            if (playerTeamId >= 0) {
                 // 只计算敌队和我方玩家强度
                 List<ItemStack> scoringDevices = BSFCommonUtil.findInventoryItemStacks(player, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()));
                 if (playerTeamId != be.teamId) {
@@ -103,11 +98,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
                     for (ItemStack scoringDevice : scoringDevices) {
                         friendlyPlayerStrength += scoringDevice.getOrDefault(DataComponentRegister.RANK, 0);
                         playerNum++;
-                    }
-                    // 扫描自己队伍的背包，把偷渡的东西全部清了
-                    List<ItemStack> bannedItems = BSFCommonUtil.findInventoryItemStacks(player, p -> !be.region.equals(p.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY)));
-                    for (ItemStack itemStack : bannedItems) {
-                        itemStack.setCount(0);
                     }
                 }
             }

@@ -20,7 +20,7 @@ public class CriticalSnowEntity extends BlockEntity {
     private int age;
 
     public CriticalSnowEntity(BlockPos pPos, BlockState pBlockState) {
-        super(BlockEntityRegister.CRITICAL_SNOW_ENTITY.get(), pPos, pBlockState);
+        super(BlockEntityRegister.CRITICAL_SNOW.get(), pPos, pBlockState);
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {

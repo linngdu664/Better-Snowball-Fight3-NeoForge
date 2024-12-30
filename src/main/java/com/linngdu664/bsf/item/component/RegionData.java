@@ -92,12 +92,12 @@ public class RegionData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegionData that = (RegionData) o;
-        return Objects.equals(start, that.start) && Objects.equals(end, that.end);
+        return minX == that.minX && minY == that.minY && minZ == that.minZ && maxX == that.maxX && maxY == that.maxY && maxZ == that.maxZ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(start, end);
+        return Objects.hash(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override

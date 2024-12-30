@@ -48,7 +48,7 @@ public class RegionControllerViewBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return blockEntityType == BlockEntityRegister.REGION_CONTROLLER_VIEW_BLOCK_ENTITY.get() ? RegionControllerViewBlockEntity::tick : null;
+        return blockEntityType == BlockEntityRegister.REGION_CONTROLLER_VIEW.get() ? RegionControllerViewBlockEntity::tick : null;
     }
 
     @Override

@@ -476,10 +476,11 @@
   "region_controller_enter.tip": "<%1$s> 進入區域",
   "region_controller_strength.tip": "強度指數：%1$s",
   "region_controller_player_num.tip": "我方玩家數量：%1$s",
-  "region_controller_no_team_tip": "你必須加入一個隊伍以進入該區域",
   "weapon.tip": "武器",
   "snowball.tip": "雪球",
   "core.tip": "核心",
+  "region_player_inspector_item_kick.tip": "[BSF反作弊] 你已被踢出區域，原因：攜帶違禁物品入內",
+  "region_player_inspector_team_kick.tip": "[BSF反作弊] 你已被踢出區域，原因：當前隊伍不符合要求",
 
   "block.bsf.smart_snow_block": "智慧雪塊",
   "block.bsf.loose_snow_block": "鬆散雪塊",
@@ -512,5 +513,9 @@
   "gui.bsf.allow_refunds": "允許退款",
   "gui.bsf.rank": "等級",
   "gui.bsf.money": "金錢",
-  "gui.bsf.lifespan": "壽命"
+  "gui.bsf.lifespan": "壽命",
+  "gui.bsf.kick_pos": "傳送座標",
+  "gui.bsf.permitted_teams": "允許隊伍",
+  "gui.bsf.check_item": "檢查物品",
+  "gui.bsf.check_team": "檢查隊伍"
 }
