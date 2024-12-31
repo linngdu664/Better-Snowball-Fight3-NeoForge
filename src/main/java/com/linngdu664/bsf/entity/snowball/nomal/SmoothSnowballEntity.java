@@ -16,8 +16,8 @@ public class SmoothSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties());
     }
 
-    public SmoothSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.SMOOTH_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties());
+    public SmoothSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.SMOOTH_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties(), region);
     }
 
     public SmoothSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

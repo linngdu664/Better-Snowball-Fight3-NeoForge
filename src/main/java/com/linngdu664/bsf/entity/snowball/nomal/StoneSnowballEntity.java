@@ -16,8 +16,8 @@ public class StoneSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicDamage(2).basicBlazeDamage(4));
     }
 
-    public StoneSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.STONE_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(2).basicBlazeDamage(4));
+    public StoneSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.STONE_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(2).basicBlazeDamage(4), region);
     }
 
     public StoneSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

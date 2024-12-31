@@ -16,8 +16,8 @@ public class IceSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(6).basicFrozenTicks(40));
     }
 
-    public IceSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.ICE_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(6).basicFrozenTicks(40));
+    public IceSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.ICE_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(6).basicFrozenTicks(40), region);
     }
 
     public IceSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

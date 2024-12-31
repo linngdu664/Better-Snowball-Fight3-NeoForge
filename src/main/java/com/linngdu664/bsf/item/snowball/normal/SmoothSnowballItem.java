@@ -16,6 +16,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class SmoothSnowballItem extends AbstractBSFSnowballItem {
+public class SmoothSnowballItem extends AbstractBSFSnowballItem implements ProjectileItem {
     public SmoothSnowballItem() {
         super(Rarity.COMMON, new SnowballProperties().allowLaunchTypeFlag(HAND_TYPE_FLAG));
         DispenserBlock.registerProjectileBehavior(this);
@@ -58,7 +59,7 @@ public class SmoothSnowballItem extends AbstractBSFSnowballItem {
 
     @Override
     public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
-        SmoothSnowballEntity snowball = new SmoothSnowballEntity(level, position.x(), position.y(), position.z());
+        SmoothSnowballEntity snowball = new SmoothSnowballEntity(level, position.x(), position.y(), position.z(), itemStack.get(DataComponentRegister.REGION));
         snowball.setItem(itemStack);
         return snowball;
     }

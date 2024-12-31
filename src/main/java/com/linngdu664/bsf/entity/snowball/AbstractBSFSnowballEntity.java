@@ -55,6 +55,12 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         this.properties = pProperties;
     }
 
+    public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, double pX, double pY, double pZ, Level pLevel, BSFSnowballEntityProperties pProperties, RegionData region) {
+        super(pEntityType, pX, pY, pZ, pLevel);
+        this.properties = pProperties;
+        this.aliveRange = RegionData.copy(region);
+    }
+
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties, RegionData region) {
         super(pEntityType, pShooter, pLevel);
         this.properties = pProperties;
@@ -234,11 +240,6 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
             if ((offHand.getItem() instanceof GloveItem && player.getUsedItemHand() == InteractionHand.OFF_HAND ||
                     mainHand.getItem() instanceof GloveItem && player.getUsedItemHand() == InteractionHand.MAIN_HAND) &&
                     player.isUsingItem() && isHeadingToSnowball(player) && canBeCaught()) {
-                ItemStack stack = new ItemStack(getDefaultItem());
-                if (aliveRange != null) {
-                    stack.set(DataComponentRegister.REGION.get(), aliveRange);
-                }
-                player.getInventory().placeItemBackInInventory(stack);
                 if (mainHand.getItem() instanceof GloveItem glove) {
                     mainHand.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                     glove.releaseUsing(mainHand, level, player, 1);
@@ -247,6 +248,11 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
                     glove.releaseUsing(offHand, level, player, 1);
                 }
                 if (!level.isClientSide) {
+                    ItemStack stack = new ItemStack(getDefaultItem());
+                    if (aliveRange != null) {
+                        stack.set(DataComponentRegister.REGION, aliveRange);
+                    }
+                    player.getInventory().placeItemBackInInventory(stack);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 3F, 0.4F / level.getRandom().nextFloat() * 0.4F + 0.8F);
                     ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY(), this.getZ(), 3, 0, 0, 0, 0.04);
                 }

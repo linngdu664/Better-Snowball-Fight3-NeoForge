@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class DuckSnowballItem extends AbstractBSFSnowballItem {
+public class DuckSnowballItem extends AbstractBSFSnowballItem implements ProjectileItem {
     public DuckSnowballItem() {
         super(Rarity.COMMON, new SnowballProperties().allowLaunchTypeFlag(HAND_TYPE_FLAG));
         DispenserBlock.registerProjectileBehavior(this);
@@ -46,7 +47,7 @@ public class DuckSnowballItem extends AbstractBSFSnowballItem {
 
     @Override
     public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
-        DuckSnowballEntity snowball = new DuckSnowballEntity(level, position.x(), position.y(), position.z());
+        DuckSnowballEntity snowball = new DuckSnowballEntity(level, position.x(), position.y(), position.z(), itemStack.get(DataComponentRegister.REGION));
         snowball.setItem(itemStack);
         return snowball;
     }

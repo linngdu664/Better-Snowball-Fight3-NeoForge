@@ -16,8 +16,8 @@ public class CompactedSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicPunch(2));
     }
 
-    public CompactedSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.COMPACTED_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicPunch(2));
+    public CompactedSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.COMPACTED_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicPunch(2), region);
     }
 
     public CompactedSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

@@ -7,6 +7,7 @@ import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
+import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class PowderSnowballItem extends AbstractBSFSnowballItem {
+public class PowderSnowballItem extends AbstractBSFSnowballItem implements ProjectileItem {
     public PowderSnowballItem() {
         super(Rarity.UNCOMMON, new SnowballProperties()
                 .idForTank(10)
@@ -47,7 +49,7 @@ public class PowderSnowballItem extends AbstractBSFSnowballItem {
 
     @Override
     public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
-        PowderSnowballEntity snowball = new PowderSnowballEntity(level, position.x(), position.y(), position.z());
+        PowderSnowballEntity snowball = new PowderSnowballEntity(level, position.x(), position.y(), position.z(), itemStack.get(DataComponentRegister.REGION));
         snowball.setItem(itemStack);
         return snowball;
     }

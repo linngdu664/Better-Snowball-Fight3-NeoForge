@@ -20,8 +20,8 @@ public class DuckSnowballEntity extends AbstractBSFSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties());
     }
 
-    public DuckSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.DUCK_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties());
+    public DuckSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.DUCK_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties(), region);
     }
 
     public DuckSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

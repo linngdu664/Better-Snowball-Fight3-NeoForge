@@ -19,8 +19,8 @@ public class CherryBlossomSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties());
     }
 
-    public CherryBlossomSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.CHERRY_BLOSSOM_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties());
+    public CherryBlossomSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.CHERRY_BLOSSOM_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties(), region);
     }
 
     public CherryBlossomSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

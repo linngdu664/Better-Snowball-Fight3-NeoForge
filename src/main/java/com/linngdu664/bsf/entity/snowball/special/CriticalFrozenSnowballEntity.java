@@ -44,8 +44,8 @@ public class CriticalFrozenSnowballEntity extends AbstractBSFSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(8).basicFrozenTicks(60));
     }
 
-    public CriticalFrozenSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.CRITICAL_FROZEN_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(8).basicFrozenTicks(60));
+    public CriticalFrozenSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.CRITICAL_FROZEN_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(3).basicBlazeDamage(8).basicFrozenTicks(60), region);
     }
 
     public CriticalFrozenSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

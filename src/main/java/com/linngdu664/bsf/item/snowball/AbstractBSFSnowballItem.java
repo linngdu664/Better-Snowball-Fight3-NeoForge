@@ -11,8 +11,6 @@ import com.linngdu664.bsf.item.weapon.SnowballMachineGunItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,15 +20,13 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
 
-public abstract class AbstractBSFSnowballItem extends Item implements ProjectileItem {
+public abstract class AbstractBSFSnowballItem extends Item {
     public static final int HAND_TYPE_FLAG = 1;
     private final SnowballProperties snowballProperties;
 
@@ -205,17 +201,6 @@ public abstract class AbstractBSFSnowballItem extends Item implements Projectile
      * @return The corresponding entity.
      */
     public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment, RegionData region) {
-        return null;
-    }
-
-    /**
-     * You must override this fucking method if you want to launch the snowball by dispensers.
-     *
-     * @param level Level.
-     * @return The corresponding entity.
-     */
-    @Override
-    public @NotNull Projectile asProjectile(@NotNull Level level, @NotNull Position position, @NotNull ItemStack itemStack, @NotNull Direction direction) {
         return null;
     }
 

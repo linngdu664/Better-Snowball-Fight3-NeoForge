@@ -31,8 +31,8 @@ public class SpectralSnowballEntity extends AbstractBSFSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties());
     }
 
-    public SpectralSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.SPECTRAL_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties());
+    public SpectralSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.SPECTRAL_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties(), region);
     }
 
     public SpectralSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

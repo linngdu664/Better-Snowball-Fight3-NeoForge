@@ -16,8 +16,8 @@ public class IronSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6));
     }
 
-    public IronSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.IRON_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6));
+    public IronSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.IRON_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(4).basicBlazeDamage(6), region);
     }
 
     public IronSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

@@ -16,8 +16,8 @@ public class GoldSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7));
     }
 
-    public GoldSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.GOLD_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7));
+    public GoldSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.GOLD_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(5).basicBlazeDamage(7), region);
     }
 
     public GoldSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {

@@ -16,8 +16,8 @@ public class ObsidianSnowballEntity extends AbstractNormalSnowballEntity {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().basicDamage(6).basicBlazeDamage(8));
     }
 
-    public ObsidianSnowballEntity(Level pLevel, double pX, double pY, double pZ) {
-        super(EntityRegister.OBSIDIAN_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(6).basicBlazeDamage(8));
+    public ObsidianSnowballEntity(Level pLevel, double pX, double pY, double pZ, RegionData region) {
+        super(EntityRegister.OBSIDIAN_SNOWBALL.get(), pX, pY, pZ, pLevel, new BSFSnowballEntityProperties().basicDamage(6).basicBlazeDamage(8), region);
     }
 
     public ObsidianSnowballEntity(LivingEntity pShooter, Level pLevel, ILaunchAdjustment launchAdjustment, RegionData region) {
