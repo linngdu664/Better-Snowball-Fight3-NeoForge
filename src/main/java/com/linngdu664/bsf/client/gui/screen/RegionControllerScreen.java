@@ -132,6 +132,7 @@ public class RegionControllerScreen extends Screen {
         slowestStrengthEdit = addRenderableWidget(new EditBox(font, rightInputBeginX, beginY + 120, rightInputWidth, 20, slowestStrengthComponent));
         enemyTeamNumEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 145, leftInputWidth, 20, enemyTeamNumComponent));
         maxGolemNumEdit = addRenderableWidget(new EditBox(font, rightInputBeginX, beginY + 145, rightInputWidth, 20, maxGolemNumComponent));
+        spawnBlockEdit.setMaxLength(48);
         spawnBlockEdit.setValue(spawnBlockStr);
         playerMultiplierEdit.setValue(playerMultiplierStr);
         golemMultiplierEdit.setValue(golemMultiplierStr);

@@ -7,6 +7,6 @@ import net.minecraft.client.Minecraft;
 public class ShowRegionPlayerInspectorScreenHandler {
     public static void handlePayload(ShowRegionPlayerInspectorScreenPayload payload) {
         Minecraft mc = Minecraft.getInstance();
-        mc.setScreen(new RegionPlayerInspectorScreen(payload.blockPos(), payload.region(), payload.kickPos(), payload.permittedTeams(), payload.checkItem(), payload.checkTeam()));
+        mc.setScreen(new RegionPlayerInspectorScreen(payload.blockPos(), payload.region(), payload.kickPos(), payload.permittedTeams(), payload.clearDirectlyItems(), payload.checkItem(), payload.checkTeam()));
     }
 }

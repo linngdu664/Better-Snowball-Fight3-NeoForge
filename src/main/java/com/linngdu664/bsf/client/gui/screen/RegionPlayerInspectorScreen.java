@@ -16,24 +16,27 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class RegionPlayerInspectorScreen extends Screen {
     private static final int MAIN_MAX_WIDTH = 420;
     private static final int MAIN_MARGIN = 9;
-    private static final int MAIN_HEIGHT = 10 + 15 + 3 * 25;  // 1文本+间隔+3行输入框
+    private static final int MAIN_HEIGHT = 10 + 15 + 4 * 25;  // 1文本+间隔+4行输入框
     private static final int LABEL_INPUT_GAP = 4;
     private final BlockPos blockPos;
     private final Component regionComponent;
     private final Component kickPosComponent = Component.translatable("gui.bsf.kick_pos");
-    private final Component permittedTeamsComponent = Component.translatable("gui.bsf.permitted_teams");;
+    private final Component permittedTeamsComponent = Component.translatable("gui.bsf.permitted_teams");
+    private final Component clearDirectlyItemsComponent = Component.translatable("gui.bsf.clear_directly");
     private final Component checkItemComponent = Component.translatable("gui.bsf.check_item");
     private final Component checkTeamComponent = Component.translatable("gui.bsf.check_team");
     private EditBox kickPosEdit;
     private EditBox permittedTeamsEdit;
+    private EditBox clearDirectlyItemsEdit;
     private Checkbox checkItemCheckbox;
     private Checkbox checkTeamCheckbox;
     private String kickPosStr;
     private String permittedTeamsStr;
+    private String clearDirectlyItemsStr;
     private boolean checkItem;
     private boolean checkTeam;
 
-    public RegionPlayerInspectorScreen(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, boolean checkItem, boolean checkTeam) {
+    public RegionPlayerInspectorScreen(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, String clearDirectlyItems, boolean checkItem, boolean checkTeam) {
         super(Component.literal(""));
         this.blockPos = blockPos;
         BlockPos start = region.start();
@@ -54,6 +57,7 @@ public class RegionPlayerInspectorScreen extends Screen {
             }
         }
         this.permittedTeamsStr = sb.toString();
+        this.clearDirectlyItemsStr = clearDirectlyItems;
         this.checkItem = checkItem;
         this.checkTeam = checkTeam;
     }
@@ -67,7 +71,7 @@ public class RegionPlayerInspectorScreen extends Screen {
         // 确定各组件位置
         int beginY = height / 2 - MAIN_HEIGHT / 2;
         int mainWidth = Math.min(MAIN_MAX_WIDTH, width - 2 * MAIN_MARGIN);
-        int maxComponentWidth = Math.max(font.width(kickPosComponent), font.width(permittedTeamsComponent));
+        int maxComponentWidth = Math.max(Math.max(font.width(kickPosComponent), font.width(permittedTeamsComponent)), font.width(clearDirectlyItemsComponent));
         int labelBeginX = width / 2 - mainWidth / 2;
         int inputBeginX = labelBeginX + maxComponentWidth + LABEL_INPUT_GAP;
         int inputWidth = width / 2 + mainWidth / 2 - inputBeginX;
@@ -85,20 +89,26 @@ public class RegionPlayerInspectorScreen extends Screen {
 
         StringWidget kickPosLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 56, maxComponentWidth, 9, kickPosComponent, font));
         StringWidget permittedTeamsLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 81, maxComponentWidth, 9, permittedTeamsComponent, font));
+        StringWidget clearDirectlyItemsLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 106, maxComponentWidth, 9, clearDirectlyItemsComponent, font));
         kickPosLabel.alignRight();
         permittedTeamsLabel.alignRight();
+        clearDirectlyItemsLabel.alignRight();
 
         kickPosEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 50, inputWidth, 20, kickPosComponent));
         permittedTeamsEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 75, inputWidth, 20, permittedTeamsComponent));
+        clearDirectlyItemsEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 100, inputWidth, 20, clearDirectlyItemsComponent));
+        permittedTeamsEdit.setMaxLength(48);
+        clearDirectlyItemsEdit.setMaxLength(256);
         kickPosEdit.setValue(kickPosStr);
         permittedTeamsEdit.setValue(permittedTeamsStr);
-        permittedTeamsEdit.setMaxLength(48);
+        clearDirectlyItemsEdit.setValue(clearDirectlyItemsStr);
     }
 
     @Override
     public void resize(Minecraft minecraft, int width, int height) {
         kickPosStr = kickPosEdit.getValue();
         permittedTeamsStr = permittedTeamsEdit.getValue();
+        clearDirectlyItemsStr = clearDirectlyItemsEdit.getValue();
         checkItem = checkItemCheckbox.selected();
         checkTeam = checkTeamCheckbox.selected();
         super.resize(minecraft, width, height);
@@ -123,9 +133,8 @@ public class RegionPlayerInspectorScreen extends Screen {
                         permittedTeams1 |= (1 << Integer.parseInt(str));
                     }
                 }
-                PacketDistributor.sendToServer(new UpdateRegionPlayerInspectorPayload(blockPos, blockPos1, (short) permittedTeams1, checkItemCheckbox.selected(), checkTeamCheckbox.selected()));
+                PacketDistributor.sendToServer(new UpdateRegionPlayerInspectorPayload(blockPos, blockPos1, (short) permittedTeams1, clearDirectlyItemsEdit.getValue(), checkItemCheckbox.selected(), checkTeamCheckbox.selected()));
             } catch (NumberFormatException ignore) {
-                ignore.printStackTrace();
             }
         }
     }

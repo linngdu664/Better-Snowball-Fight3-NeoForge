@@ -517,6 +517,7 @@
   "gui.bsf.lifespan": "寿命",
   "gui.bsf.kick_pos": "传送坐标",
   "gui.bsf.permitted_teams": "允许队伍",
+  "gui.bsf.clear_directly": "直接清除",
   "gui.bsf.check_item": "检查物品",
   "gui.bsf.check_team": "检查队伍"
 }

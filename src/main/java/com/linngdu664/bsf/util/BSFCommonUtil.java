@@ -240,7 +240,7 @@ public class BSFCommonUtil {
         return null;
     }
 
-    private static NonNullList<ItemStack>[] getPlayerInventoryList(Player player) {
+    public static NonNullList<ItemStack>[] getPlayerInventoryList(Player player) {
         Inventory inventory = player.getInventory();
         return new NonNullList[]{inventory.items, inventory.armor, inventory.offhand};
     }

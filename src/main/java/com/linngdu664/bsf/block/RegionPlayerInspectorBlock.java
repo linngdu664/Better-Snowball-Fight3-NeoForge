@@ -53,6 +53,7 @@ public class RegionPlayerInspectorBlock extends Block implements EntityBlock {
                         be.getRegion(),
                         be.getKickPos(),
                         be.getPermittedTeams(),
+                        be.getClearDirectlyItemsStr(),
                         be.isCheckItem(),
                         be.isCheckTeam()
                 ));

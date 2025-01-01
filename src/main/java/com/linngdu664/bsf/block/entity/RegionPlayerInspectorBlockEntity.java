@@ -8,20 +8,30 @@ import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class RegionPlayerInspectorBlockEntity extends BlockEntity {
     private RegionData region = RegionData.EMPTY;
     private BlockPos kickPos = BlockPos.ZERO;
+    private HashSet<Item> clearDirectlyItems = new HashSet<>();
     private short permittedTeams;
     private boolean checkItem;
     private boolean checkTeam;
@@ -54,10 +64,22 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
         }
         if (be.checkItem) {
             for (Player player : filteredList) {
-                if (BSFCommonUtil.findInventoryItemStack(player, p -> !p.isEmpty() && !be.region.equals(p.get(DataComponentRegister.REGION))) != null) {
-                    // 如果有区域不符的物品，传送走
-                    player.teleportTo(be.kickPos.getX() + 0.5, be.kickPos.getY() + 1.0, be.kickPos.getZ() + 0.5);
-                    player.displayClientMessage(Component.translatable("region_player_inspector_item_kick.tip").withStyle(ChatFormatting.RED), false);
+                loop:
+                for (NonNullList<ItemStack> inv : BSFCommonUtil.getPlayerInventoryList(player)) {
+                    for (ItemStack itemStack : inv) {
+                        if (itemStack.isEmpty() || be.region.equals(itemStack.get(DataComponentRegister.REGION))) {
+                            continue;
+                        }
+                        if (be.clearDirectlyItems.contains(itemStack.getItem())) {
+                            // 在集合里的物品直接清掉
+                            itemStack.setCount(0);
+                        } else {
+                            // 如果有区域不符的物品，传送走
+                            player.teleportTo(be.kickPos.getX() + 0.5, be.kickPos.getY() + 1.0, be.kickPos.getZ() + 0.5);
+                            player.displayClientMessage(Component.translatable("region_player_inspector_item_kick.tip").withStyle(ChatFormatting.RED), false);
+                            break loop;
+                        }
+                    }
                 }
             }
         }
@@ -74,6 +96,11 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
         permittedTeams = tag.getShort("PermittedTeams");
         checkItem = tag.getBoolean("CheckItem");
         checkTeam = tag.getBoolean("CheckTeam");
+        clearDirectlyItems = new HashSet<>();
+        ListTag listTag = tag.getList("DirectClearItems", 8);     // type 8 string tag. see mc wiki.
+        for (int i = 0, size = listTag.size(); i < size; i++) {
+            clearDirectlyItems.add(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(listTag.getString(i))));
+        }
     }
 
     @Override
@@ -84,6 +111,13 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
         tag.putShort("PermittedTeams", permittedTeams);
         tag.putBoolean("CheckItem", checkItem);
         tag.putBoolean("CheckTeam", checkTeam);
+        ListTag listTag = new ListTag();
+        int i = 0;
+        for (Item item : clearDirectlyItems) {
+            listTag.addTag(i, StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
+            i++;
+        }
+        tag.put("DirectClearItems", listTag);
     }
 
     public RegionData getRegion() {
@@ -129,5 +163,24 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
     public void setCheckTeam(boolean checkTeam) {
         this.checkTeam = checkTeam;
         setChanged();
+    }
+
+    public String getClearDirectlyItemsStr() {
+        StringBuilder sb = new StringBuilder();
+        for (Item item : clearDirectlyItems) {
+            sb.append(BuiltInRegistries.ITEM.getKey(item));
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+
+    public void setClearDirectlyItems(String directClearItemsStr) {
+        clearDirectlyItems.clear();
+        for (String str : directClearItemsStr.split("\\s+")) {
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(str));
+            if (!item.equals(Items.AIR)) {
+                clearDirectlyItems.add(item);
+            }
+        }
     }
 }

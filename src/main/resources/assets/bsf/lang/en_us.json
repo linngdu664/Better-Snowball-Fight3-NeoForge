@@ -517,6 +517,7 @@
   "gui.bsf.lifespan": "Lifespan",
   "gui.bsf.kick_pos": "Teleport to",
   "gui.bsf.permitted_teams": "Permitted Teams",
+  "gui.bsf.clear_directly": "Clear Directly",
   "gui.bsf.check_item": "Check Items",
   "gui.bsf.check_team": "Check Team"
 }
