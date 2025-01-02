@@ -13,6 +13,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.List;
+
 public class RegionPlayerInspectorScreen extends Screen {
     private static final int MAIN_MAX_WIDTH = 420;
     private static final int MAIN_MARGIN = 9;
@@ -36,28 +38,27 @@ public class RegionPlayerInspectorScreen extends Screen {
     private boolean checkItem;
     private boolean checkTeam;
 
-    public RegionPlayerInspectorScreen(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, String clearDirectlyItems, boolean checkItem, boolean checkTeam) {
+    public RegionPlayerInspectorScreen(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, List<String> clearDirectlyItems, boolean checkItem, boolean checkTeam) {
         super(Component.literal(""));
         this.blockPos = blockPos;
         BlockPos start = region.start();
         BlockPos end = region.end();
         this.regionComponent = Component.translatable("gui.bsf.battle_region_tip", start.getX(), start.getY(), start.getZ(), end.getX(), end.getY(), end.getZ());
         this.kickPosStr = String.format("%d %d %d", kickPos.getX(), kickPos.getY(), kickPos.getZ());
-        boolean isFirst = true;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 16; i++) {
             if ((permittedTeams & (1 << i)) != 0) {
-                if (isFirst) {
-                    isFirst = false;
-                    sb.append(i);
-                } else {
-                    sb.append(' ');
-                    sb.append(i);
-                }
+                sb.append(i);
+                sb.append(' ');
             }
         }
         this.permittedTeamsStr = sb.toString();
-        this.clearDirectlyItemsStr = clearDirectlyItems;
+        sb = new StringBuilder();
+        for (String str : clearDirectlyItems) {
+            sb.append(str);
+            sb.append(' ');
+        }
+        this.clearDirectlyItemsStr = sb.toString();
         this.checkItem = checkItem;
         this.checkTeam = checkTeam;
     }
@@ -133,7 +134,7 @@ public class RegionPlayerInspectorScreen extends Screen {
                         permittedTeams1 |= (1 << Integer.parseInt(str));
                     }
                 }
-                PacketDistributor.sendToServer(new UpdateRegionPlayerInspectorPayload(blockPos, blockPos1, (short) permittedTeams1, clearDirectlyItemsEdit.getValue(), checkItemCheckbox.selected(), checkTeamCheckbox.selected()));
+                PacketDistributor.sendToServer(new UpdateRegionPlayerInspectorPayload(blockPos, blockPos1, (short) permittedTeams1, List.of(clearDirectlyItemsEdit.getValue().split("\\s+")), checkItemCheckbox.selected(), checkTeamCheckbox.selected()));
             } catch (NumberFormatException ignore) {
             }
         }

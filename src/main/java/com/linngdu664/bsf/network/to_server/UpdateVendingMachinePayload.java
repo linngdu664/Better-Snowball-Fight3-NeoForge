@@ -33,6 +33,7 @@ public record UpdateVendingMachinePayload(BlockPos blockPos, int rank, int price
                 be.setMinRank(payload.rank);
                 be.setPrice(payload.price);
                 be.setCanSell(payload.canSell);
+                be.setChanged();
                 level.sendBlockUpdated(blockPos, blockState, blockState, 2);    // 更新blockstate同步
             }
         });

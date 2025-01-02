@@ -77,7 +77,6 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
 
     public void setControllerBlockPos(BlockPos blockPos) {
         this.controllerBlockPos = blockPos;
-        setChanged();
     }
 
     public BlockPos getControllerBlockPos() {

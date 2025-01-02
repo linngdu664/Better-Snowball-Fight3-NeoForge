@@ -36,6 +36,7 @@ public record UpdateRegionControllerPayload(UpdateRegionControllerParas paras) i
                 be.setSlowestStrength(paras.slowestStrength());
                 be.setEnemyTeamNum(paras.enemyTeamNum());
                 be.setMaxGolem(paras.maxGolem());       // 这些数值不需要同步到客户端，因此不需要更新blockstate
+                be.setChanged();
             }
         });
     }

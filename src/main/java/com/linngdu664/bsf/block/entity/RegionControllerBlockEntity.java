@@ -272,7 +272,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 summonPosList.add(new BlockPos(p.getX(), p.getY(), p.getZ()));
             }
         });
-        setChanged();
     }
 
     public int getSnowGolemCount() {
@@ -286,7 +285,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
             snowGolemList.add(golem.getReconstructData());
         }
         snowGolemList.sort(Comparator.comparingInt(e -> e.getInt("Rank")));
-        setChanged();
     }
 
     public byte getTeamId() {
@@ -295,7 +293,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setTeamId(byte teamId) {
         this.teamId = teamId;
-        setChanged();
     }
 
     public Block getSpawnBlock() {
@@ -304,7 +301,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setSpawnBlock(Block block) {
         this.spawnBlock = block;
-        setChanged();
     }
 
     public float getPlayerMultiplier() {
@@ -313,7 +309,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setPlayerMultiplier(float playerMultiplier) {
         this.playerMultiplier = playerMultiplier;
-        setChanged();
     }
 
     public float getGolemMultiplier() {
@@ -322,7 +317,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setGolemMultiplier(float golemMultiplier) {
         this.golemMultiplier = golemMultiplier;
-        setChanged();
     }
 
     public float getDiversity() {
@@ -331,7 +325,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setDiversity(float diversity) {
         this.diversity = diversity;
-        setChanged();
     }
 
     public float getRankOffset() {
@@ -340,7 +333,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setRankOffset(float rankOffset) {
         this.rankOffset = rankOffset;
-        setChanged();
     }
 
     public float getFastestStrength() {
@@ -349,7 +341,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setFastestStrength(float fastestStrength) {
         this.fastestStrength = fastestStrength;
-        setChanged();
     }
 
     public float getSlowestStrength() {
@@ -358,7 +349,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setSlowestStrength(float slowestStrength) {
         this.slowestStrength = slowestStrength;
-        setChanged();
     }
 
     public int getEnemyTeamNum() {
@@ -367,7 +357,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setEnemyTeamNum(int enemyTeamNum) {
         this.enemyTeamNum = enemyTeamNum;
-        setChanged();
     }
 
     public int getMaxGolem() {
@@ -376,7 +365,6 @@ public class RegionControllerBlockEntity extends BlockEntity {
 
     public void setMaxGolem(int maxGolem) {
         this.maxGolem = maxGolem;
-        setChanged();
     }
 
     public float getCurrentStrength() {

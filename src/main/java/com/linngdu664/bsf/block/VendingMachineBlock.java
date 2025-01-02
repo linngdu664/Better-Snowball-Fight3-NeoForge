@@ -51,6 +51,7 @@ public class VendingMachineBlock extends Block implements EntityBlock {
             if (hand == InteractionHand.OFF_HAND && !stack.isEmpty() && player.getMainHandItem().isEmpty()) {
                 if (!level.isClientSide) {
                     be.setGoods(stack);
+                    be.setChanged();
                     level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set goods to " + stack.getHoverName().getString()), false);
                 }

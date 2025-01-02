@@ -10,19 +10,22 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record ShowRegionPlayerInspectorScreenPayload(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, String clearDirectlyItems, boolean checkItem, boolean checkTeam) implements CustomPacketPayload {
+import java.util.ArrayList;
+import java.util.List;
+
+public record ShowRegionPlayerInspectorScreenPayload(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, List<String> clearDirectlyItems, boolean checkItem, boolean checkTeam) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ShowRegionPlayerInspectorScreenPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("show_region_player_inspector_screen"));
     public static final StreamCodec<ByteBuf, ShowRegionPlayerInspectorScreenPayload> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, ShowRegionPlayerInspectorScreenPayload::blockPos,
             RegionData.STREAM_CODEC, ShowRegionPlayerInspectorScreenPayload::region,
             BlockPos.STREAM_CODEC, ShowRegionPlayerInspectorScreenPayload::kickPos,
             ByteBufCodecs.SHORT, ShowRegionPlayerInspectorScreenPayload::permittedTeams,
-            ByteBufCodecs.STRING_UTF8, ShowRegionPlayerInspectorScreenPayload::clearDirectlyItems,
-            ByteBufCodecs.BYTE, ShowRegionPlayerInspectorScreenPayload::packedCheck,
+            ByteBufCodecs.collection(ArrayList::new, ByteBufCodecs.STRING_UTF8), ShowRegionPlayerInspectorScreenPayload::clearDirectlyItems,
+            ByteBufCodecs.BYTE, ShowRegionPlayerInspectorScreenPayload::packCheck,
             ShowRegionPlayerInspectorScreenPayload::new
     );
 
-    private ShowRegionPlayerInspectorScreenPayload(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, String directClearItems, byte packedCheck) {
+    private ShowRegionPlayerInspectorScreenPayload(BlockPos blockPos, RegionData region, BlockPos kickPos, short permittedTeams, List<String> directClearItems, byte packedCheck) {
         this(blockPos, region, kickPos, permittedTeams, directClearItems, (packedCheck & 1) != 0, (packedCheck & 2) != 0);
     }
 
@@ -30,7 +33,7 @@ public record ShowRegionPlayerInspectorScreenPayload(BlockPos blockPos, RegionDa
         context.enqueueWork(() -> ShowRegionPlayerInspectorScreenHandler.handlePayload(payload));     // to prevent class loading
     }
 
-    public byte packedCheck() {
+    public byte packCheck() {
         return (byte) ((checkItem ? 1 : 0) | (checkTeam ? 2 : 0));
     }
 

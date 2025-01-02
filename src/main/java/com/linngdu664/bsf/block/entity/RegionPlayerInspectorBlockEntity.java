@@ -126,7 +126,6 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
 
     public void setRegion(RegionData region) {
         this.region = region;
-        setChanged();
     }
 
     public BlockPos getKickPos() {
@@ -135,7 +134,6 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
 
     public void setKickPos(BlockPos kickPos) {
         this.kickPos = kickPos;
-        setChanged();
     }
 
     public short getPermittedTeams() {
@@ -144,7 +142,6 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
 
     public void setPermittedTeams(short permittedTeams) {
         this.permittedTeams = permittedTeams;
-        setChanged();
     }
 
     public boolean isCheckItem() {
@@ -153,7 +150,6 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
 
     public void setCheckItem(boolean checkItem) {
         this.checkItem = checkItem;
-        setChanged();
     }
 
     public boolean isCheckTeam() {
@@ -162,21 +158,19 @@ public class RegionPlayerInspectorBlockEntity extends BlockEntity {
 
     public void setCheckTeam(boolean checkTeam) {
         this.checkTeam = checkTeam;
-        setChanged();
     }
 
-    public String getClearDirectlyItemsStr() {
-        StringBuilder sb = new StringBuilder();
+    public List<String> getClearDirectlyItems() {
+        ArrayList<String> list = new ArrayList<>();
         for (Item item : clearDirectlyItems) {
-            sb.append(BuiltInRegistries.ITEM.getKey(item));
-            sb.append(' ');
+            list.add(BuiltInRegistries.ITEM.getKey(item).toString());
         }
-        return sb.toString();
+        return list;
     }
 
-    public void setClearDirectlyItems(String directClearItemsStr) {
-        clearDirectlyItems.clear();
-        for (String str : directClearItemsStr.split("\\s+")) {
+    public void setClearDirectlyItems(List<String> directClearItems) {
+        clearDirectlyItems = new HashSet<>();
+        for (String str : directClearItems) {
             Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(str));
             if (!item.equals(Items.AIR)) {
                 clearDirectlyItems.add(item);

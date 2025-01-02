@@ -71,7 +71,6 @@ public class VendingMachineBlockEntity extends BlockEntity {
 
     public void setGoods(ItemStack goods) {
         this.goods = goods.copy();
-        setChanged();
     }
 
     public int getMinRank() {
@@ -80,7 +79,6 @@ public class VendingMachineBlockEntity extends BlockEntity {
 
     public void setMinRank(int minRank) {
         this.minRank = minRank;
-        setChanged();
     }
 
     public int getPrice() {
@@ -89,7 +87,6 @@ public class VendingMachineBlockEntity extends BlockEntity {
 
     public void setPrice(int price) {
         this.price = price;
-        setChanged();
     }
 
     public boolean isCanSell() {
@@ -98,6 +95,5 @@ public class VendingMachineBlockEntity extends BlockEntity {
 
     public void setCanSell(boolean canSell) {
         this.canSell = canSell;
-        setChanged();
     }
 }

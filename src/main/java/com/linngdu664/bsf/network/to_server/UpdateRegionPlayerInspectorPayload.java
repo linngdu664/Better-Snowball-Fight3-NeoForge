@@ -11,17 +11,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record UpdateRegionPlayerInspectorPayload(BlockPos blockPos, BlockPos kickPos, short permittedTeams, String clearDirectlyItems, boolean checkItem, boolean checkTeam) implements CustomPacketPayload {
+import java.util.ArrayList;
+import java.util.List;
+
+public record UpdateRegionPlayerInspectorPayload(BlockPos blockPos, BlockPos kickPos, short permittedTeams, List<String> clearDirectlyItems, boolean checkItem, boolean checkTeam) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<UpdateRegionPlayerInspectorPayload> TYPE = new CustomPacketPayload.Type<>(Main.makeResLoc("update_region_player_inspector"));
     public static final StreamCodec<ByteBuf, UpdateRegionPlayerInspectorPayload> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, UpdateRegionPlayerInspectorPayload::blockPos,
             BlockPos.STREAM_CODEC, UpdateRegionPlayerInspectorPayload::kickPos,
             ByteBufCodecs.SHORT, UpdateRegionPlayerInspectorPayload::permittedTeams,
-            ByteBufCodecs.STRING_UTF8, UpdateRegionPlayerInspectorPayload::clearDirectlyItems,
-            ByteBufCodecs.BOOL, UpdateRegionPlayerInspectorPayload::checkItem,
-            ByteBufCodecs.BOOL, UpdateRegionPlayerInspectorPayload::checkTeam,
+            ByteBufCodecs.collection(ArrayList::new, ByteBufCodecs.STRING_UTF8), UpdateRegionPlayerInspectorPayload::clearDirectlyItems,
+            ByteBufCodecs.BYTE, UpdateRegionPlayerInspectorPayload::packCheck,
             UpdateRegionPlayerInspectorPayload::new
     );
+
+    private UpdateRegionPlayerInspectorPayload(BlockPos blockPos, BlockPos kickPos, short permittedTeams, List<String> directClearItems, byte packedCheck) {
+        this(blockPos, kickPos, permittedTeams, directClearItems, (packedCheck & 1) != 0, (packedCheck & 2) != 0);
+    }
 
     public static void handleDataInServer(UpdateRegionPlayerInspectorPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
@@ -33,8 +39,13 @@ public record UpdateRegionPlayerInspectorPayload(BlockPos blockPos, BlockPos kic
                 be.setClearDirectlyItems(payload.clearDirectlyItems);
                 be.setCheckItem(payload.checkItem);
                 be.setCheckTeam(payload.checkTeam);
+                be.setChanged();
             }
         });
+    }
+
+    public byte packCheck() {
+        return (byte) ((checkItem ? 1 : 0) | (checkTeam ? 2 : 0));
     }
 
     @Override

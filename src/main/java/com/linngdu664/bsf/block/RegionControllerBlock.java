@@ -91,17 +91,19 @@ public class RegionControllerBlock extends Block implements EntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof RegionControllerBlockEntity regionControllerBlockEntity && player.getAbilities().instabuild) {
+        if (level.getBlockEntity(pos) instanceof RegionControllerBlockEntity be && player.getAbilities().instabuild) {
             Item item = stack.getItem();
             if (item.equals(ItemRegister.REGION_TOOL.get())) {
                 if (!level.isClientSide()) {
                     RegionData regionData = stack.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                     if (regionData.start().getY() < regionData.end().getY()) {
-                        regionControllerBlockEntity.setSnowGolemList(regionData);
-                        player.displayClientMessage(Component.literal("Add " + regionControllerBlockEntity.getSnowGolemCount() + " golems"), false);
+                        be.setSnowGolemList(regionData);
+                        be.setChanged();
+                        player.displayClientMessage(Component.literal("Add " + be.getSnowGolemCount() + " golems"), false);
                     } else {
-                        regionControllerBlockEntity.setRegionAndSummon(regionData);
-                        player.displayClientMessage(Component.literal("Add " + regionControllerBlockEntity.getSummonPosList().size() + " spawn points"), false);
+                        be.setRegionAndSummon(regionData);
+                        be.setChanged();
+                        player.displayClientMessage(Component.literal("Add " + be.getSummonPosList().size() + " spawn points"), false);
                     }
                 }
                 return ItemInteractionResult.SUCCESS;
@@ -109,7 +111,8 @@ public class RegionControllerBlock extends Block implements EntityBlock {
             if (item instanceof TeamLinkerItem teamLinkerItem) {
                 if (!level.isClientSide()) {
                     byte teamId = teamLinkerItem.getTeamId();
-                    regionControllerBlockEntity.setTeamId(teamId);
+                    be.setTeamId(teamId);
+                    be.setChanged();
                     level.sendBlockUpdated(pos, state, state, 2);
                     player.displayClientMessage(Component.literal("Set controller team to " + DyeColor.byId(teamId).getName()), false);
                 }

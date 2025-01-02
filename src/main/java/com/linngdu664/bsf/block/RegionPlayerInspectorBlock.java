@@ -53,7 +53,7 @@ public class RegionPlayerInspectorBlock extends Block implements EntityBlock {
                         be.getRegion(),
                         be.getKickPos(),
                         be.getPermittedTeams(),
-                        be.getClearDirectlyItemsStr(),
+                        be.getClearDirectlyItems(),
                         be.isCheckItem(),
                         be.isCheckTeam()
                 ));
@@ -70,6 +70,7 @@ public class RegionPlayerInspectorBlock extends Block implements EntityBlock {
             if (item.equals(ItemRegister.REGION_TOOL.get())) {
                 if (!level.isClientSide()) {
                     be.setRegion(stack.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY));
+                    be.setChanged();
                     player.displayClientMessage(Component.literal("Inspection area was set"), false);
                 }
                 return ItemInteractionResult.SUCCESS;
