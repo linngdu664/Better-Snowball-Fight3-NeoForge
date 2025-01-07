@@ -12,7 +12,7 @@ public class ServerConfig extends BSFConfig {
                     .define("explosiveDestroy", true));
     public static ConfigValueHolder<Boolean> BLACK_HOLE_DESTROY = new ConfigValueHolder(Main.MODID, "server/blackHoleDestroy", (builder) ->
             builder.comment("Whether black hole snowballs can destroy blocks. Default value: false")
-                    .define("blackHoleDestroy", false));
+                    .define("blackHoleDestroy", true));
     public static ConfigValueHolder<Boolean> BLACK_HOLE_DROP = new ConfigValueHolder(Main.MODID, "server/blackHoleDrop", (builder) ->
             builder.comment("Whether to drop when black hole snowballs destroy blocks. Set to false to improve performance. Default value: false")
                     .define("blackHoleDrop", false));
