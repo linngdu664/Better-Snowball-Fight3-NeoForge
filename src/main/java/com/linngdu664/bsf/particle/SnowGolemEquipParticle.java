@@ -1,18 +1,16 @@
 package com.linngdu664.bsf.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
-public class SnowGolemEquipParticle extends TextureSheetParticle {
+public class SnowGolemEquipParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected SnowGolemEquipParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, float sizeMultiplier, SpriteSet sprites) {
-        super(level, x, y, z, 0.0, 0.0, 0.0);
+        super(level, x, y, z, 0.0, 0.0, 0.0, sprites.first());
         this.sprites = sprites;
         this.friction = 0.96F;
         this.gravity = -0.1F;
@@ -30,12 +28,12 @@ public class SnowGolemEquipParticle extends TextureSheetParticle {
         this.hasPhysics = true;
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         return 240;
     }
 
@@ -52,7 +50,6 @@ public class SnowGolemEquipParticle extends TextureSheetParticle {
         return this.quadSize * Mth.clamp(((float) this.age + scaleFactor) / (float) this.lifetime * 32.0F, 0.0F, 1.0F);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
 
@@ -60,7 +57,7 @@ public class SnowGolemEquipParticle extends TextureSheetParticle {
             this.sprites = sprites;
         }
 
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             SnowGolemEquipParticle snowGolemEquipParticle = new SnowGolemEquipParticle(level, x, y, z, 0, 0, 0, 1.5F, this.sprites);
             snowGolemEquipParticle.setColor((float) xSpeed, (float) ySpeed, (float) zSpeed);
             return snowGolemEquipParticle;

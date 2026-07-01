@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import com.linngdu664.bsf.entity.BSFSnowGolemEntity;
 import com.linngdu664.bsf.registry.BlockRegister;
@@ -10,6 +11,7 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +28,7 @@ import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.block.state.pattern.BlockPattern;
 import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
 import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -35,14 +37,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class SmartSnowBlock extends HorizontalDirectionalBlock {
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final MapCodec<SmartSnowBlock> CODEC = simpleCodec(SmartSnowBlock::new);
     private static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
     private static final Predicate<BlockState> PUMPKINS_PREDICATE = (p_51396_) -> p_51396_ != null && p_51396_.is(BlockRegister.SMART_SNOW_BLOCK.get());
     private BlockPattern snowGolemFull;
 
     public SmartSnowBlock(BlockBehaviour.Properties properties) {
-        super(properties);
+        super(Main.blockProperties("smart_snow_block", properties));
         this.registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
@@ -56,19 +58,22 @@ public class SmartSnowBlock extends HorizontalDirectionalBlock {
                     pLevel.setBlock(blockInWorld.getPos(), Blocks.AIR.defaultBlockState(), 2);
                     pLevel.levelEvent(2001, blockInWorld.getPos(), Block.getId(blockInWorld.getState()));
                 }
-                BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(pLevel);
+                BSFSnowGolemEntity snowGolem = EntityRegister.BSF_SNOW_GOLEM.get().create(pLevel, EntitySpawnReason.TRIGGERED);
+                if (snowGolem == null) {
+                    return;
+                }
                 snowGolem.setOwnerUUID(player.getUUID());
                 snowGolem.setAliveRange(pStack.get(DataComponentRegister.REGION));
                 snowGolem.setStyle((byte) (pLevel.getRandom().nextInt(0, AbstractBSFSnowGolemEntity.STYLE_NUM)));
                 BlockPos blockPos = blockPatternMatch.getBlock(0, 2, 0).getPos();
-                snowGolem.moveTo(blockPos.getX() + 0.5D, blockPos.getY() + 0.05D, blockPos.getZ() + 0.5D, 0.0F, 0.0F);
+                snowGolem.snapTo(blockPos.getX() + 0.5D, blockPos.getY() + 0.05D, blockPos.getZ() + 0.5D, 0.0F, 0.0F);
                 pLevel.addFreshEntity(snowGolem);
                 for (ServerPlayer serverplayer : pLevel.getEntitiesOfClass(ServerPlayer.class, snowGolem.getBoundingBox().inflate(5.0D))) {
                     CriteriaTriggers.SUMMONED_ENTITY.trigger(serverplayer, snowGolem);
                 }
                 for (int l = 0; l < getOrCreateSnowGolemFull().getHeight(); ++l) {
                     BlockInWorld blockInWorld = blockPatternMatch.getBlock(0, l, 0);
-                    pLevel.blockUpdated(blockInWorld.getPos(), Blocks.AIR);
+                    pLevel.setBlockAndUpdate(blockInWorld.getPos(), Blocks.AIR.defaultBlockState());
                 }
             }
         }

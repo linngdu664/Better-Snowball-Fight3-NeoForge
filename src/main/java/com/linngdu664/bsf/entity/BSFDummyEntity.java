@@ -1,7 +1,6 @@
 package com.linngdu664.bsf.entity;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -18,6 +17,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import org.jetbrains.annotations.NotNull;
@@ -42,15 +43,15 @@ public class BSFDummyEntity extends Mob {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        entityData.set(STYLE, compound.getByte("Style"));
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        entityData.set(STYLE, input.getByteOr("Style", (byte) 0));
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putByte("Style", getStyle());
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putByte("Style", getStyle());
     }
 
     @Override
@@ -71,7 +72,7 @@ public class BSFDummyEntity extends Mob {
         if (!damageContainer.getSource().is(DamageTypes.GENERIC_KILL)) {
             damage += damageContainer.getNewDamage();
             setHealth(Float.MAX_VALUE);
-            if (!level().isClientSide) {
+            if (!level().isClientSide()) {
                 this.setCustomNameVisible(true);
                 this.showNameTime = 40;
             }
@@ -81,7 +82,7 @@ public class BSFDummyEntity extends Mob {
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             damages[ptr++] = damage;
             if (ptr >= damages.length) {
                 ptr = 0;
@@ -113,7 +114,7 @@ public class BSFDummyEntity extends Mob {
         Item item = itemStack.getItem();
         if (item.equals(Items.SNOWBALL)) {
             Level level = level();
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 entityData.set(STYLE, (byte) ((getStyle() + 1) % AbstractBSFSnowGolemEntity.STYLE_NUM));
                 ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY() + 1, this.getZ(), 20, 0, 0.5, 0, 0.05);
                 this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);

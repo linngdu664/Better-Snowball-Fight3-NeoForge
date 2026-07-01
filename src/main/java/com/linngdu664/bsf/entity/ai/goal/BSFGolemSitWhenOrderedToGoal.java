@@ -21,7 +21,7 @@ public class BSFGolemSitWhenOrderedToGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        if (golem.isInWaterOrBubble()) {
+        if (golem.isInWater()) {
             return false;
         } else if (!golem.onGround()) {
             return false;

@@ -1,15 +1,16 @@
 package com.linngdu664.bsf.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
-public class SubspaceSnowballAttackTraceParticle extends TextureSheetParticle {
+public class SubspaceSnowballAttackTraceParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected SubspaceSnowballAttackTraceParticle(ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, SpriteSet pSprites) {
-        super(pLevel, pX, pY, pZ);
+        super(pLevel, pX, pY, pZ, pSprites.first());
         this.gravity = 0;
         this.friction = 1.0F;
         this.sprites = pSprites;
@@ -22,8 +23,8 @@ public class SubspaceSnowballAttackTraceParticle extends TextureSheetParticle {
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected @NotNull Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class SubspaceSnowballAttackTraceParticle extends TextureSheetParticle {
 
     }
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         return 240;
     }
 
@@ -45,7 +46,7 @@ public class SubspaceSnowballAttackTraceParticle extends TextureSheetParticle {
             this.sprites = pSprites;
         }
 
-        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             SubspaceSnowballAttackTraceParticle subspaceSnowballAttackTraceParticle = new SubspaceSnowballAttackTraceParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, this.sprites);
             subspaceSnowballAttackTraceParticle.setColor(0.8F, 0, 0.9F);
             return subspaceSnowballAttackTraceParticle;

@@ -18,30 +18,34 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
+import java.util.function.Consumer;
 import java.util.List;
 
 public class ColdCompressionJetEngineItem extends Item {
     public static final int STARTUP_DURATION = 24;
 
     public ColdCompressionJetEngineItem() {
-        super(new Item.Properties().stacksTo(1).rarity(Rarity.RARE).durability(400));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(1).rarity(Rarity.RARE).durability(400));
     }
 
     @Override
-    public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
+    public void inventoryTick(@NotNull ItemStack pStack, @NotNull ServerLevel pLevel, @NotNull Entity pEntity, @Nullable EquipmentSlot pSlot) {
         BlockPos blockPos1 = new BlockPos((int) pEntity.getX() - 1, (int) pEntity.getY(), (int) pEntity.getZ() - 1);
-        if (!pLevel.isClientSide && (pLevel.getBlockState(blockPos1).is(BlockTags.SNOW) || pLevel.getBlockState(blockPos1.below()).is(BlockTags.SNOW)) && pStack.getDamageValue() > 0 && pLevel.getRandom().nextFloat() < 0.55f) {
-            if (pIsSelected) {
+        if ((pLevel.getBlockState(blockPos1).is(BlockTags.SNOW) || pLevel.getBlockState(blockPos1.below()).is(BlockTags.SNOW)) && pStack.getDamageValue() > 0 && pLevel.getRandom().nextFloat() < 0.55f) {
+            if (pSlot == EquipmentSlot.MAINHAND || pSlot == EquipmentSlot.OFFHAND) {
                 pStack.setDamageValue(Math.max(pStack.getDamageValue() - 2, 0));
                 PacketDistributor.sendToPlayersTrackingEntityAndSelf(pEntity, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(pEntity.position().add(-0.5, 0, -0.5), pEntity.position().add(0.5, 0, 0.5), new Vec3(0, 1, 0), 0.1, 0.15, 4), BSFParticleType.SNOWFLAKE.ordinal()));
             } else {
@@ -52,13 +56,13 @@ public class ColdCompressionJetEngineItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
         if (stack.getDamageValue() == stack.getMaxDamage() - 1) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
         pPlayer.startUsingItem(pUsedHand);
-        return InteractionResultHolder.consume(stack);
+        return InteractionResult.CONSUME;
     }
 
     @Override
@@ -70,7 +74,7 @@ public class ColdCompressionJetEngineItem extends Item {
         int i = this.getUseDuration(pStack, pLivingEntity) - pRemainingUseDuration;
         Vec3 vec3 = Vec3.directionFromRotation(pLivingEntity.getXRot(), pLivingEntity.getYRot());
         Vec3 particlesPos = pLivingEntity.getEyePosition();
-        if (pLevel.isClientSide) {
+        if (pLevel.isClientSide()) {
             if (i == STARTUP_DURATION) {
                 Vec3 aVec = vec3.scale(2);
                 pLivingEntity.push(aVec.x, aVec.y, aVec.z);
@@ -95,7 +99,7 @@ public class ColdCompressionJetEngineItem extends Item {
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP3.get(), ToggleMovingSoundPayload.PLAY_ONCE));
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pLivingEntity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP4.get(), ToggleMovingSoundPayload.PLAY_LOOP));
                 PacketDistributor.sendToPlayersTrackingEntityAndSelf(pLivingEntity, new ForwardConeParticlesPayload(new ForwardConeParticlesParas(particlesPos, vec3.reverse().scale(0.5), 5F, 10, 0.2F, 0), BSFParticleType.SNOWFLAKE.ordinal()));
-                PacketDistributor.sendToPlayer((ServerPlayer) pLivingEntity, new ScreenshakePayload(6).setIntensity(0.7F).setEasing(Easing.EXPO_IN_OUT));       // 服务端发包防止其他人抖动，我也不知道为什么会这样
+                PacketDistributor.sendToPlayer((ServerPlayer) pLivingEntity, new ScreenshakePayload(6).setIntensity(0.7F).setEasing(Easing.EXPO_IN_OUT));       // 鏈嶅姟绔彂鍖呴槻姝㈠叾浠栦汉鎶栧姩锛屾垜涔熶笉鐭ラ亾涓轰粈涔堜細杩欐牱
             } else {
                 List<LivingEntity> list = pLevel.getEntitiesOfClass(LivingEntity.class, pLivingEntity.getBoundingBox().inflate(2), p -> !pLivingEntity.equals(p));
                 for (LivingEntity entity : list) {
@@ -115,7 +119,7 @@ public class ColdCompressionJetEngineItem extends Item {
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
         Level level = entity.level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new ToggleMovingSoundPayload(entity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP5.get(), ToggleMovingSoundPayload.PLAY_ONCE));
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new ToggleMovingSoundPayload(entity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP4.get(), ToggleMovingSoundPayload.STOP_LOOP));
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new ToggleMovingSoundPayload(entity.getId(), SoundRegister.COLD_COMPRESSION_JET_ENGINE_STARTUP2.get(), ToggleMovingSoundPayload.STOP_LOOP));
@@ -126,8 +130,8 @@ public class ColdCompressionJetEngineItem extends Item {
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
-        return UseAnim.BOW;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack pStack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
@@ -141,8 +145,9 @@ public class ColdCompressionJetEngineItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("cold_compression_jet_engine.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("cold_compression_jet_engine1.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("cold_compression_jet_engine.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("cold_compression_jet_engine1.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

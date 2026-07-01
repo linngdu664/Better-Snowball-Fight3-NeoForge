@@ -1,57 +1,32 @@
 package com.linngdu664.bsf.item.misc;
 
-import com.linngdu664.bsf.client.model.SnowFallBootsModel;
 import com.linngdu664.bsf.registry.ArmorMaterialRegister;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.*;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorType;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
-public class SnowFallBootsItem extends ArmorItem {
+public class SnowFallBootsItem extends Item {
     public SnowFallBootsItem() {
-        super(ArmorMaterialRegister.SNOW_FALL_BOOTS_ARMOR_MATERIAL, Type.BOOTS, new Properties().rarity(Rarity.UNCOMMON).stacksTo(1).durability(810));
+        super(com.linngdu664.bsf.Main.itemProperties()
+                .rarity(Rarity.UNCOMMON)
+                .stacksTo(1)
+                .humanoidArmor(ArmorMaterialRegister.SNOW_FALL_BOOTS_ARMOR_MATERIAL, ArmorType.BOOTS)
+                .durability(810)
+                .repairable(Items.LEATHER_BOOTS));
     }
 
     @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                HumanoidModel armorModel = new HumanoidModel(new ModelPart(Collections.emptyList(), Map.of(
-                        "left_leg", new SnowFallBootsModel(Minecraft.getInstance().getEntityModels().bakeLayer(SnowFallBootsModel.LAYER_LOCATION)).bone,
-                        "right_leg", new SnowFallBootsModel(Minecraft.getInstance().getEntityModels().bakeLayer(SnowFallBootsModel.LAYER_LOCATION)).bone,
-                        "head", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "hat", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "body", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "right_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "left_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()))));
-                armorModel.crouching = livingEntity.isShiftKeyDown();
-                armorModel.riding = original.riding;
-                armorModel.young = livingEntity.isBaby();
-                return armorModel;
-            }
-        });
-    }
-
-    @Override
-    public boolean isValidRepairItem(@NotNull ItemStack pStack, ItemStack pRepairCandidate) {
-        return pRepairCandidate.is(Items.LEATHER_BOOTS);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("snow_fall_boots.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("snow_fall_boots1.tooltip", Component.translatable("enchantment.bsf.kinetic_energy_storage")).withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("snow_fall_boots.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("snow_fall_boots1.tooltip", Component.translatable("enchantment.bsf.kinetic_energy_storage")).withStyle(ChatFormatting.GRAY));
     }
 }
+

@@ -7,6 +7,7 @@ import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SpellParticleOption;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,7 +16,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -43,7 +44,7 @@ public class SpectralSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (!isCaught) {
                 Vec3 location = BSFCommonUtil.getRealHitPosOnMoveVecWithHitResult(this, pResult);
                 ((ServerLevel) level).sendParticles(ParticleTypes.FIREWORK, location.x, location.y, location.z, 60, 0, 0, 0, 0.12);
@@ -72,8 +73,8 @@ public class SpectralSnowballEntity extends AbstractBSFSnowballEntity {
     public void tick() {
         super.tick();
         Level level = level();
-        if (level.isClientSide) {
-            level.addParticle(ParticleTypes.INSTANT_EFFECT, xo, yo + 0.1, zo, 0, 0, 0);
+        if (level.isClientSide()) {
+            level.addParticle(SpellParticleOption.create(ParticleTypes.INSTANT_EFFECT, -1, 1.0F), xo, yo + 0.1, zo, 0, 0, 0);
         }
     }
 

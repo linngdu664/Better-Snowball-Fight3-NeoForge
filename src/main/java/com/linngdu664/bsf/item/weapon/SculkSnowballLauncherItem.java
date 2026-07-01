@@ -15,18 +15,18 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_NEXT;
@@ -50,12 +50,12 @@ public class SculkSnowballLauncherItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
-            return InteractionResultHolder.fail(itemStack);
+            return InteractionResult.FAIL;
         }
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             ItemStack stack = getAmmo(pPlayer, itemStack);
             if (stack != null || pPlayer.isCreative()) {
                 pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.SNOWBALL_CANNON_SHOOT.get(), SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
@@ -67,14 +67,14 @@ public class SculkSnowballLauncherItem extends AbstractBSFWeaponItem {
                 SculkSnowballEntity snowballEntity = new SculkSnowballEntity(pPlayer, pLevel, itemStack.getOrDefault(DataComponentRegister.SCULK_SOUND_ID, -1), itemStack.get(DataComponentRegister.REGION.get()));
                 snowballEntity.shootFromRotation(pPlayer, pPlayer.getXRot(), pPlayer.getYRot(), 0.0F, 2.0F, 1.0F);
                 pLevel.addFreshEntity(snowballEntity);
-                itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
+                itemStack.hurtAndBreak(1, pPlayer, pUsedHand);
                 if (stack != null) {
                     consumeAmmo(stack, pPlayer);
                 }
                 pPlayer.awardStat(Stats.ITEM_USED.get(this));
             }
         }
-        return InteractionResultHolder.pass(itemStack);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -83,20 +83,12 @@ public class SculkSnowballLauncherItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("sculk_snowball_launcher.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("sculk_snowball_launcher1.tooltip", Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
-        tooltipComponents.add(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("sculk_snowball_launcher.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("sculk_snowball_launcher1.tooltip", Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.accept(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                return HumanoidModel.ArmPose.valueOf("BSF_WEAPON");
-            }
-        });
-    }
 }
+

@@ -1,0 +1,6 @@
+{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "bsf:item/obsidian_snowball_tank"
+              }
+}

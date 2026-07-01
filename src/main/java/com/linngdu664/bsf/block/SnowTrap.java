@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,8 +13,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -34,7 +36,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class SnowTrap extends Block {
     public SnowTrap() {
-        super(Properties.ofLegacyCopy(Blocks.SNOW).noLootTable().randomTicks());
+        super(Main.blockProperties("snow_trap", Properties.ofLegacyCopy(Blocks.SNOW)).noLootTable().randomTicks());
     }
 
     @Override
@@ -75,9 +77,9 @@ public class SnowTrap extends Block {
     @Override
     public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         BlockState blockstate = pLevel.getBlockState(pPos.below());
-        if (blockstate.is(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON)) {
+        if (blockstate.is(BlockTags.CANNOT_SUPPORT_SNOW_LAYER)) {
             return false;
-        } else if (blockstate.is(BlockTags.SNOW_LAYER_CAN_SURVIVE_ON)) {
+        } else if (blockstate.is(BlockTags.SUPPORT_OVERRIDE_SNOW_LAYER)) {
             return true;
         } else {
             return Block.isFaceFull(blockstate.getCollisionShape(pLevel, pPos.below()), Direction.UP);
@@ -85,10 +87,10 @@ public class SnowTrap extends Block {
     }
 
     @Override
-    public void entityInside(@NotNull BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
+    protected void entityInside(@NotNull BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         if (pEntity instanceof LivingEntity livingEntity && pLevel instanceof ServerLevel serverLevel) {
             if (!(livingEntity instanceof AbstractBSFSnowGolemEntity) && !(livingEntity instanceof SnowGolem)) {
-                livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4));
+                livingEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 4));
                 if (livingEntity.getTicksFrozen() < 200) {
                     livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + 160);
                 }

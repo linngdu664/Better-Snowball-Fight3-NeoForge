@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-public class SubspaceSnowballHitParticle extends TextureSheetParticle {
+public class SubspaceSnowballHitParticle extends SingleQuadParticle {
     private final PolarPos2d polarPos2d;
     private final double radius;
     private final SpriteSet sprites;
@@ -21,7 +21,7 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
     private double speed;
 
     protected SubspaceSnowballHitParticle(ClientLevel pLevel, double pX, double pY, double pZ, double p0X, double p0Y, double p0Z, float r, float g, float b, double speed, SpriteSet pSprites) {
-        super(pLevel, p0X, p0Y, p0Z);
+        super(pLevel, p0X, p0Y, p0Z, pSprites.first());
         this.polarPos2d = new PolarPos2d(new Vec2d(p0X, p0Z), new Vec2d(pX, pZ));
         this.hasPhysics = false;
         this.gravity = 0F;
@@ -43,13 +43,13 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
         return 4 * x * maxY * (maxX - x) / (maxX * maxX);
     }
     @Override
-    public int getLightColor(float partialTick) {
-        return super.getLightColor(partialTick)|112;
+    public int getLightCoords(float partialTick) {
+        return super.getLightCoords(partialTick)|112;
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected @NotNull Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
@@ -89,8 +89,7 @@ public class SubspaceSnowballHitParticle extends TextureSheetParticle {
             this.sprite = pSprite;
         }
 
-        public Particle createParticle(SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
-            RandomSource random = pLevel.getRandom();
+        public Particle createParticle(SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             Color color = ParticleUtil.hsvColor(random.nextInt(360), BSFCommonUtil.randIntWithInfer(random, 40, 100), BSFCommonUtil.randIntWithInfer(random, 80, 100));
             return new SubspaceSnowballHitParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, (float) color.getRed() / 255, (float) color.getGreen() / 255, (float) color.getBlue() / 255, BSFCommonUtil.randDoubleWithInfer(random, 1, 5), this.sprite);
         }

@@ -13,19 +13,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
 import java.util.List;
 
 public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
@@ -34,9 +36,9 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             List<Entity> list = pLevel.getEntitiesOfClass(Entity.class, pPlayer.getBoundingBox().inflate(10), p -> p.getPosition(1).distanceToSqr(pPlayer.getPosition(1)) < 10 * 10);
             for (Entity entity : list) {
                 entity.setDeltaMovement(entity.getDeltaMovement().reverse());
@@ -53,15 +55,16 @@ public class VectorInversionAnchorItem extends AbstractBSFEnhanceableToolItem {
             }
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(pPlayer, new VectorInversionParticlesPayload(pPlayer.getX(), pPlayer.getEyeY(), pPlayer.getZ(), 10, 0.24, 400));
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundRegister.VECTOR_INVERSION.get(), SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-            itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
+            itemStack.hurtAndBreak(1, pPlayer, pUsedHand);
         }
-        pPlayer.getCooldowns().addCooldown(this, 30);
+        pPlayer.getCooldowns().addCooldown(itemStack, 30);
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.success(itemStack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("vector_inversion_anchor.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("vector_inversion_anchor.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

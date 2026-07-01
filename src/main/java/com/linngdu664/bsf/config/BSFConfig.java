@@ -5,6 +5,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 public class BSFConfig {
     public static final ConcurrentHashMap<Pair<String, ConfigPath>, ArrayList<ConfigValueHolder>> VALUE_HOLDERS = new ConcurrentHashMap();

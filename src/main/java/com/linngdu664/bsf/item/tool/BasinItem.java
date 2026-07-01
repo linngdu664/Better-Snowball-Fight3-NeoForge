@@ -19,17 +19,18 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -38,12 +39,13 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.Function;
+import java.util.function.Consumer;
+import java.util.List;
 
 public class BasinItem extends Item {
     public BasinItem() {
-        super(new Properties().stacksTo(1));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(1));
     }
 
     @Override
@@ -69,14 +71,14 @@ public class BasinItem extends Item {
         return InteractionResult.PASS;
     }
 
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         int snowType = itemStack.getOrDefault(DataComponentRegister.BASIN_SNOW_TYPE, (byte) 0);
         if (snowType == 0) {
-            return InteractionResultHolder.pass(itemStack);
+            return InteractionResult.PASS;
         }
         Vec3 cameraVec = Vec3.directionFromRotation(pPlayer.getXRot(), pPlayer.getYRot());
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             List<LivingEntity> list = pLevel.getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(8), p -> {
                 if (p instanceof ArmorStand || p.isSpectator() || p.distanceToSqr(pPlayer) >= 64) {
                     return false;
@@ -97,7 +99,7 @@ public class BasinItem extends Item {
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.POWDER_SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             pPlayer.awardStat(Stats.ITEM_USED.get(this));
         }
-        return InteractionResultHolder.success(itemStack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -113,10 +115,10 @@ public class BasinItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("basin0.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("basin1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("basin2.tooltip", Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("basin0.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("basin1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("basin2.tooltip", Minecraft.getInstance().options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     /**
@@ -187,10 +189,11 @@ public class BasinItem extends Item {
                 if (livingEntity.getTicksFrozen() < t) {
                     livingEntity.setTicksFrozen(t);
                 }
-                livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, (int) (t * 0.5), amp));
+                livingEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, (int) (t * 0.5), amp));
                 livingEntity.hurt(pLevel.damageSources().playerAttack(pPlayer), Float.MIN_NORMAL);
             }
             livingEntity.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, jamTime, 0));
         }
     }
 }
+

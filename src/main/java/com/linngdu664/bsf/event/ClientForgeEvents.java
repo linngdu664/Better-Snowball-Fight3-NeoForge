@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -26,13 +27,13 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.LinkedHashSet;
 
 
-@EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Main.MODID, value = Dist.CLIENT)
 public class ClientForgeEvents {
     public static final RandomSource BSF_RANDOM_SOURCE = RandomSource.create();
     public static int tickCount = 0;
@@ -43,13 +44,13 @@ public class ClientForgeEvents {
         Player player = minecraft.player;
         ItemStack itemStack = player.getMainHandItem();
         if (itemStack.is(ItemRegister.SCULK_SNOWBALL_LAUNCHER.get()) && player.isShiftKeyDown()) {
-            PacketDistributor.sendToServer(new SculkSnowballLauncherSwitchSoundPayload(event.getScrollDeltaY() > 0));
+            ClientPacketDistributor.sendToServer(new SculkSnowballLauncherSwitchSoundPayload(event.getScrollDeltaY() > 0));
             event.setCanceled(true);
         } else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keyShift.isDown()) {
-            PacketDistributor.sendToServer(new SwitchTweakerTargetModePayload(event.getScrollDeltaY() < 0));
+            ClientPacketDistributor.sendToServer(new SwitchTweakerTargetModePayload(event.getScrollDeltaY() < 0));
             event.setCanceled(true);
         } else if (itemStack.is(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get()) && minecraft.options.keySprint.isDown()) {
-            PacketDistributor.sendToServer(new SwitchTweakerStatusModePayload(event.getScrollDeltaY() < 0));
+            ClientPacketDistributor.sendToServer(new SwitchTweakerStatusModePayload(event.getScrollDeltaY() < 0));
             event.setCanceled(true);
         }
     }
@@ -127,9 +128,21 @@ public class ClientForgeEvents {
             return;
         }
         tickCount++;
+        Player player = minecraft.player;
+        if (player != null) {
+            ItemStack mainHand = player.getMainHandItem();
+            if (mainHand.getItem() instanceof AbstractBSFWeaponItem weapon) {
+                weapon.clientInventoryTick(player, mainHand, player.getInventory().getSelectedSlot());
+            }
+            ItemStack offHand = player.getOffhandItem();
+            if (offHand.getItem() instanceof AbstractBSFWeaponItem weapon) {
+                weapon.clientInventoryTick(player, offHand, Inventory.SLOT_OFFHAND);
+            }
+        }
         ScoringGuiHandler.tick();
         Camera camera = minecraft.gameRenderer.getMainCamera();
         ScreenshakeHandler.clientTick(camera, null);
         ScreenshakeHandler.clientTick(camera, BSF_RANDOM_SOURCE);
     }
 }
+

@@ -17,6 +17,7 @@ import com.linngdu664.bsf.entity.snowball.tracking.*;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.block.Blocks;
@@ -30,17 +31,21 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class EntityRegister {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, Main.MODID);
+    private static ResourceKey<EntityType<?>> entityKey(String name) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, Main.makeResLoc(name));
+    }
+
     public static final DeferredHolder<EntityType<?>, EntityType<BSFSnowGolemEntity>> BSF_SNOW_GOLEM =
             ENTITY_TYPES.register("bsf_snow_golem", () -> EntityType.Builder.of(BSFSnowGolemEntity::new, MobCategory.MISC)
                     .sized(0.7F, 1.9F).clientTrackingRange(8).immuneTo(Blocks.POWDER_SNOW)
-                    .build(Main.makeResLoc("bsf_snow_golem").toString()));
+                    .build(entityKey("bsf_snow_golem")));
     public static final DeferredHolder<EntityType<?>, EntityType<RegionControllerSnowGolemEntity>> REGION_CONTROLLER_SNOW_GOLEM =
             ENTITY_TYPES.register("region_controller_snow_golem", () -> EntityType.Builder.of(RegionControllerSnowGolemEntity::new, MobCategory.MISC)
                     .sized(0.7F, 1.9F).clientTrackingRange(8).immuneTo(Blocks.POWDER_SNOW)
-                    .build(Main.makeResLoc("region_controller_snow_golem").toString()));
+                    .build(entityKey("region_controller_snow_golem")));
     public static final DeferredHolder<EntityType<?>, EntityType<BSFDummyEntity>> BSF_DUMMY =
             ENTITY_TYPES.register("bsf_dummy", () -> EntityType.Builder.of(BSFDummyEntity::new, MobCategory.MISC)
-                    .sized(0.7F, 1.9F).clientTrackingRange(8).build(Main.makeResLoc("bsf_dummy").toString()));
+                    .sized(0.7F, 1.9F).clientTrackingRange(8).build(entityKey("bsf_dummy")));
     public static final DeferredHolder<EntityType<?>, EntityType<AbstractFixedForceExecutor>> MONSTER_GRAVITY_EXECUTOR = executorRegister(MonsterGravityExecutor::new, "monster_gravity_executor", 0.25F);
     public static final DeferredHolder<EntityType<?>, EntityType<AbstractFixedForceExecutor>> MONSTER_REPULSION_EXECUTOR = executorRegister(MonsterRepulsionExecutor::new, "monster_repulsion_executor", 0.25F);
     public static final DeferredHolder<EntityType<?>, EntityType<AbstractFixedForceExecutor>> PROJECTILE_GRAVITY_EXECUTOR = executorRegister(ProjectileGravityExecutor::new, "projectile_gravity_executor", 0.25F);
@@ -87,16 +92,16 @@ public class EntityRegister {
     public static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> snowballRegister(EntityType.EntityFactory<T> pFactory, String name) {
         return ENTITY_TYPES.register(name, () -> EntityType.Builder.of(pFactory, MobCategory.MISC)
                 .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10)
-                .build(Main.makeResLoc(name).toString()));
+                .build(entityKey(name)));
     }
 
     public static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> executorRegister(EntityType.EntityFactory<T> pFactory, String name, float size) {
         return ENTITY_TYPES.register(name, () -> EntityType.Builder.of(pFactory, MobCategory.MISC)
                 .sized(size, size).updateInterval(10).fireImmune()
-                .build(Main.makeResLoc(name).toString()));
+                .build(entityKey(name)));
     }
 
-    @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = Main.MODID, value = Dist.CLIENT)
     public static class RendererRegister {
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -148,7 +153,7 @@ public class EntityRegister {
         }
     }
 
-    @EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = Main.MODID)
     public static class attributeRegister {
         @SubscribeEvent
         public static void onCreateEntityAttribute(EntityAttributeCreationEvent event) {
@@ -158,4 +163,3 @@ public class EntityRegister {
         }
     }
 }
-

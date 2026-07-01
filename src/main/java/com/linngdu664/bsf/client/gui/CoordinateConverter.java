@@ -3,7 +3,6 @@ package com.linngdu664.bsf.client.gui;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -25,11 +24,10 @@ public class CoordinateConverter {
     public CoordinateConverter(float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         Window window = mc.getWindow();
-        GameRenderer gameRenderer = mc.gameRenderer;
-        Camera camera = gameRenderer.getMainCamera();
-        this.cameraPos = camera.getPosition();
+        Camera camera = mc.gameRenderer.getMainCamera();
+        this.cameraPos = camera.position();
         this.rotMat = new Matrix3f().rotation(camera.rotation().conjugate(new Quaternionf()));      // make rot mat
-        float fovy = (float) gameRenderer.getFov(camera, partialTicks, true) * Mth.DEG_TO_RAD;
+        float fovy = camera.getFov() * Mth.DEG_TO_RAD;
         this.tanHalfFovy = Mth.sin(fovy * 0.5F) / Mth.cos(fovy * 0.5F);
         this.tanHalfFovx = this.tanHalfFovy * (float) window.getWidth() / (float) window.getHeight();
     }

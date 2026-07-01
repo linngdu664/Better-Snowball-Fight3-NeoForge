@@ -14,18 +14,18 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_NEXT;
@@ -35,19 +35,19 @@ public class TargetLocatorItem extends AbstractBSFWeaponItem {
     public static final int TYPE_FLAG = 32;
 
     public TargetLocatorItem() {
-        super(514, Rarity.UNCOMMON, TYPE_FLAG);
+        super(514, Rarity.UNCOMMON, TYPE_FLAG, 1);
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
-            return InteractionResultHolder.fail(itemStack);
+            return InteractionResult.FAIL;
         }
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             if (pPlayer.isShiftKeyDown()) {
                 itemStack.remove(DataComponentRegister.TARGET_UUID);
-                pPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("targeted_clear.tip", null, new Object[0])), false);
+                pPlayer.sendSystemMessage(MutableComponent.create(new TranslatableContents("targeted_clear.tip", null, new Object[0])));
                 itemStack.set(DataComponents.CUSTOM_NAME, MutableComponent.create(new TranslatableContents("item.bsf.target_locator", null, new Object[0])));
                 pPlayer.awardStat(Stats.ITEM_USED.get(this));
             } else {
@@ -57,7 +57,7 @@ public class TargetLocatorItem extends AbstractBSFWeaponItem {
                     GPSSnowballEntity snowballEntity = new GPSSnowballEntity(pPlayer, pLevel, itemStack, itemStack.get(DataComponentRegister.REGION.get()));
                     snowballEntity.shootFromRotation(pPlayer, pPlayer.getXRot(), pPlayer.getYRot(), 0.0F, 2.0F, 1.0F);
                     pLevel.addFreshEntity(snowballEntity);
-                    itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
+                    itemStack.hurtAndBreak(1, pPlayer, pUsedHand);
                     if (stack != null) {
                         consumeAmmo(stack, pPlayer);
                     }
@@ -65,16 +65,16 @@ public class TargetLocatorItem extends AbstractBSFWeaponItem {
                 }
             }
         }
-        return InteractionResultHolder.pass(itemStack);
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("target_locator.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("target_locator1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("target_locator2.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("target_locator.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("target_locator1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("target_locator2.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override
@@ -87,18 +87,5 @@ public class TargetLocatorItem extends AbstractBSFWeaponItem {
         return true;
     }
 
-    @Override
-    public int getEnchantmentValue(ItemStack stack) {
-        return 1;
-    }
-
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                return HumanoidModel.ArmPose.valueOf("BSF_WEAPON");
-            }
-        });
-    }
 }
+

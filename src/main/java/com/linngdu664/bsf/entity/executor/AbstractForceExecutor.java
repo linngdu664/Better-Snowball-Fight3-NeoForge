@@ -1,13 +1,14 @@
 package com.linngdu664.bsf.entity.executor;
 
 import com.linngdu664.bsf.item.component.RegionData;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -38,26 +39,26 @@ public abstract class AbstractForceExecutor extends AbstractExecutor {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        GM = pCompound.getDouble("GM");
-        boundaryR2 = pCompound.getDouble("BoundaryR2");
-        range = pCompound.getDouble("Range");
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        GM = input.getDoubleOr("GM", 0.0);
+        boundaryR2 = input.getDoubleOr("BoundaryR2", 0.0);
+        range = input.getDoubleOr("Range", 0.0);
         range2 = range * range;
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putDouble("GM", GM);
-        pCompound.putDouble("BoundaryR2", boundaryR2);
-        pCompound.putDouble("Range", range);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putDouble("GM", GM);
+        output.putDouble("BoundaryR2", boundaryR2);
+        output.putDouble("Range", range);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             targetList = getTargetList();
             forceEffect();
         }

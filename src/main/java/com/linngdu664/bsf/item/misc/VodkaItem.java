@@ -7,35 +7,41 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class VodkaItem extends Item {
     public VodkaItem() {
-        super(new Properties().stacksTo(16).rarity(Rarity.UNCOMMON));
+        super(com.linngdu664.bsf.Main.itemProperties()
+                .food(new FoodProperties.Builder().alwaysEdible().build(), Consumables.defaultDrink().build())
+                .stacksTo(16)
+                .rarity(Rarity.UNCOMMON));
     }
 
     @Override
     public @NotNull ItemStack finishUsingItem(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pEntityLiving) {
         if (pEntityLiving instanceof Player player) {
-            if (!pLevel.isClientSide) {
+            if (!pLevel.isClientSide()) {
                 int t = 0;
                 if (pEntityLiving.hasEffect(EffectRegister.COLD_RESISTANCE)) {
                     t = pEntityLiving.getEffect(EffectRegister.COLD_RESISTANCE).getDuration();
                     pEntityLiving.setRemainingFireTicks(pEntityLiving.getRemainingFireTicks() + 60);
                 }
-                pEntityLiving.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100 + t));
+                pEntityLiving.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 100 + t));
                 pEntityLiving.addEffect(new MobEffectInstance(EffectRegister.COLD_RESISTANCE, 600));
-                pEntityLiving.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 600));
+                pEntityLiving.addEffect(new MobEffectInstance(MobEffects.SPEED, 600));
                 CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, pStack);
             }
             player.awardStat(Stats.ITEM_USED.get(this));
@@ -54,17 +60,18 @@ public class VodkaItem extends Item {
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
-        return UseAnim.DRINK;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack pStack) {
+        return ItemUseAnimation.DRINK;
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pHand) {
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("vodka.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("vodka.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

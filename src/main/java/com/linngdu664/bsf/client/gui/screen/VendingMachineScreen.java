@@ -10,11 +10,11 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public class VendingMachineScreen extends Screen {
     private static final int MIDDLE_MAX_WIDTH = 350;
-    private static final int MIDDLE_HEIGHT = 2 * 25 + 10 + 17;  // 2输入框+间隔+1复选框
+    private static final int MIDDLE_HEIGHT = 2 * 25 + 10 + 17;
     private static final int LABEL_INPUT_GAP = 4;
     private static final int MAIN_MARGIN = 9;
     private final BlockPos blockPos;
@@ -40,8 +40,7 @@ public class VendingMachineScreen extends Screen {
     protected void init() {
         super.init();
         Font font = minecraft.font;
-
-        // 确定各组件位置
+        // Layout
         int beginY = height / 2 - MIDDLE_HEIGHT / 2;
         int maxComponentWidth = Math.max(font.width(rankComponent), font.width(priceComponent));
         int middleWidth = Math.min(MIDDLE_MAX_WIDTH, width - 2 * MAIN_MARGIN);
@@ -53,8 +52,8 @@ public class VendingMachineScreen extends Screen {
 
         StringWidget rankLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 6, labelWidth, 9, rankComponent, font));
         StringWidget priceLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 31, labelWidth, 9, priceComponent, font));
-        rankLabel.alignRight();
-        priceLabel.alignRight();
+        ScreenAlignment.alignRight(rankLabel, labelBeginX, labelWidth);
+        ScreenAlignment.alignRight(priceLabel, labelBeginX, labelWidth);
 
         rankEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY, inputWidth, 20, rankComponent));
         priceEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 25, inputWidth, 20, priceComponent));
@@ -66,20 +65,20 @@ public class VendingMachineScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft minecraft, int width, int height) {
+    public void resize(int width, int height) {
         rankStr = rankEdit.getValue();
         priceStr = priceEdit.getValue();
         canSell = canSellCheckbox.selected();
-        super.resize(minecraft, width, height);
+        super.resize(width, height);
     }
 
     @Override
     public void onClose() {
         super.onClose();
         if (minecraft.level.getBlockEntity(blockPos) instanceof VendingMachineBlockEntity) {
-            // 发包
+            // Send packet
             try {
-                PacketDistributor.sendToServer(new UpdateVendingMachinePayload(
+                ClientPacketDistributor.sendToServer(new UpdateVendingMachinePayload(
                         blockPos,
                         Integer.parseInt(rankEdit.getValue()),
                         Integer.parseInt(priceEdit.getValue()),
@@ -90,3 +89,4 @@ public class VendingMachineScreen extends Screen {
         }
     }
 }
+

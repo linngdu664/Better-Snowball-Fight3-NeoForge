@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -17,7 +18,7 @@ public class LooseSnowBlock extends Block {
     public static final IntegerProperty FROZEN = IntegerProperty.create("frozen", 0, 1);
 
     public LooseSnowBlock() {
-        super(Properties.ofLegacyCopy(Blocks.SNOW_BLOCK)
+        super(Main.blockProperties("loose_snow_block", Properties.ofLegacyCopy(Blocks.SNOW_BLOCK))
                 .noLootTable()
                 .noOcclusion()
                 .strength(0.1f)

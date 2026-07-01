@@ -9,8 +9,7 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.AABB;
 
 import java.util.EnumSet;
@@ -50,14 +49,17 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
             return;
         }
         TargetingConditions targetConditions = TargetingConditions.forCombat().range(SEARCH_DISTANCE);
-        Level level = snowGolem.level();
+        if (!(snowGolem.level() instanceof ServerLevel level)) {
+            target = null;
+            return;
+        }
         if (snowGolem.getLocator() == 0) {
-            targetConditions.selector(p -> p instanceof Enemy);
-            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+            targetConditions.selector((p, serverLevel) -> p instanceof Enemy);
+            target = getNearestEntity(level, targetConditions);
         } else if (snowGolem.getLocator() == 2) {
-            BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+            BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
             int teamId = savedData.getTeam(snowGolem.getOwnerUUID());
-            targetConditions.selector(p -> {
+            targetConditions.selector((p, serverLevel) -> {
                 if (p instanceof BSFSnowGolemEntity snowGolem1) {
                     if (teamId < 0) {
                         return !Objects.equals(snowGolem.getOwner(), snowGolem1.getOwner());
@@ -75,20 +77,36 @@ public class BSFGolemNearsetAttackableTargetGoal extends TargetGoal {
                 }
                 return false;
             });
-            target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+            target = getNearestEntity(level, targetConditions);
         } else {
             if (snowGolem.getOwner() != null) {
-                targetConditions.selector(p -> {
+                targetConditions.selector((p, serverLevel) -> {
                     if (p instanceof Player) {
                         return !p.equals(snowGolem.getOwner());
                     }
                     return !snowGolem.isEntityHasSameOwner(p);
                 });
-                target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+                target = getNearestEntity(level, targetConditions);
             } else {
-                target = level.getNearestPlayer(targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+                targetConditions.selector((p, serverLevel) -> p instanceof Player);
+                target = getNearestEntity(level, targetConditions);
             }
         }
+    }
+
+    private LivingEntity getNearestEntity(ServerLevel level, TargetingConditions targetConditions) {
+        LivingEntity nearest = null;
+        double nearestDistance = Double.MAX_VALUE;
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true)) {
+            if (targetConditions.test(level, snowGolem, entity)) {
+                double distance = snowGolem.distanceToSqr(entity);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearest = entity;
+                }
+            }
+        }
+        return nearest;
     }
 
     public void start() {

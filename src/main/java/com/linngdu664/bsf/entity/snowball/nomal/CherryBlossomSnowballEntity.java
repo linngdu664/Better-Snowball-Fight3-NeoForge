@@ -8,7 +8,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -31,7 +31,7 @@ public class CherryBlossomSnowballEntity extends AbstractNormalSnowballEntity {
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
         Level level = level();
-        if (!level.isClientSide && !isCaught) {
+        if (!level.isClientSide() && !isCaught) {
             ((ServerLevel) level).sendParticles(ParticleTypes.CHERRY_LEAVES, getX(), getY(), getZ(), 48, 1, 1, 1, 0);
         }
     }
@@ -40,7 +40,7 @@ public class CherryBlossomSnowballEntity extends AbstractNormalSnowballEntity {
     public void tick() {
         super.tick();
         Level level = level();
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             level.addParticle(ParticleTypes.CHERRY_LEAVES, xo, yo + 0.1, zo, 0, 0, 0);
         }
     }

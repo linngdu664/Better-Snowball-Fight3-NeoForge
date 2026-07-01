@@ -15,7 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +36,7 @@ public class HeavyPlayerTrackingSnowballItem extends AbstractBSFSnowballItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.isShiftKeyDown()) {
             ItemStack newStack = new ItemStack(ItemRegister.HEAVY_MONSTER_TRACKING_SNOWBALL.get(), itemStack.getCount());
@@ -48,7 +48,7 @@ public class HeavyPlayerTrackingSnowballItem extends AbstractBSFSnowballItem {
             storageInTank(pPlayer);
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     public AbstractBSFSnowballEntity getCorrespondingEntity(Level level, LivingEntity livingEntity, ILaunchAdjustment launchAdjustment, RegionData region) {
@@ -65,3 +65,4 @@ public class HeavyPlayerTrackingSnowballItem extends AbstractBSFSnowballItem {
         pTooltipComponents.add(Component.translatable("HPT_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

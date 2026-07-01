@@ -9,16 +9,18 @@ import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesPar
 import com.linngdu664.bsf.particle.util.BSFParticleType;
 import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,11 +28,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -59,7 +64,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (level.isClientSide || !level.hasNeighborSignal(pos) || !(blockEntity instanceof RegionControllerBlockEntity be) || be.snowGolemList.isEmpty() || be.summonPosList.isEmpty() || be.enemyTeamNum == 0) {
+        if (level.isClientSide() || !level.hasNeighborSignal(pos) || !(blockEntity instanceof RegionControllerBlockEntity be) || be.snowGolemList.isEmpty() || be.summonPosList.isEmpty() || be.enemyTeamNum == 0) {
             return;
         }
         if (be.timer < 20) {
@@ -68,7 +73,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         }
 
         List<? extends Player> playerList = level.players();
-        BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
         float enemyGolemStrength = 0;
         float enemyPlayerStrength = 0;
         float friendlyGolemStrength = 0;
@@ -106,7 +111,7 @@ public class RegionControllerBlockEntity extends BlockEntity {
         be.currentStrength = be.golemMultiplier * (Mth.sqrt(enemyGolemStrength / be.enemyTeamNum) - Mth.sqrt(friendlyGolemStrength)) + be.playerMultiplier * (Mth.sqrt(enemyPlayerStrength / be.enemyTeamNum) - Mth.sqrt(friendlyPlayerStrength));
         level.sendBlockUpdated(pos, state, state, 2);       // 强度同步到客户端
 
-        if (friendlyGolemList.isEmpty() || be.probability <= 0 || level.random.nextFloat() < be.probability) {
+        if (friendlyGolemList.isEmpty() || be.probability <= 0 || level.getRandom().nextFloat() < be.probability) {
             // 这一刻要尝试生成雪傀儡
             // 设置概率，对应期望为1.25s-6.25s
             if (be.currentStrength < be.slowestStrength) {
@@ -117,14 +122,14 @@ public class RegionControllerBlockEntity extends BlockEntity {
                 be.probability = 0.8F;
             }
             if (friendlyGolemList.size() < be.maxGolem) {
-                float minRank = be.snowGolemList.getFirst().getInt("Rank");
-                float maxRank = be.snowGolemList.getLast().getInt("Rank");
+                float minRank = getSnowGolemRank(be.snowGolemList.getFirst());
+                float maxRank = getSnowGolemRank(be.snowGolemList.getLast());
                 float mu = Mth.clamp(be.currentStrength + be.rankOffset, minRank - be.diversity, maxRank + be.diversity);
                 int size = be.snowGolemList.size();
                 float[] cumulativeDistribution = new float[size];
                 float total = 0;
                 for (int i = 0; i < size; i++) {
-                    float f = (be.snowGolemList.get(i).getInt("Rank") - mu) / be.diversity;
+                    float f = (getSnowGolemRank(be.snowGolemList.get(i)) - mu) / be.diversity;
                     float val = (float) Math.exp(f * f * -0.5F);        // 左右平移的正态分布
                     cumulativeDistribution[i] = val;
                     total += val;
@@ -149,20 +154,26 @@ public class RegionControllerBlockEntity extends BlockEntity {
     }
 
     public void summonGolem(float[] cumulativeDistribution) {
-        float randNum = level.random.nextFloat();
+        if (level == null) {
+            return;
+        }
+        float randNum = level.getRandom().nextFloat();
         for (int i = 0, size = snowGolemList.size(); i < size; i++) {
             if (randNum < cumulativeDistribution[i]) {
                 // summon golem
                 List<BlockPos> blockPosList = summonPosList;
-                BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));
+                BlockPos blockPos = blockPosList.get(level.getRandom().nextInt(blockPosList.size()));
                 Vec3 summonPos = blockPos.above().getBottomCenter();
-                RegionControllerSnowGolemEntity snowGolem = EntityRegister.REGION_CONTROLLER_SNOW_GOLEM.get().create(level);
-                snowGolem.load(snowGolemList.get(i));
+                RegionControllerSnowGolemEntity snowGolem = EntityRegister.REGION_CONTROLLER_SNOW_GOLEM.get().create(level, EntitySpawnReason.TRIGGERED);
+                if (snowGolem == null) {
+                    return;
+                }
+                snowGolem.load(TagValueInput.create(ProblemReporter.DISCARDING, snowGolem.registryAccess(), snowGolemList.get(i)));
                 snowGolem.setDropEquipment(false);
                 snowGolem.setDropSnowball(false);
                 snowGolem.setFixedTeamId(teamId);
                 snowGolem.setAliveRange(region);
-                snowGolem.moveTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
+                snowGolem.snapTo(summonPos.x, summonPos.y, summonPos.z, 0.0F, 0.0F);
                 level.addFreshEntity(snowGolem);
                 Vec3 color = new Vec3(0.9, 0.9, 0.9);
                 PacketDistributor.sendToPlayersTrackingEntity(snowGolem, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(snowGolem.getPosition(1).add(-0.5, 0, -0.5), snowGolem.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 100), BSFParticleType.SPAWN_SNOW.ordinal()));
@@ -173,63 +184,57 @@ public class RegionControllerBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         summonPosList = new ArrayList<>();
-        for (long summonPose : tag.getLongArray("SummonPos")) {
-            summonPosList.add(BlockPos.of(summonPose));
-        }
+        input.read("SummonPos", Codec.LONG_STREAM).ifPresent(posStream -> posStream.forEach(summonPose -> summonPosList.add(BlockPos.of(summonPose))));
         snowGolemList = new ArrayList<>();
-        ListTag listTag = tag.getList("SnowGolem", 10);     // type 10 compound tag. see mc wiki.
-        for (int i = 0, size = listTag.size(); i < size; i++) {
-            snowGolemList.add(listTag.getCompound(i));
+        for (CompoundTag golemTag : input.listOrEmpty("SnowGolem", CompoundTag.CODEC)) {
+            snowGolemList.add(golemTag);
         }
-        region = RegionData.loadFromCompoundTag("Region", tag);
+        region = RegionData.loadFromValueInput("Region", input);
         if (region == null) {
             region = RegionData.EMPTY;
         }
-        spawnBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(tag.getString("SpawnBlock")));
-        playerMultiplier = tag.getFloat("PlayerMultiplier");
-        golemMultiplier = tag.getFloat("GolemMultiplier");
-        diversity = tag.getFloat("Diversity");
-        rankOffset = tag.getFloat("RankOffset");
-        fastestStrength = tag.getFloat("FastestStrength");
-        slowestStrength = tag.getFloat("SlowestStrength");
-        enemyTeamNum = tag.getInt("EnemyTeamNum");
-        maxGolem = tag.getInt("MaxGolem");
-        currentStrength = tag.getFloat("CurrentStrength");
-        teamId = tag.getByte("TeamId");
-        playerNum = tag.getInt("PlayerNum");
+        spawnBlock = BuiltInRegistries.BLOCK.getValue(Identifier.tryParse(input.getStringOr("SpawnBlock", "minecraft:air")));
+        playerMultiplier = input.getFloatOr("PlayerMultiplier", 0);
+        golemMultiplier = input.getFloatOr("GolemMultiplier", 0);
+        diversity = input.getFloatOr("Diversity", 0);
+        rankOffset = input.getFloatOr("RankOffset", 0);
+        fastestStrength = input.getFloatOr("FastestStrength", 0);
+        slowestStrength = input.getFloatOr("SlowestStrength", 0);
+        enemyTeamNum = input.getIntOr("EnemyTeamNum", 0);
+        maxGolem = input.getIntOr("MaxGolem", 0);
+        currentStrength = input.getFloatOr("CurrentStrength", 0);
+        teamId = input.getByteOr("TeamId", (byte) 0);
+        playerNum = input.getIntOr("PlayerNum", 0);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         long[] summonPoses = new long[summonPosList.size()];
         for (int i = 0, size = summonPosList.size(); i < size; i++) {
             summonPoses[i] = summonPosList.get(i).asLong();
         }
-        tag.putLongArray("SummonPos", summonPoses);
-        ListTag listTag = new ListTag();
-        int i = 0;
+        output.store("SummonPos", Codec.LONG_STREAM, Arrays.stream(summonPoses));
+        ValueOutput.TypedOutputList<CompoundTag> listTag = output.list("SnowGolem", CompoundTag.CODEC);
         for (CompoundTag cTag : snowGolemList) {
-            listTag.addTag(i, cTag);
-            i++;
+            listTag.add(cTag);
         }
-        tag.put("SnowGolem", listTag);
-        region.saveToCompoundTag("Region", tag);
-        tag.putString("SpawnBlock", BuiltInRegistries.BLOCK.getKey(spawnBlock).toString());
-        tag.putFloat("PlayerMultiplier", playerMultiplier);
-        tag.putFloat("GolemMultiplier", golemMultiplier);
-        tag.putFloat("Diversity", diversity);
-        tag.putFloat("RankOffset", rankOffset);
-        tag.putFloat("FastestStrength", fastestStrength);
-        tag.putFloat("SlowestStrength", slowestStrength);
-        tag.putInt("EnemyTeamNum", enemyTeamNum);
-        tag.putInt("MaxGolem", maxGolem);
-        tag.putFloat("CurrentStrength", currentStrength);
-        tag.putByte("TeamId", teamId);
-        tag.putInt("PlayerNum", playerNum);
+        region.saveToValueOutput("Region", output);
+        output.putString("SpawnBlock", BuiltInRegistries.BLOCK.getKey(spawnBlock).toString());
+        output.putFloat("PlayerMultiplier", playerMultiplier);
+        output.putFloat("GolemMultiplier", golemMultiplier);
+        output.putFloat("Diversity", diversity);
+        output.putFloat("RankOffset", rankOffset);
+        output.putFloat("FastestStrength", fastestStrength);
+        output.putFloat("SlowestStrength", slowestStrength);
+        output.putInt("EnemyTeamNum", enemyTeamNum);
+        output.putInt("MaxGolem", maxGolem);
+        output.putFloat("CurrentStrength", currentStrength);
+        output.putByte("TeamId", teamId);
+        output.putInt("PlayerNum", playerNum);
     }
 
     @Override
@@ -243,12 +248,12 @@ public class RegionControllerBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+    public void handleUpdateTag(ValueInput tag) {
         // in client these fields are valid
-        super.handleUpdateTag(tag, lookupProvider);
-        teamId = tag.getByte("TeamId");
-        currentStrength = tag.getFloat("CurrentStrength");
-        playerNum = tag.getInt("PlayerNum");
+        super.handleUpdateTag(tag);
+        teamId = tag.getByteOr("TeamId", (byte) 0);
+        currentStrength = tag.getFloatOr("CurrentStrength", 0);
+        playerNum = tag.getIntOr("PlayerNum", 0);
     }
 
     @Override
@@ -284,7 +289,11 @@ public class RegionControllerBlockEntity extends BlockEntity {
         for (BSFSnowGolemEntity golem : golemList) {
             snowGolemList.add(golem.getReconstructData());
         }
-        snowGolemList.sort(Comparator.comparingInt(e -> e.getInt("Rank")));
+        snowGolemList.sort(Comparator.comparingInt(RegionControllerBlockEntity::getSnowGolemRank));
+    }
+
+    private static int getSnowGolemRank(CompoundTag tag) {
+        return tag.getIntOr("Rank", 0);
     }
 
     public byte getTeamId() {

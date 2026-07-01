@@ -109,7 +109,7 @@ public class BSFGolemFollowOwnerGoal extends Goal {
         } else if (!canTeleportTo(new BlockPos(pX, pY, pZ))) {
             return false;
         } else {
-            golem.moveTo(pX + 0.5D, pY, pZ + 0.5D, golem.getYRot(), golem.getXRot());
+            golem.snapTo(pX + 0.5D, pY, pZ + 0.5D, golem.getYRot(), golem.getXRot());
             navigation.stop();
             return true;
         }

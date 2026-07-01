@@ -6,10 +6,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class RegionData {
     public static final Codec<RegionData> CODEC = RecordCodecBuilder.create(instance ->
@@ -55,9 +58,18 @@ public class RegionData {
 
     public static RegionData loadFromCompoundTag(String key, CompoundTag tag) {
         if (tag.contains(key + "Start") && tag.contains(key + "End")) {
-            BlockPos start = BlockPos.of(tag.getLong(key + "Start"));
-            BlockPos end = BlockPos.of(tag.getLong(key + "End"));
+            BlockPos start = BlockPos.of(tag.getLongOr(key + "Start", 0L));
+            BlockPos end = BlockPos.of(tag.getLongOr(key + "End", 0L));
             return new RegionData(start, end);
+        }
+        return null;
+    }
+
+    public static RegionData loadFromValueInput(String key, ValueInput input) {
+        Optional<Long> start = input.getLong(key + "Start");
+        Optional<Long> end = input.getLong(key + "End");
+        if (start.isPresent() && end.isPresent()) {
+            return new RegionData(BlockPos.of(start.get()), BlockPos.of(end.get()));
         }
         return null;
     }
@@ -65,6 +77,11 @@ public class RegionData {
     public void saveToCompoundTag(String key, CompoundTag tag) {
         tag.putLong(key + "Start", start.asLong());
         tag.putLong(key + "End", end.asLong());
+    }
+
+    public void saveToValueOutput(String key, ValueOutput output) {
+        output.putLong(key + "Start", start.asLong());
+        output.putLong(key + "End", end.asLong());
     }
 
     public BlockPos start() {
@@ -108,3 +125,4 @@ public class RegionData {
                 '}';
     }
 }
+

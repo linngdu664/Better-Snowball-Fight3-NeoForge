@@ -1,59 +1,29 @@
 package com.linngdu664.bsf.item.misc;
 
-import com.linngdu664.bsf.client.model.IceSkatesModel;
 import com.linngdu664.bsf.registry.ArmorMaterialRegister;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorType;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
-public class IceSkatesItem extends ArmorItem {
+public class IceSkatesItem extends Item {
     public IceSkatesItem() {
-        super(ArmorMaterialRegister.ICE_SKATES_ARMOR_MATERIAL, Type.BOOTS, new Properties().stacksTo(1).durability(256));
+        super(com.linngdu664.bsf.Main.itemProperties()
+                .stacksTo(1)
+                .humanoidArmor(ArmorMaterialRegister.ICE_SKATES_ARMOR_MATERIAL, ArmorType.BOOTS)
+                .durability(256)
+                .repairable(Items.LEATHER_BOOTS));
     }
 
     @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                HumanoidModel armorModel = new HumanoidModel(new ModelPart(Collections.emptyList(), Map.of(
-                        "left_leg", new IceSkatesModel(Minecraft.getInstance().getEntityModels().bakeLayer(IceSkatesModel.LAYER_LOCATION)).bone,
-                        "right_leg", new IceSkatesModel(Minecraft.getInstance().getEntityModels().bakeLayer(IceSkatesModel.LAYER_LOCATION)).bone,
-                        "head", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "hat", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "body", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "right_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()),
-                        "left_arm", new ModelPart(Collections.emptyList(), Collections.emptyMap()))));
-                armorModel.crouching = livingEntity.isShiftKeyDown();
-                armorModel.riding = original.riding;
-                armorModel.young = livingEntity.isBaby();
-                return armorModel;
-            }
-        });
-    }
-
-    @Override
-    public boolean isValidRepairItem(@NotNull ItemStack pStack, ItemStack pRepairCandidate) {
-        return pRepairCandidate.is(Items.LEATHER_BOOTS);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("ice_skates.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("ice_skates.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

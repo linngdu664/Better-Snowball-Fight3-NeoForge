@@ -1,0 +1,6 @@
+{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "bsf:item/active_teleportation_golem_core"
+              }
+}

@@ -22,7 +22,7 @@ public class PowderExecutor extends AbstractExecutor {
     public void tick() {
         super.tick();
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             ((ServerLevel) level).sendParticles(ParticleRegister.BIG_LONG_TIME_SNOWFLAKE.get(), this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0.2);
         }
     }

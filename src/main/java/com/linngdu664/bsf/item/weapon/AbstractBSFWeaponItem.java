@@ -10,7 +10,6 @@ import com.linngdu664.bsf.network.to_server.AmmoTypePayload;
 import com.linngdu664.bsf.registry.DataComponentRegister;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -19,8 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,12 +27,16 @@ import java.util.LinkedHashSet;
 public abstract class AbstractBSFWeaponItem extends Item {
     private final int typeFlag;
     private final LinkedHashSet<Item> launchOrder = new LinkedHashSet<>();   // client only
-    private ItemStack prevAmmoItemStack = Items.AIR.getDefaultInstance();      // client only
-    private ItemStack currentAmmoItemStack = Items.AIR.getDefaultInstance();   // client only
-    private ItemStack nextAmmoItemStack = Items.AIR.getDefaultInstance();      // client only
+    private ItemStack prevAmmoItemStack = null;      // client only
+    private ItemStack currentAmmoItemStack = null;   // client only
+    private ItemStack nextAmmoItemStack = null;      // client only
 
     public AbstractBSFWeaponItem(int durability, Rarity rarity, int flag) {
-        super(new Properties().stacksTo(1).durability(durability).rarity(rarity));
+        this(durability, rarity, flag, 25);
+    }
+
+    public AbstractBSFWeaponItem(int durability, Rarity rarity, int flag, int enchantmentValue) {
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(1).durability(durability).rarity(rarity).repairable(Items.IRON_INGOT).enchantable(enchantmentValue));
         this.typeFlag = flag;
     }
 
@@ -80,57 +82,44 @@ public abstract class AbstractBSFWeaponItem extends Item {
         return null;
     }
 
-    @Override
-    public boolean isValidRepairItem(@NotNull ItemStack pStack, ItemStack pRepairCandidate) {
-        return pRepairCandidate.is(Items.IRON_INGOT);
-    }
-
-    @Override
-    public int getEnchantmentValue(ItemStack stack) {
-        return 25;
-    }
-
-    @Override
-    public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
-        if (pLevel.isClientSide && pEntity instanceof Player player && (this.equals(player.getMainHandItem().getItem()) || this.equals(player.getOffhandItem().getItem()))) {
-            Inventory inventory = player.getInventory();
-            int k = inventory.getContainerSize();
-            HashMap<Item, Integer> hashMap = new HashMap<>();
-            for (int i = 0; i < k; i++) {
-                ItemStack itemStack = inventory.getItem(i);
-                Item item = itemStack.getItem();
-                if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.AMMO_ITEM)) {
-                    AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
-                    if ((typeFlag & snowball.getTypeFlag()) != 0) {
-                        hashMap.put(snowball, hashMap.getOrDefault(snowball, 0) + itemStack.getMaxDamage() - itemStack.getDamageValue());
-                    }
-                } else if (isAllowBulkedSnowball() && item instanceof AbstractBSFSnowballItem snowball && (typeFlag & snowball.getTypeFlag()) != 0) {
-                    hashMap.put(snowball, hashMap.getOrDefault(snowball, 0) + itemStack.getCount());
+    public void clientInventoryTick(Player player, ItemStack pStack, int slotId) {
+        Inventory inventory = player.getInventory();
+        int k = inventory.getContainerSize();
+        HashMap<Item, Integer> hashMap = new HashMap<>();
+        for (int i = 0; i < k; i++) {
+            ItemStack itemStack = inventory.getItem(i);
+            Item item = itemStack.getItem();
+            if (item instanceof SnowballTankItem && itemStack.has(DataComponentRegister.AMMO_ITEM)) {
+                AbstractBSFSnowballItem snowball = (AbstractBSFSnowballItem) itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
+                if ((typeFlag & snowball.getTypeFlag()) != 0) {
+                    hashMap.put(snowball, hashMap.getOrDefault(snowball, 0) + itemStack.getMaxDamage() - itemStack.getDamageValue());
                 }
+            } else if (isAllowBulkedSnowball() && item instanceof AbstractBSFSnowballItem snowball && (typeFlag & snowball.getTypeFlag()) != 0) {
+                hashMap.put(snowball, hashMap.getOrDefault(snowball, 0) + itemStack.getCount());
             }
-            launchOrder.addAll(hashMap.keySet());
-            launchOrder.removeIf(item -> !hashMap.containsKey(item));
-            modifyOrder(player, launchOrder);
-            if (launchOrder.isEmpty()) {
-                prevAmmoItemStack = Items.AIR.getDefaultInstance();
-                currentAmmoItemStack = Items.AIR.getDefaultInstance();
-                nextAmmoItemStack = Items.AIR.getDefaultInstance();
-            } else if (launchOrder.size() == 1) {
-                prevAmmoItemStack = Items.AIR.getDefaultInstance();
-                currentAmmoItemStack = new ItemStack(launchOrder.getFirst(), hashMap.get(launchOrder.getFirst()));
-                nextAmmoItemStack = Items.AIR.getDefaultInstance();
-            } else {
-                prevAmmoItemStack = new ItemStack(launchOrder.getLast(), hashMap.get(launchOrder.getLast()));
-                currentAmmoItemStack = new ItemStack(launchOrder.getFirst(), hashMap.get(launchOrder.getFirst()));
-                Iterator<Item> iterator = launchOrder.iterator();
-                iterator.next();
-                Item nextItem = iterator.next();
-                nextAmmoItemStack = new ItemStack(nextItem, hashMap.get(nextItem));
-            }
-            Item newItem = currentAmmoItemStack.getItem();
-            if (!newItem.equals(pStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item())) {
-                PacketDistributor.sendToServer(new AmmoTypePayload(newItem, pSlotId));
-            }
+        }
+        launchOrder.addAll(hashMap.keySet());
+        launchOrder.removeIf(item -> !hashMap.containsKey(item));
+        modifyOrder(player, launchOrder);
+        if (launchOrder.isEmpty()) {
+            prevAmmoItemStack = Items.AIR.getDefaultInstance();
+            currentAmmoItemStack = Items.AIR.getDefaultInstance();
+            nextAmmoItemStack = Items.AIR.getDefaultInstance();
+        } else if (launchOrder.size() == 1) {
+            prevAmmoItemStack = Items.AIR.getDefaultInstance();
+            currentAmmoItemStack = new ItemStack(launchOrder.getFirst(), hashMap.get(launchOrder.getFirst()));
+            nextAmmoItemStack = Items.AIR.getDefaultInstance();
+        } else {
+            prevAmmoItemStack = new ItemStack(launchOrder.getLast(), hashMap.get(launchOrder.getLast()));
+            currentAmmoItemStack = new ItemStack(launchOrder.getFirst(), hashMap.get(launchOrder.getFirst()));
+            Iterator<Item> iterator = launchOrder.iterator();
+            iterator.next();
+            Item nextItem = iterator.next();
+            nextAmmoItemStack = new ItemStack(nextItem, hashMap.get(nextItem));
+        }
+        Item newItem = currentAmmoItemStack.getItem();
+        if (!newItem.equals(pStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item())) {
+            ClientPacketDistributor.sendToServer(new AmmoTypePayload(newItem, slotId));
         }
     }
 
@@ -186,3 +175,5 @@ public abstract class AbstractBSFWeaponItem extends Item {
         return typeFlag;
     }
 }
+
+

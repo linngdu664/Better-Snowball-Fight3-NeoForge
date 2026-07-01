@@ -1,0 +1,6 @@
+{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "bsf:item/impulse_snowball_tank"
+              }
+}

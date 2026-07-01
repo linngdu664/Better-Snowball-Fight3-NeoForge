@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class LargeSnowballTankItem extends SnowballTankItem {
     public LargeSnowballTankItem() {
-        super(new Properties().stacksTo(1).durability(192).rarity(Rarity.UNCOMMON));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(1).durability(192).rarity(Rarity.UNCOMMON));
     }
 
     @Override
@@ -27,3 +27,4 @@ public class LargeSnowballTankItem extends SnowballTankItem {
         return super.getName(pStack);
     }
 }
+

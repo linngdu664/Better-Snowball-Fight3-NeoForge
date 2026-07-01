@@ -4,9 +4,7 @@ import com.linngdu664.bsf.registry.BlockEntityRegister;
 import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -14,6 +12,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class CriticalSnowEntity extends BlockEntity {
     private int targetAge = BSFCommonUtil.staticRandInt(100, 140);
@@ -24,7 +24,7 @@ public class CriticalSnowEntity extends BlockEntity {
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             CriticalSnowEntity criticalSnowEntity = (CriticalSnowEntity) blockEntity;
             if (criticalSnowEntity.age < criticalSnowEntity.targetAge) {
                 criticalSnowEntity.age++;
@@ -53,16 +53,16 @@ public class CriticalSnowEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        age = tag.getInt("age");
-        targetAge = tag.getInt("target_age");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        age = input.getIntOr("age", 0);
+        targetAge = input.getIntOr("target_age", BSFCommonUtil.staticRandInt(100, 140));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("age", age);
-        tag.putInt("target_age", targetAge);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("age", age);
+        output.putInt("target_age", targetAge);
     }
 }

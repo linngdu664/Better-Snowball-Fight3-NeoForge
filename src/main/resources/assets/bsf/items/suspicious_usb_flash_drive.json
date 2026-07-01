@@ -1,0 +1,6 @@
+{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "bsf:item/suspicious_usb_flash_drive"
+              }
+}

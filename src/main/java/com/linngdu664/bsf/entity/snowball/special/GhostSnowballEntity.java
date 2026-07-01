@@ -5,8 +5,8 @@ import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,15 +15,18 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
     private int timer = 0;
+    private final IntOpenHashSet hitLivingEntityIds = new IntOpenHashSet();
 
     public GhostSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, new BSFSnowballEntityProperties().canBeCaught(false));
@@ -36,22 +39,25 @@ public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putInt("Timer", timer);
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("Timer", timer);
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        timer = pCompound.getInt("Timer");
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        timer = input.getIntOr("Timer", 0);
     }
 
     @Override
     protected void onHitEntity(EntityHitResult pResult) {
+        Entity entity = pResult.getEntity();
+        if (entity instanceof LivingEntity && !hitLivingEntityIds.add(entity.getId())) {
+            return;
+        }
         super.onHitEntity(pResult);
-        if (!level().isClientSide) {
-            Entity entity = pResult.getEntity();
+        if (!level().isClientSide()) {
             if (entity instanceof LivingEntity livingEntity && !isCaught) {
                 livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 160, 1));
                 level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.WITHER_SPAWN, SoundSource.NEUTRAL, 0.3F, 1.0F / (level().getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
@@ -60,10 +66,15 @@ public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return super.canHitEntity(entity) && (!(entity instanceof LivingEntity) || !hitLivingEntityIds.contains(entity.getId()));
+    }
+
+    @Override
     public void tick() {
         super.tick();
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (timer == 100) {
                 discard();
                 ((ServerLevel) level).sendParticles(ParticleTypes.SOUL, this.getX(), this.getY(), this.getZ(), 8, 0, 0, 0, 0);
@@ -77,7 +88,7 @@ public class GhostSnowballEntity extends AbstractBSFSnowballEntity {
 
     @Override
     protected void spawnBasicParticles(Level level, Vec3 location) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             ((ServerLevel) level).sendParticles(ParticleTypes.SOUL, location.x, location.y, location.z, 8, 0, 0, 0, 0);
         }
     }

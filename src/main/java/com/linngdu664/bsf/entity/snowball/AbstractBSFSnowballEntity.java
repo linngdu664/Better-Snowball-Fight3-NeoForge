@@ -12,7 +12,6 @@ import com.linngdu664.bsf.registry.ParticleRegister;
 import com.linngdu664.bsf.registry.TriggerTypeRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -25,13 +24,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -51,56 +53,56 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, double pX, double pY, double pZ, Level pLevel, BSFSnowballEntityProperties pProperties) {
-        super(pEntityType, pX, pY, pZ, pLevel);
+        super(pEntityType, pX, pY, pZ, pLevel, Items.SNOWBALL.getDefaultInstance());
         this.properties = pProperties;
+        this.setItem(new ItemStack(this.getDefaultItem()));
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, double pX, double pY, double pZ, Level pLevel, BSFSnowballEntityProperties pProperties, RegionData region) {
-        super(pEntityType, pX, pY, pZ, pLevel);
+        super(pEntityType, pX, pY, pZ, pLevel, Items.SNOWBALL.getDefaultInstance());
         this.properties = pProperties;
+        this.setItem(new ItemStack(this.getDefaultItem()));
         this.aliveRange = RegionData.copy(region);
     }
 
     public AbstractBSFSnowballEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, LivingEntity pShooter, Level pLevel, BSFSnowballEntityProperties pProperties, RegionData region) {
-        super(pEntityType, pShooter, pLevel);
+        super(pEntityType, pShooter, pLevel, Items.SNOWBALL.getDefaultInstance());
         this.properties = pProperties;
+        this.setItem(new ItemStack(this.getDefaultItem()));
         this.aliveRange = RegionData.copy(region);
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putFloat("Damage", properties.damage);
-        pCompound.putFloat("BlazeDamage", properties.blazeDamage);
-        pCompound.putInt("WeaknessTicks", properties.weaknessTicks);
-        pCompound.putInt("FrozenTicks", properties.frozenTicks);
-        pCompound.putDouble("Punch", properties.punch);
-        pCompound.putBoolean("CanBeCaught", properties.canBeCaught);
-        pCompound.putInt("LaunchFrom", properties.launchFrom.ordinal());
-        pCompound.putFloat("ParticleGenerationStepSize", particleGenerationStepSize);
-        pCompound.putFloat("ParticleGenerationPointOffset", particleGeneratePointOffset);
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putFloat("Damage", properties.damage);
+        output.putFloat("BlazeDamage", properties.blazeDamage);
+        output.putInt("WeaknessTicks", properties.weaknessTicks);
+        output.putInt("FrozenTicks", properties.frozenTicks);
+        output.putDouble("Punch", properties.punch);
+        output.putBoolean("CanBeCaught", properties.canBeCaught);
+        output.putInt("LaunchFrom", properties.launchFrom.ordinal());
+        output.putFloat("ParticleGenerationStepSize", particleGenerationStepSize);
+        output.putFloat("ParticleGenerationPointOffset", particleGeneratePointOffset);
         if (aliveRange != null) {
-            aliveRange.saveToCompoundTag("AliveRange", pCompound);
+            aliveRange.saveToValueOutput("AliveRange", output);
         }
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        properties.damage = pCompound.getFloat("Damage");
-        properties.blazeDamage = pCompound.getFloat("BlazeDamage");
-        properties.weaknessTicks = pCompound.getInt("WeaknessTicks");
-        properties.frozenTicks = pCompound.getInt("FrozenTicks");
-        properties.punch = pCompound.getDouble("Punch");
-        properties.canBeCaught = pCompound.getBoolean("CanBeCaught");
-        properties.launchFrom = LaunchFrom.values()[pCompound.getInt("LaunchFrom")];
-        if (pCompound.contains("ParticleGenerationStepSize")) {
-            particleGenerationStepSize = pCompound.getFloat("ParticleGenerationStepSize");
-        } else {
-            particleGenerationStepSize = 0.5F;      // command summoned fallback
-        }
-        particleGeneratePointOffset = pCompound.getFloat("ParticleGenerationPointOffset");
-        aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        properties.damage = input.getFloatOr("Damage", Float.MIN_NORMAL);
+        properties.blazeDamage = input.getFloatOr("BlazeDamage", 3.0F);
+        properties.weaknessTicks = input.getIntOr("WeaknessTicks", 0);
+        properties.frozenTicks = input.getIntOr("FrozenTicks", 0);
+        properties.punch = input.getDoubleOr("Punch", 0.0);
+        properties.canBeCaught = input.getBooleanOr("CanBeCaught", true);
+        int launchFrom = Mth.clamp(input.getIntOr("LaunchFrom", LaunchFrom.HAND.ordinal()), 0, LaunchFrom.values().length - 1);
+        properties.launchFrom = LaunchFrom.values()[launchFrom];
+        particleGenerationStepSize = input.getFloatOr("ParticleGenerationStepSize", 0.5F);
+        particleGeneratePointOffset = input.getFloatOr("ParticleGenerationPointOffset", 0.0F);
+        aliveRange = RegionData.loadFromValueInput("AliveRange", input);
     }
 
     @Override
@@ -119,7 +121,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
         if (pResult.getEntity() instanceof LivingEntity entity) {
             // Handling the catch
             if (catchOnGlove(entity)) {
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY(), this.getZ(), 3, 0, 0, 0, 0.04);
                 }
                 isCaught = true;
@@ -135,7 +137,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
                 if (entity.getTicksFrozen() < properties.frozenTicks) {
                     entity.setTicksFrozen(properties.frozenTicks);
                 }
-                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1));
+                entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 1));
             }
             if (properties.weaknessTicks > 0) {
                 entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, properties.weaknessTicks, 1));
@@ -177,7 +179,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide && aliveRange != null && !aliveRange.inRegion(position())) {
+        if (!level().isClientSide() && aliveRange != null && !aliveRange.inRegion(position())) {
             discard();
         }
         callTraceParticles();
@@ -209,7 +211,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     protected void generateVelIndependentTraceParticles(Vec3 vec3) {
         // Spawn trace particles
         Level level = level();
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             level.addParticle(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), vec3.x, vec3.y + 0.1, vec3.z, 0, 0, 0);
         }
     }
@@ -247,7 +249,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
                     offHand.hurtAndBreak(1, player, EquipmentSlot.OFFHAND);
                     glove.releaseUsing(offHand, level, player, 1);
                 }
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     ItemStack stack = new ItemStack(getDefaultItem());
                     if (aliveRange != null) {
                         stack.set(DataComponentRegister.REGION, aliveRange);
@@ -271,8 +273,8 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
 
     protected void handleExplosion(float radius, Vec3 location) {
         Level level = level();
-        if (!level.isClientSide) {
-            if (level.getGameRules().getBoolean((GameRules.RULE_MOBGRIEFING)) && ServerConfig.EXPLOSIVE_DESTROY.getConfigValue()) {
+        if (level instanceof ServerLevel serverLevel) {
+            if (serverLevel.getGameRules().get(GameRules.MOB_GRIEFING) && ServerConfig.EXPLOSIVE_DESTROY.getConfigValue()) {
                 level.explode(getOwner(), location.x, location.y, location.z, radius, Level.ExplosionInteraction.TNT);
             } else {
                 level.explode(getOwner(), location.x, location.y, location.z, radius, Level.ExplosionInteraction.NONE);
@@ -282,7 +284,7 @@ public abstract class AbstractBSFSnowballEntity extends ThrowableItemProjectile 
     }
 
     protected void spawnBasicParticles(Level level, Vec3 location) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             ((ServerLevel) level).sendParticles(ParticleTypes.ITEM_SNOWBALL, location.x, location.y, location.z, 8, 0, 0, 0, 0);
             ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, location.x, location.y, location.z, 8, 0, 0, 0, 0.04);
         }

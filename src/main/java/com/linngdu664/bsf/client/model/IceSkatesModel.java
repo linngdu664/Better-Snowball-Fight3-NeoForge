@@ -1,25 +1,24 @@
 package com.linngdu664.bsf.client.model;
 
 import com.linngdu664.bsf.Main;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.world.entity.Entity;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.util.Unit;
 
 // Made with Blockbench 4.3.1
 // Exported for Minecraft version 1.17 - 1.18 with Mojang mappings
 
-public class IceSkatesModel<T extends Entity> extends EntityModel<T> {
+public class IceSkatesModel extends Model<Unit> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("ice_skates"), "main");
     public final ModelPart bone;
 
     public IceSkatesModel(ModelPart root) {
+        super(root, RenderTypes::entityCutout);
         this.bone = root.getChild("bone");
     }
 
@@ -35,13 +34,4 @@ public class IceSkatesModel<T extends Entity> extends EntityModel<T> {
         return LayerDefinition.create(meshdefinition, 32, 32);
     }
 
-    @Override
-    public void setupAnim(@NotNull T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
-    }
-
-    @Override
-    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-        bone.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-    }
 }

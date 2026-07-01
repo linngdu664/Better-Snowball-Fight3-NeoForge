@@ -19,10 +19,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -31,7 +32,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class SnowmanInHandItem extends Item {
     private static final ILaunchAdjustment LAUNCH_ADJUSTMENT = new ILaunchAdjustment() {
@@ -68,7 +69,7 @@ public class SnowmanInHandItem extends Item {
 
 
     public SnowmanInHandItem() {
-        super(new Properties().stacksTo(1).durability(256).rarity(Rarity.EPIC));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(1).durability(256).rarity(Rarity.EPIC).enchantable(25));
     }
 
     @Override
@@ -102,31 +103,33 @@ public class SnowmanInHandItem extends Item {
                     pLevel.addFreshEntity(snowballEntity);
                 }
                 pLevel.playSound(null, pLivingEntity.getX(), pLivingEntity.getY(), pLivingEntity.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.PLAYERS, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
-                pStack.hurtAndBreak(1, pLivingEntity, LivingEntity.getSlotForHand(pLivingEntity.getUsedItemHand()));
+                pStack.hurtAndBreak(1, pLivingEntity, pLivingEntity.getUsedItemHand());
             }
         }
     }
 
     @Override
-    public void releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, int pTimeCharged) {
+    public boolean releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, int pTimeCharged) {
         if (pLivingEntity instanceof Player player) {
             player.awardStat(Stats.ITEM_USED.get(this));
+            return true;
         }
+        return false;
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
         pPlayer.startUsingItem(pUsedHand);
-        return InteractionResultHolder.consume(stack);
+        return InteractionResult.CONSUME;
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
-        return UseAnim.BOW;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack pStack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
@@ -135,15 +138,11 @@ public class SnowmanInHandItem extends Item {
     }
 
     @Override
-    public int getEnchantmentValue(ItemStack stack) {
-        return 25;
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Options options = Minecraft.getInstance().options;
-        tooltipComponents.add(Component.translatable("snowman_in_hand.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("snowman_in_hand1.tooltip", options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
-        tooltipComponents.add(Component.translatable("snowman_in_hand2.tooltip", options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.accept(Component.translatable("snowman_in_hand.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("snowman_in_hand1.tooltip", options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.accept(Component.translatable("snowman_in_hand2.tooltip", options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 }
+

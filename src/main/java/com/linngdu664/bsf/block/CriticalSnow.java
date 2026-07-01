@@ -1,15 +1,17 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.block.entity.CriticalSnowEntity;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -29,7 +31,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class CriticalSnow extends Block implements EntityBlock {
     public CriticalSnow() {
-        super(Properties.ofLegacyCopy(Blocks.SNOW).speedFactor(0.2F).jumpFactor(0.2F).noLootTable());
+        super(Main.blockProperties("critical_snow", Properties.ofLegacyCopy(Blocks.SNOW)).speedFactor(0.2F).jumpFactor(0.2F).noLootTable());
     }
 
     @Nullable
@@ -82,9 +84,9 @@ public class CriticalSnow extends Block implements EntityBlock {
     @Override
     public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         BlockState blockstate = pLevel.getBlockState(pPos.below());
-        if (blockstate.is(BlockTags.SNOW_LAYER_CANNOT_SURVIVE_ON)) {
+        if (blockstate.is(BlockTags.CANNOT_SUPPORT_SNOW_LAYER)) {
             return false;
-        } else if (blockstate.is(BlockTags.SNOW_LAYER_CAN_SURVIVE_ON)) {
+        } else if (blockstate.is(BlockTags.SUPPORT_OVERRIDE_SNOW_LAYER)) {
             return true;
         } else {
             return Block.isFaceFull(blockstate.getCollisionShape(pLevel, pPos.below()), Direction.UP);
@@ -97,7 +99,7 @@ public class CriticalSnow extends Block implements EntityBlock {
     }
 
     @Override
-    public @NotNull BlockState updateShape(BlockState pState, Direction pFacing, BlockState pFacingState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pFacingPos) {
-        return !pState.canSurvive(pLevel, pCurrentPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(pState, pFacing, pFacingState, pLevel, pCurrentPos, pFacingPos);
+    public @NotNull BlockState updateShape(BlockState pState, LevelReader pLevel, ScheduledTickAccess pTicks, BlockPos pCurrentPos, Direction pFacing, BlockPos pFacingPos, BlockState pFacingState, RandomSource pRandom) {
+        return !pState.canSurvive(pLevel, pCurrentPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(pState, pLevel, pTicks, pCurrentPos, pFacing, pFacingPos, pFacingState, pRandom);
     }
 }

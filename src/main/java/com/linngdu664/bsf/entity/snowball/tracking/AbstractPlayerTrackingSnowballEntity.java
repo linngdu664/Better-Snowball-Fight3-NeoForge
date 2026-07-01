@@ -11,9 +11,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -35,7 +34,7 @@ public abstract class AbstractPlayerTrackingSnowballEntity extends AbstractTrack
         Level level = level();
         Entity shooter = getOwner();
         AABB aabb = getBoundingBox().inflate(range);
-        BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        BSFTeamSavedData savedData = level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
         if (shooter instanceof Player player) {
             List<Player> list = level.getEntitiesOfClass(Player.class, aabb, p -> !p.isSpectator() && !p.isCreative() && !p.equals(shooter) && !savedData.isSameTeam(player, p) && BSFCommonUtil.vec3AngleCos(velocity, p.getPosition(1).subtract(selfPos)) > 0.5);
             if (!list.isEmpty()) {

@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
@@ -23,7 +23,7 @@ public record ItemData(Item item) {
     public static final ItemData EMPTY = new ItemData(Items.AIR);
 
     private ItemData(String itemName) {
-        this(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemName)));
+        this(BuiltInRegistries.ITEM.getValue(Identifier.tryParse(itemName)));
     }
 
     private String getItemResLoc() {
@@ -31,3 +31,4 @@ public record ItemData(Item item) {
     }
 
 }
+

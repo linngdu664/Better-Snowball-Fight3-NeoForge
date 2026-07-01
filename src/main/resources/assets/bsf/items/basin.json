@@ -1,0 +1,26 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "bsf:snow_type",
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/basin_of_snow"
+        },
+        "threshold": 1
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/basin_of_powder_snow"
+        },
+        "threshold": 2
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "bsf:item/basin"
+    }
+  }
+}

@@ -6,8 +6,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class SnowGolemCoreItem extends Item {
     private final int coolDown;
@@ -15,7 +16,7 @@ public class SnowGolemCoreItem extends Item {
     private final ChatFormatting[] chatFormats;
 
     public SnowGolemCoreItem(int coolDown, String[] hoverText, ChatFormatting[] chatFormats) {
-        super(new Properties().rarity(Rarity.UNCOMMON));
+        super(com.linngdu664.bsf.Main.itemProperties().rarity(Rarity.UNCOMMON));
         this.coolDown = coolDown;
         this.hoverText = hoverText;
         this.chatFormats = chatFormats;
@@ -26,9 +27,10 @@ public class SnowGolemCoreItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         for (int i = 0, size = hoverText.length; i < size; i++) {
-            tooltipComponents.add(Component.translatable(hoverText[i]).withStyle(chatFormats[i]));
+            tooltipComponents.accept(Component.translatable(hoverText[i]).withStyle(chatFormats[i]));
         }
     }
 }
+

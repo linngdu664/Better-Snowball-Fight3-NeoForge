@@ -14,17 +14,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_NEXT;
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_PREV;
@@ -90,11 +91,11 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pEntityLiving, int pTimeLeft) {
-        launch(pStack, pLevel, pEntityLiving, pTimeLeft, 3.0F);
+    public boolean releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pEntityLiving, int pTimeLeft) {
+        return launch(pStack, pLevel, pEntityLiving, pTimeLeft, 3.0F);
     }
 
-    public void launch(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving, int pTimeLeft, float velocity) {
+    public boolean launch(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving, int pTimeLeft, float velocity) {
         if (pEntityLiving instanceof Player player) {
             int i = this.getUseDuration(pStack, pEntityLiving) - pTimeLeft;
             float f = getPowerForTime(i);
@@ -104,7 +105,7 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
                     AbstractBSFSnowballEntity snowballEntity = ItemToEntity(itemStack, player, pLevel, getLaunchAdjustment(f, itemStack.getItem()));
                     BSFShootFromRotation(snowballEntity, player.getXRot(), player.getYRot(), f * velocity, 0.5F);
                     pLevel.addFreshEntity(snowballEntity);
-                    pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
+                    pStack.hurtAndBreak(1, player, player.getUsedItemHand());
                     Vec3 cameraVec = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
                     //add push
                     if (pLevel.isClientSide()) {
@@ -116,20 +117,22 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
                     }
                     consumeAmmo(itemStack, player);
                     player.awardStat(Stats.ITEM_USED.get(this));
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pHand);
         int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(pPlayer, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), itemStack);
         if (enchantmentLevel <= 0 && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
             pPlayer.startUsingItem(pHand);
-            return InteractionResultHolder.consume(itemStack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail(itemStack);
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -138,14 +141,15 @@ public class SnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
-        return UseAnim.BOW;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack pStack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("snowball_cannon1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("snowball_cannon1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 }
+

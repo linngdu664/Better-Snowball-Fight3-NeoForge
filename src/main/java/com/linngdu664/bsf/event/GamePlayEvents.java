@@ -22,7 +22,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -40,7 +40,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -48,7 +48,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -70,13 +69,13 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = Main.MODID)
 public class GamePlayEvents {
     private static final AttributeModifier SKATES_SPEED_BUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), 0.15, AttributeModifier.Operation.ADD_VALUE);
     private static final AttributeModifier SKATES_SPEED_DEBUFF = new AttributeModifier(Main.makeResLoc("skates_speed"), -0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 
     public static void pvpMoney(ServerPlayer winPlayer, ServerPlayer losePlayer, ItemStack winDevice, ItemStack loseDevice) {
-        // 胜者拿走败者20%的钱
+        // Winner receives half of the loser's money.
         int deathPlayerPoint = loseDevice.getOrDefault(DataComponentRegister.MONEY, 0);
         int getPoints = deathPlayerPoint / 2;
         loseDevice.set(DataComponentRegister.MONEY, deathPlayerPoint - getPoints);
@@ -87,7 +86,7 @@ public class GamePlayEvents {
     }
 
     public static void pveWinMoney(ServerPlayer winPlayer, RegionControllerSnowGolemEntity loseGolem, ItemStack winDevice) {
-        // 获取雪人的奖励
+        // Winner receives the defeated golem's reward.
         int killerPlayerRank = winDevice.getOrDefault(DataComponentRegister.RANK, 0);
         int killerPlayerMoney = winDevice.getOrDefault(DataComponentRegister.MONEY, 0);
         int getRank = loseGolem.getRank();
@@ -100,10 +99,10 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
         LivingEntity deathEntity = event.getEntity();
-        if (!deathEntity.level().isClientSide) {
+        if (!deathEntity.level().isClientSide()) {
             DamageSource source = event.getSource();
             Entity killerEntity = source.getEntity();
-            BSFTeamSavedData savedData = deathEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+            BSFTeamSavedData savedData = deathEntity.level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
             if (killerEntity instanceof ServerPlayer killerPlayer) {
                 if (deathEntity instanceof ServerPlayer deathPlayer) {
                     ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK, 0) >= 0);
@@ -124,7 +123,7 @@ public class GamePlayEvents {
             } else if (killerEntity instanceof RegionControllerSnowGolemEntity killerGolem && deathEntity instanceof ServerPlayer deathPlayer) {
                 ItemStack device = BSFCommonUtil.findInventoryItemStack(deathPlayer, p -> p.getItem().equals(ItemRegister.SCORING_DEVICE.get()) && p.getOrDefault(DataComponentRegister.RANK.get(), 0) >= 0);
                 if (device != null && killerGolem.getFixedTeamId() != savedData.getTeam(deathPlayer.getUUID()) && device.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY).inRegion(deathPlayer.position())) {
-                    // 掉10%的钱
+                    // Remove 10 percent of the player's money.
                     int deathPlayerPoint = device.getOrDefault(DataComponentRegister.MONEY, 0);
                     int getPoints = deathPlayerPoint / 10;
                     device.set(DataComponentRegister.MONEY, deathPlayerPoint - getPoints);
@@ -143,7 +142,7 @@ public class GamePlayEvents {
                         RegionData region = device.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                         RegionData region1 = device1.getOrDefault(DataComponentRegister.REGION, RegionData.EMPTY);
                         if (region1.equals(region) && region.inRegion(deathPlayer.position())) {
-                            // 胜者拿走败者20%的钱
+                            // Winner receives half of the loser's money.
                             pvpMoney(killerOwner, deathPlayer, device1, device);
                         }
                     }
@@ -156,12 +155,12 @@ public class GamePlayEvents {
     public static void onLivingHurt(LivingDamageEvent.Pre event) {
         Entity targetEntity = event.getEntity();
         DamageSource damageSource = event.getSource();
-        if (!targetEntity.level().isClientSide && damageSource.is(DamageTypes.THROWN) && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
+        if (!targetEntity.level().isClientSide() && damageSource.is(DamageTypes.THROWN) && !ServerConfig.ENABLE_FRIENDLY_FIRE.getConfigValue()) {
             Entity killerEntity = damageSource.getEntity();
             if (targetEntity.equals(killerEntity)) {
                 return;
             }
-            BSFTeamSavedData savedData = targetEntity.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+            BSFTeamSavedData savedData = targetEntity.level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
             if (killerEntity instanceof Player killerPlayer) {
                 switch (targetEntity) {
                     case Player targetPlayer -> {
@@ -229,7 +228,7 @@ public class GamePlayEvents {
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         ServerPlayer player = (ServerPlayer) event.getEntity();
-        BSFTeamSavedData savedData = player.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        BSFTeamSavedData savedData = player.level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
         PacketDistributor.sendToPlayer(player, new CurrentTeamPayload((byte) savedData.getTeam(player.getUUID())));
         PacketDistributor.sendToPlayer(player, new TeamMembersPayload(savedData.getMembers(savedData.getTeam(player.getUUID()))));
     }
@@ -296,15 +295,15 @@ public class GamePlayEvents {
         Player player = event.getEntity();
         Entity entity = event.getTarget();
         Level level = player.level();
-        if (!level.isClientSide && !player.isSpectator() && entity instanceof LivingEntity target) {
+        if (!level.isClientSide() && !player.isSpectator() && entity instanceof LivingEntity target) {
             Item item = player.getMainHandItem().getItem();
             if (item instanceof SolidBucketItem) {
                 if (!(target instanceof AbstractBSFSnowGolemEntity) && !(target instanceof SnowGolem)) {
                     if (target.getTicksFrozen() < 240) {
                         target.setTicksFrozen(240);
                     }
-                    target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
-                    target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 2));
+                    target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 1));
+                    target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 2));
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 150, 1));
                 }
                 target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, 80, 0));
@@ -322,7 +321,7 @@ public class GamePlayEvents {
                     if (target.getTicksFrozen() < 180) {
                         target.setTicksFrozen(180);
                     }
-                    target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 1));
+                    target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 20, 1));
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 30, 1));
                 }
                 target.addEffect(new MobEffectInstance(EffectRegister.WEAPON_JAM, 40, 0));
@@ -351,7 +350,7 @@ public class GamePlayEvents {
         if (event.getEntity() instanceof Player player) {
             Level level = player.level();
             ItemStack shoes = player.getItemBySlot(EquipmentSlot.FEET);
-            if (!level.isClientSide && shoes.getItem() instanceof SnowFallBootsItem) {
+            if (!level.isClientSide() && shoes.getItem() instanceof SnowFallBootsItem) {
                 int i = Mth.floor(player.getX());
                 int j = Mth.floor(player.getY());
                 int k = Mth.floor(player.getZ());
@@ -359,13 +358,13 @@ public class GamePlayEvents {
                 //Block block2 = level.getBlockState(new BlockPos(i, j - 1, k)).getBlock();
                 if (level.getBlockState(new BlockPos(i, j, k)).is(BlockTags.SNOW) || level.getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.SNOW) || snowAroundPlayer(level, player, block1)) {
                     event.setDamageMultiplier(0);
-                    float h = event.getDistance();
+                    float h = (float) event.getDistance();
                     ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY(), player.getZ(), (int) h * 8, 0, 0, 0, h * 0.01);
                     shoes.hurtAndBreak((int) Math.ceil((h - 3) * 0.25), player, EquipmentSlot.FEET);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                     int enchantmentLevel = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(player, BSFEnchantmentHelper.KINETIC_ENERGY_STORAGE), shoes);
                     if (enchantmentLevel > 0 && h > 5) {
-                        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, (int) h * 6, enchantmentLevel - 1));
+                        player.addEffect(new MobEffectInstance(MobEffects.SPEED, (int) h * 6, enchantmentLevel - 1));
                     }
                 }
             }
@@ -374,7 +373,7 @@ public class GamePlayEvents {
 
     @SubscribeEvent
     public static void onLootTableLoad(LootTableLoadEvent event) {
-        if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure")) || event.getName().equals(ResourceLocation.withDefaultNamespace("chests/igloo_chest"))) {
+        if (event.getName().equals(Identifier.withDefaultNamespace("chests/shipwreck_treasure")) || event.getName().equals(Identifier.withDefaultNamespace("chests/igloo_chest"))) {
             LootTable lootTable = event.getTable();
             lootTable.addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1.0F))
@@ -387,7 +386,7 @@ public class GamePlayEvents {
                     .add(LootItem.lootTableItem(ItemRegister.SUSPICIOUS_USB_FLASH_DRIVE.get()))
                     .build());
             event.setTable(lootTable);
-        } else if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"))) {
+        } else if (event.getName().equals(Identifier.withDefaultNamespace("chests/pillager_outpost"))) {
             LootTable lootTable = event.getTable();
             lootTable.addPool(LootPool.lootPool()
                     .setRolls(BinomialDistributionGenerator.binomial(2, 0.4F))

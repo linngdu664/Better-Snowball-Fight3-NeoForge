@@ -3,6 +3,7 @@ package com.linngdu664.bsf.effect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 
 public class ColdResistanceEffect extends MobEffect {
@@ -16,7 +17,7 @@ public class ColdResistanceEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(@NotNull LivingEntity pLivingEntity, int pAmplifier) {
+    public boolean applyEffectTick(@NotNull ServerLevel serverLevel, @NotNull LivingEntity pLivingEntity, int pAmplifier) {
         int t = pLivingEntity.getTicksFrozen();
         if (t > 5) {
             pLivingEntity.setTicksFrozen(t - 5);

@@ -4,9 +4,9 @@ import com.linngdu664.bsf.entity.snowball.AbstractBSFSnowballEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.BlockRegister;
 import com.linngdu664.bsf.registry.ParticleRegister;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,14 +15,17 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 
 public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowballEntity {
     private static final EntityDataAccessor<Boolean> INVISIBLE = SynchedEntityData.defineId(AbstractConstructSnowballEntity.class, EntityDataSerializers.BOOLEAN);
@@ -50,34 +53,32 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putBoolean("Invisible", getInvisible());
-        pCompound.putInt("BlockDurationTick", blockDurationTick);
-        pCompound.putFloat("DestroyStepSize", destroyStepSize);
-        pCompound.putBoolean("InBlockDuration", inBlockDuration);
-        pCompound.putBoolean("InDestroying", inDestroying);
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("Invisible", getInvisible());
+        output.putInt("BlockDurationTick", blockDurationTick);
+        output.putFloat("DestroyStepSize", destroyStepSize);
+        output.putBoolean("InBlockDuration", inBlockDuration);
+        output.putBoolean("InDestroying", inDestroying);
         long[] tmpArray = new long[allBlock.size()];
         int i = 0;
         for (BlockPos blockPos : allBlock) {
             tmpArray[i] = blockPos.asLong();
             i++;
         }
-        pCompound.putLongArray("AllBlock", tmpArray);
+        output.store("AllBlock", Codec.LONG_STREAM, Arrays.stream(tmpArray));
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        setInvisible(pCompound.getBoolean("Invisible"));
-        blockDurationTick = pCompound.getInt("BlockDurationTick");
-        destroyStepSize = pCompound.getFloat("DestroyStepSize");
-        inBlockDuration = pCompound.getBoolean("InBlockDuration");
-        inDestroying = pCompound.getBoolean("InDestroying");
-        long[] tmpArr = pCompound.getLongArray("AllBlock");
-        for (int i = tmpArr.length - 1; i >= 0; i--) {
-            allBlock.push(BlockPos.of(tmpArr[i]));
-        }
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        setInvisible(input.getBooleanOr("Invisible", false));
+        blockDurationTick = input.getIntOr("BlockDurationTick", 0);
+        destroyStepSize = input.getFloatOr("DestroyStepSize", 5.0F);
+        inBlockDuration = input.getBooleanOr("InBlockDuration", false);
+        inDestroying = input.getBooleanOr("InDestroying", false);
+        input.read("AllBlock", Codec.LONG_STREAM)
+                .ifPresent(tmpStream -> tmpStream.forEach(longBlockPos -> allBlock.push(BlockPos.of(longBlockPos))));
     }
 
 
@@ -91,7 +92,7 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
 
     @Override
     public void tick() {
-        if (level().isClientSide && getInvisible()) {
+        if (level().isClientSide() && getInvisible()) {
             this.discard();
         }
         if (inBlockDuration) {
@@ -101,7 +102,7 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
             this.setDeltaMovement(0, 0, 0);
         } else if (inDestroying) {
             Level level = level();
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 for (int i = 0; i < destroyStepSize && !allBlock.isEmpty(); i++) {
                     destroyBlock(level, allBlock.pop());
                 }
@@ -154,7 +155,7 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     protected void generateVelIndependentTraceParticles(Vec3 vec3) {
         if (!inBlockDuration) {
             Level level = level();
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 level.addParticle(ParticleRegister.SHORT_TIME_SNOWFLAKE.get(), vec3.x, vec3.y + 0.1, vec3.z, 0, 0, 0);
             }
         }
@@ -167,7 +168,7 @@ public abstract class AbstractConstructSnowballEntity extends AbstractBSFSnowbal
     }
 
     private void destroyBlock(Level level, BlockPos pos) {
-        if (posIsLooseSnow(level, pos) && !level.isClientSide) {
+        if (posIsLooseSnow(level, pos) && !level.isClientSide()) {
             level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.SNOW_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             BlockState snow = Blocks.SNOW.defaultBlockState();

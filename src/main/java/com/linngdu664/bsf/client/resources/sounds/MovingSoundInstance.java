@@ -36,7 +36,7 @@ public class MovingSoundInstance extends AbstractTickableSoundInstance {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             MovingSoundInstance that = (MovingSoundInstance) o;
-            return Objects.equals(entity, that.entity) && Objects.equals(location, that.location);
+            return Objects.equals(entity, that.entity) && Objects.equals(identifier, that.identifier);
         }
         return this == o;
     }
@@ -44,7 +44,7 @@ public class MovingSoundInstance extends AbstractTickableSoundInstance {
     @Override
     public int hashCode() {
         if (looping) {
-            return 31 * Objects.hash(entity) + Objects.hash(location);
+            return 31 * Objects.hash(entity) + Objects.hash(identifier);
         }
         return super.hashCode();
     }

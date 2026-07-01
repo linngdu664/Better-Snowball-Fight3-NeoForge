@@ -1,0 +1,6 @@
+{
+    "model":  {
+                  "type":  "minecraft:model",
+                  "model":  "bsf:item/large_projectile_gravity_snowball_tank"
+              }
+}

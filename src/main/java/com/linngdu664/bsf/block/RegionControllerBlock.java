@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.block.entity.RegionControllerBlockEntity;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.item.minigame_tool.TeamLinkerItem;
@@ -15,7 +16,6 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -43,7 +43,7 @@ public class RegionControllerBlock extends Block implements EntityBlock {
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
 
     public RegionControllerBlock() {
-        super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+        super(Main.blockProperties("region_controller", BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK)));
     }
 
     @Nullable
@@ -61,9 +61,9 @@ public class RegionControllerBlock extends Block implements EntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof RegionControllerBlockEntity be) {
-            // 空手点击时的逻辑，创造模式打开GUI，生存模式选择一个雪傀儡出生点传送
-            if (level.isClientSide) {
-                return InteractionResult.SUCCESS;       // 客户端直接ok
+            // Empty-hand interaction: creative opens GUI, survival teleports to a spawn point.
+            if (level.isClientSide()) {
+                return InteractionResult.SUCCESS;
             }
             if (player.isCreative()) {
                 PacketDistributor.sendToPlayer((ServerPlayer) player, new ShowRegionControllerScreenPayload(new RegionControllerGuiParas(
@@ -90,7 +90,7 @@ public class RegionControllerBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof RegionControllerBlockEntity be && player.getAbilities().instabuild) {
             Item item = stack.getItem();
             if (item.equals(ItemRegister.REGION_TOOL.get())) {
@@ -99,14 +99,14 @@ public class RegionControllerBlock extends Block implements EntityBlock {
                     if (regionData.start().getY() < regionData.end().getY()) {
                         be.setSnowGolemList(regionData);
                         be.setChanged();
-                        player.displayClientMessage(Component.literal("Add " + be.getSnowGolemCount() + " golems"), false);
+                        player.sendSystemMessage(Component.literal("Add " + be.getSnowGolemCount() + " golems"));
                     } else {
                         be.setRegionAndSummon(regionData);
                         be.setChanged();
-                        player.displayClientMessage(Component.literal("Add " + be.getSummonPosList().size() + " spawn points"), false);
+                        player.sendSystemMessage(Component.literal("Add " + be.getSummonPosList().size() + " spawn points"));
                     }
                 }
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             if (item instanceof TeamLinkerItem teamLinkerItem) {
                 if (!level.isClientSide()) {
@@ -114,25 +114,25 @@ public class RegionControllerBlock extends Block implements EntityBlock {
                     be.setTeamId(teamId);
                     be.setChanged();
                     level.sendBlockUpdated(pos, state, state, 2);
-                    player.displayClientMessage(Component.literal("Set controller team to " + DyeColor.byId(teamId).getName()), false);
+                    player.sendSystemMessage(Component.literal("Set controller team to " + DyeColor.byId(teamId).getName()));
                 }
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             if (item.equals(ItemRegister.REGION_CONTROLLER_VIEW.get())) {
                 if (!level.isClientSide()) {
                     stack.set(DataComponentRegister.BIND_POS, pos);
-                    player.displayClientMessage(Component.literal("Bind to view item"), false);
+                    player.sendSystemMessage(Component.literal("Bind to view item"));
                 }
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;     // 传到空手右击的逻辑
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     private void randomTp(RegionControllerBlockEntity entity, Level level, Player player) {
         List<BlockPos> blockPosList = entity.getSummonPosList();
         if (!blockPosList.isEmpty()) {
-            BlockPos blockPos = blockPosList.get(level.random.nextInt(blockPosList.size()));
+            BlockPos blockPos = blockPosList.get(level.getRandom().nextInt(blockPosList.size()));
             Vec3 pos = blockPos.above().getBottomCenter();
             player.teleportTo(pos.x, pos.y, pos.z);
             ((ServerPlayer) player).connection.send(new ClientboundSetEntityMotionPacket(player));

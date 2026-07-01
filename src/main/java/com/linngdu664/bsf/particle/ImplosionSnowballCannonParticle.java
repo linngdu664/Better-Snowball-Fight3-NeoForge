@@ -11,14 +11,14 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class ImplosionSnowballCannonParticle extends TextureSheetParticle {
+public class ImplosionSnowballCannonParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
     private final SphereAxisRotationHelper rotationHelper;
     private float speed;
     private Vec3 movingStep;
 
     protected ImplosionSnowballCannonParticle(ClientLevel pLevel, Vec3 center, Vec3 offset, Vec3 axis, float r, float g, float b, SpriteSet pSprites) {
-        super(pLevel, center.x + offset.x, center.y + offset.y, center.z + offset.z);
+        super(pLevel, center.x + offset.x, center.y + offset.y, center.z + offset.z, pSprites.first());
         this.hasPhysics = false;
         this.gravity = 0F;
         this.friction = 0.9F;
@@ -35,8 +35,8 @@ public class ImplosionSnowballCannonParticle extends TextureSheetParticle {
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected @NotNull Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ImplosionSnowballCannonParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             RandomSource randomSource = pLevel.getRandom();
             float f = randomSource.nextFloat() * 0.6F + 0.4F;
             double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);

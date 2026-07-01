@@ -13,7 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -37,7 +37,7 @@ public class CriticalFrozenSnowballItem extends AbstractBSFSnowballItem implemen
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         return throwOrStorage(pPlayer, pLevel, pUsedHand, 1.125F, 30);
     }
 
@@ -58,3 +58,4 @@ public class CriticalFrozenSnowballItem extends AbstractBSFSnowballItem implemen
         pTooltipComponents.add(Component.translatable("critical_frozen_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

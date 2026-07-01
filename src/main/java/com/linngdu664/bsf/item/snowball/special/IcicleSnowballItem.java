@@ -8,7 +8,7 @@ import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +24,7 @@ public class IcicleSnowballItem extends AbstractSnowStorageSnowballItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         return throwOrStorage(pPlayer, pLevel, pUsedHand, 1.7F, 15);
     }
 
@@ -39,3 +39,4 @@ public class IcicleSnowballItem extends AbstractSnowStorageSnowballItem {
         pTooltipComponents.add(Component.translatable("icicle_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

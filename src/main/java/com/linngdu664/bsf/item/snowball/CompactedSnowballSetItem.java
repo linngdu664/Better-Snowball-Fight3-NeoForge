@@ -10,21 +10,22 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class CompactedSnowballSetItem extends Item {
     public CompactedSnowballSetItem() {
-        super(new Properties().stacksTo(16).rarity(Rarity.COMMON));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(16).rarity(Rarity.COMMON));
     }
 
     private float getSnowballDamageRate(Player player) {
@@ -36,8 +37,8 @@ public class CompactedSnowballSetItem extends Item {
                 default -> 0.75f;
             };
         }
-        if (player.hasEffect(MobEffects.DAMAGE_BOOST)) {
-            if (player.getEffect(MobEffects.DAMAGE_BOOST).getAmplifier() == 0) {
+        if (player.hasEffect(MobEffects.STRENGTH)) {
+            if (player.getEffect(MobEffects.STRENGTH).getAmplifier() == 0) {
                 reDamageRate += 0.15F;
             } else {
                 reDamageRate += 0.3F;
@@ -47,10 +48,10 @@ public class CompactedSnowballSetItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             ILaunchAdjustment launchAdjustment = new ILaunchAdjustment() {
                 @Override
                 public double adjustPunch(double punch) {
@@ -97,15 +98,16 @@ public class CompactedSnowballSetItem extends Item {
             itemStack.shrink(1);
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("lunch_yes_hand.tooltip").withStyle(ChatFormatting.DARK_GREEN));
-        tooltipComponents.add(Component.translatable("lunch_no_cannon.tooltip").withStyle(ChatFormatting.DARK_RED));
-        tooltipComponents.add(Component.translatable("lunch_no_machine_gun.tooltip").withStyle(ChatFormatting.DARK_RED));
-        tooltipComponents.add(Component.translatable("lunch_no_shotgun.tooltip").withStyle(ChatFormatting.DARK_RED));
-        tooltipComponents.add(Component.translatable("compacted_snowball_set.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("lunch_yes_hand.tooltip").withStyle(ChatFormatting.DARK_GREEN));
+        tooltipComponents.accept(Component.translatable("lunch_no_cannon.tooltip").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.accept(Component.translatable("lunch_no_machine_gun.tooltip").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.accept(Component.translatable("lunch_no_shotgun.tooltip").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.accept(Component.translatable("compacted_snowball_set.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

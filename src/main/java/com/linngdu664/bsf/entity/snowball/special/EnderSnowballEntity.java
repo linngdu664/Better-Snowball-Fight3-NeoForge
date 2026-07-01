@@ -16,7 +16,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -40,7 +41,7 @@ public class EnderSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
         Level level = level();
-        if (!isCaught && !level.isClientSide) {
+        if (!isCaught && !level.isClientSide()) {
             Entity entity = pResult.getEntity();
             EntityType<?> type = entity.getType();
             if (getOwner() != null && (type.equals(EntityType.PLAYER) || entity instanceof Mob && !(type.equals(EntityRegister.BSF_DUMMY.get())))) {
@@ -54,16 +55,16 @@ public class EnderSnowballEntity extends AbstractBSFSnowballEntity {
                 float yRot1 = owner.getYRot();
                 float xRot2 = entity.getXRot();
                 float yRot2 = entity.getYRot();
-                owner.absMoveTo(entity.getX(), entity.getY(), entity.getZ(), yRot2, xRot2);
+                owner.absSnapTo(entity.getX(), entity.getY(), entity.getZ(), yRot2, xRot2);
                 owner.push(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
                 if (owner instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.connection.send(new ClientboundPlayerPositionPacket(entity.getX(), entity.getY(), entity.getZ(), yRot2, xRot2, new HashSet<>(), owner.getId()));
+                    serverPlayer.connection.send(ClientboundPlayerPositionPacket.of(owner.getId(), new PositionMoveRotation(owner.position(), owner.getDeltaMovement(), yRot2, xRot2), new HashSet<>()));
                     serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(owner));
                 }
-                entity.absMoveTo(ownerPos.x, ownerPos.y, ownerPos.z, yRot1, xRot1);
+                entity.absSnapTo(ownerPos.x, ownerPos.y, ownerPos.z, yRot1, xRot1);
                 entity.push(v1.x - v2.x, v1.y - v2.y, v2.z - v1.z);
                 if (entity instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.connection.send(new ClientboundPlayerPositionPacket(ownerPos.x, ownerPos.y, ownerPos.z, yRot1, xRot1, new HashSet<>(), entity.getId()));
+                    serverPlayer.connection.send(ClientboundPlayerPositionPacket.of(entity.getId(), new PositionMoveRotation(entity.position(), entity.getDeltaMovement(), yRot1, xRot1), new HashSet<>()));
                     serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(entity));
                 }
                 level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 1.0F, 1.0F);
@@ -83,7 +84,7 @@ public class EnderSnowballEntity extends AbstractBSFSnowballEntity {
     public void tick() {
         super.tick();
         Level level = level();
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             level.addParticle(ParticleTypes.PORTAL, xo, yo + 0.1, zo, 0, 0, 0);
         }
     }

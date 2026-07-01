@@ -11,14 +11,14 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.List;
 
 public class RegionPlayerInspectorScreen extends Screen {
     private static final int MAIN_MAX_WIDTH = 420;
     private static final int MAIN_MARGIN = 9;
-    private static final int MAIN_HEIGHT = 10 + 15 + 4 * 25;  // 1文本+间隔+4行输入框
+    private static final int MAIN_HEIGHT = 10 + 15 + 4 * 25;  // 1閺傚洦婀?闂傛挳娈?4鐞涘矁绶崗銉︻攱
     private static final int LABEL_INPUT_GAP = 4;
     private final BlockPos blockPos;
     private final Component regionComponent;
@@ -63,13 +63,12 @@ public class RegionPlayerInspectorScreen extends Screen {
         this.checkTeam = checkTeam;
     }
 
-    // 设置组件
+    // 鐠佸墽鐤嗙紒鍕
     @Override
     protected void init() {
         super.init();
         Font font = minecraft.font;
-
-        // 确定各组件位置
+        // Layout
         int beginY = height / 2 - MAIN_HEIGHT / 2;
         int mainWidth = Math.min(MAIN_MAX_WIDTH, width - 2 * MAIN_MARGIN);
         int maxComponentWidth = Math.max(Math.max(font.width(kickPosComponent), font.width(permittedTeamsComponent)), font.width(clearDirectlyItemsComponent));
@@ -83,7 +82,7 @@ public class RegionPlayerInspectorScreen extends Screen {
 
 
         StringWidget regionLabel = addRenderableWidget(new StringWidget(0, beginY, width, 9, regionComponent, font));
-        regionLabel.alignCenter();
+        ScreenAlignment.alignCenter(regionLabel, 0, width);
 
         checkItemCheckbox = addRenderableWidget(Checkbox.builder(checkItemComponent, font).pos(leftCheckboxBeginX, beginY + 25).selected(checkItem).build());
         checkTeamCheckbox = addRenderableWidget(Checkbox.builder(checkTeamComponent, font).pos(rightCheckboxBeginX, beginY + 25).selected(checkTeam).build());
@@ -91,9 +90,9 @@ public class RegionPlayerInspectorScreen extends Screen {
         StringWidget kickPosLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 56, maxComponentWidth, 9, kickPosComponent, font));
         StringWidget permittedTeamsLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 81, maxComponentWidth, 9, permittedTeamsComponent, font));
         StringWidget clearDirectlyItemsLabel = addRenderableWidget(new StringWidget(labelBeginX, beginY + 106, maxComponentWidth, 9, clearDirectlyItemsComponent, font));
-        kickPosLabel.alignRight();
-        permittedTeamsLabel.alignRight();
-        clearDirectlyItemsLabel.alignRight();
+        ScreenAlignment.alignRight(kickPosLabel, labelBeginX, maxComponentWidth);
+        ScreenAlignment.alignRight(permittedTeamsLabel, labelBeginX, maxComponentWidth);
+        ScreenAlignment.alignRight(clearDirectlyItemsLabel, labelBeginX, maxComponentWidth);
 
         kickPosEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 50, inputWidth, 20, kickPosComponent));
         permittedTeamsEdit = addRenderableWidget(new EditBox(font, inputBeginX, beginY + 75, inputWidth, 20, permittedTeamsComponent));
@@ -106,21 +105,20 @@ public class RegionPlayerInspectorScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft minecraft, int width, int height) {
+    public void resize(int width, int height) {
         kickPosStr = kickPosEdit.getValue();
         permittedTeamsStr = permittedTeamsEdit.getValue();
         clearDirectlyItemsStr = clearDirectlyItemsEdit.getValue();
         checkItem = checkItemCheckbox.selected();
         checkTeam = checkTeamCheckbox.selected();
-        super.resize(minecraft, width, height);
+        super.resize(width, height);
     }
 
-    // 关闭GUI，向服务器发送参数
-    @Override
+    // 閸忔娊妫碐UI閿涘苯鎮滈張宥呭閸ｃ劌褰傞柅浣稿棘閺?    @Override
     public void onClose() {
         super.onClose();
         if (minecraft.level.getBlockEntity(blockPos) instanceof RegionPlayerInspectorBlockEntity) {
-            // 发包
+            // Send packet
             try {
                 String[] strs = kickPosEdit.getValue().split("\\s+");
                 if (strs.length <= 2) {
@@ -134,9 +132,10 @@ public class RegionPlayerInspectorScreen extends Screen {
                         permittedTeams1 |= (1 << Integer.parseInt(str));
                     }
                 }
-                PacketDistributor.sendToServer(new UpdateRegionPlayerInspectorPayload(blockPos, blockPos1, (short) permittedTeams1, List.of(clearDirectlyItemsEdit.getValue().split("\\s+")), checkItemCheckbox.selected(), checkTeamCheckbox.selected()));
+                ClientPacketDistributor.sendToServer(new UpdateRegionPlayerInspectorPayload(blockPos, blockPos1, (short) permittedTeams1, List.of(clearDirectlyItemsEdit.getValue().split("\\s+")), checkItemCheckbox.selected(), checkTeamCheckbox.selected()));
             } catch (NumberFormatException ignore) {
             }
         }
     }
 }
+

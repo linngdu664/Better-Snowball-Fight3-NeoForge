@@ -6,6 +6,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ScreenshakeHandler {
     public static final ArrayList<ScreenshakeInstance> INSTANCES = new ArrayList<>();
@@ -20,7 +21,7 @@ public class ScreenshakeHandler {
         if ((double) intensity >= 0.1) {
             yawOffset = randomizeOffset(random);
             pitchOffset = randomizeOffset(random);
-            camera.setRotation(camera.getYRot() + yawOffset, camera.getXRot() + pitchOffset);
+            camera.setRotation(camera.yRot() + yawOffset, camera.xRot() + pitchOffset);
         }
     }
 

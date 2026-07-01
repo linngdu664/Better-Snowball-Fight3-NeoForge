@@ -2,6 +2,7 @@ package com.linngdu664.bsf.entity.executor;
 
 import com.linngdu664.bsf.item.component.RegionData;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.PowerParticleOption;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -21,7 +22,7 @@ public abstract class AbstractFixedForceExecutor extends AbstractForceExecutor {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             modelTicker++;
         }
     }
@@ -30,9 +31,9 @@ public abstract class AbstractFixedForceExecutor extends AbstractForceExecutor {
     public void remove(@NotNull RemovalReason pReason) {
         super.remove(pReason);
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
-            ((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 10, 0, 0, 0, 0.06);
+            ((ServerLevel) level).sendParticles(PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1.0F), this.getX(), this.getY(), this.getZ(), 10, 0, 0, 0, 0.06);
         }
     }
 

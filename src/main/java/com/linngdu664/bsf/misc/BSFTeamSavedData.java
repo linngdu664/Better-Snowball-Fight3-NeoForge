@@ -1,11 +1,16 @@
 package com.linngdu664.bsf.misc;
 
+import com.linngdu664.bsf.Main;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +19,9 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class BSFTeamSavedData extends SavedData {
+    public static final Codec<BSFTeamSavedData> CODEC = CompoundTag.CODEC.xmap(BSFTeamSavedData::new, BSFTeamSavedData::saveToTag);
+    public static final SavedDataType<BSFTeamSavedData> TYPE = new SavedDataType<>(Identifier.fromNamespaceAndPath(Main.MODID, "bsf_team"), BSFTeamSavedData::new, CODEC);
+
     private final HashSet<UUID>[] groupMembers = new HashSet[16];
     private final HashMap<UUID, Integer> groupIdMap = new HashMap<>();
 
@@ -24,30 +32,41 @@ public class BSFTeamSavedData extends SavedData {
     }
 
     public BSFTeamSavedData(CompoundTag root, HolderLookup.Provider lookupProvider) {
+        this(root);
+    }
+
+    public BSFTeamSavedData(CompoundTag root) {
         this();
-        if (root.contains("BSFTeam")) {
-            ListTag listTag = (ListTag) root.get("BSFTeam");
+        if (root.get("BSFTeam") instanceof ListTag listTag) {
             for (Tag tag : listTag) {
                 CompoundTag current = (CompoundTag) tag;
-                UUID uuid = current.getUUID("UUID");
-                int groupId = current.getInt("TeamId");
-                groupMembers[groupId].add(uuid);
-                groupIdMap.put(uuid, groupId);
+                current.read("UUID", UUIDUtil.CODEC).ifPresent(uuid -> {
+                    int groupId = current.getIntOr("TeamId", -1);
+                    if (groupId >= 0 && groupId < groupMembers.length) {
+                        groupMembers[groupId].add(uuid);
+                        groupIdMap.put(uuid, groupId);
+                    }
+                });
             }
         }
     }
 
-    @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag pCompoundTag, HolderLookup.@NotNull Provider provider) {
+        pCompoundTag.merge(saveToTag());
+        return pCompoundTag;
+    }
+
+    private CompoundTag saveToTag() {
+        CompoundTag root = new CompoundTag();
         ListTag listTag = new ListTag();
         for (var e : groupIdMap.entrySet()) {
             CompoundTag compoundTag = new CompoundTag();
-            compoundTag.putUUID("UUID", e.getKey());
+            compoundTag.store("UUID", UUIDUtil.CODEC, e.getKey());
             compoundTag.putInt("TeamId", e.getValue());
             listTag.add(compoundTag);
         }
-        pCompoundTag.put("BSFTeam", listTag);
-        return pCompoundTag;
+        root.put("BSFTeam", listTag);
+        return root;
     }
 
     public int getTeam(UUID uuid) {
@@ -62,6 +81,7 @@ public class BSFTeamSavedData extends SavedData {
         if (groupId != -1) {
             groupIdMap.remove(uuid);
             groupMembers[groupId].remove(uuid);
+            setDirty();
         }
     }
 
@@ -72,6 +92,7 @@ public class BSFTeamSavedData extends SavedData {
         }
         groupIdMap.put(uuid, groupId);
         groupMembers[groupId].add(uuid);
+        setDirty();
     }
 
     public HashSet<UUID> getMembers(int groupId) {

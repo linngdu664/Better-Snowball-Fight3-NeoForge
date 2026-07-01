@@ -10,13 +10,13 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class VectorInversionParticle extends TextureSheetParticle {
+public class VectorInversionParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
     private final SphereAxisRotationHelper rotationHelper;
     private float speed;
 
     protected VectorInversionParticle(ClientLevel pLevel, Vec3 center, Vec3 offset, double axisYaw, double axisPitch, double speed, float r, float g, float b, SpriteSet pSprites) {
-        super(pLevel, center.x + offset.x, center.y + offset.y, center.z + offset.z);
+        super(pLevel, center.x + offset.x, center.y + offset.y, center.z + offset.z, pSprites.first());
         this.hasPhysics = false;
         this.gravity = 0F;
         this.friction = 0.9F;
@@ -32,8 +32,8 @@ public class VectorInversionParticle extends TextureSheetParticle {
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected @NotNull Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class VectorInversionParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             RandomSource randomSource = pLevel.getRandom();
             float f = randomSource.nextFloat() * 0.6F + 0.4F;
             double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);
@@ -77,8 +77,8 @@ public class VectorInversionParticle extends TextureSheetParticle {
 
 
     @Override
-    public int getLightColor(float partialTick) {
-        return super.getLightColor(partialTick)|112;
+    public int getLightCoords(float partialTick) {
+        return super.getLightCoords(partialTick)|112;
     }
 
     public static class ProviderPurple implements ParticleProvider<SimpleParticleType> {
@@ -89,7 +89,7 @@ public class VectorInversionParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             RandomSource randomSource = pLevel.getRandom();
             float f = randomSource.nextFloat() * 0.6F + 0.4F;
             double theta = BSFCommonUtil.randDouble(randomSource, 0, 2 * Mth.PI);

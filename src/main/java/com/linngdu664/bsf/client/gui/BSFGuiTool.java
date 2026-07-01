@@ -2,20 +2,16 @@ package com.linngdu664.bsf.client.gui;
 
 import com.linngdu664.bsf.Main;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -84,14 +80,14 @@ public class BSFGuiTool {
      * @param innerColor  内框颜色
      * @param percent     进度条进度(0-1)
      */
-    public static void renderProgressBar(GuiGraphics guiGraphics, V2I pos, V2I frame, int padding, int frameColor, int innerColor, float percent) {
+    public static void renderProgressBar(GuiGraphicsExtractor guiGraphics, V2I pos, V2I frame, int padding, int frameColor, int innerColor, float percent) {
         guiGraphics.fill(pos.x + 1, pos.y + 1, pos.x + frame.x - 1, pos.y + frame.y - 1, 0x80000000);
-        guiGraphics.renderOutline(pos.x, pos.y, frame.x, frame.y, frameColor);
+        guiGraphics.outline(pos.x, pos.y, frame.x, frame.y, frameColor);
         int innerW = (int) ((frame.x - padding - padding) * percent);
         guiGraphics.fill(pos.x + padding, pos.y + padding, pos.x + padding + innerW, pos.y + frame.y - padding, innerColor);
     }
 
-    public static Vec2 renderHackBox(GuiGraphics guiGraphics, CoordinateConverter converter, Window window, LivingEntity livingEntity, int frameColor, float particleTick) {
+    public static Vec2 renderHackBox(GuiGraphicsExtractor guiGraphics, CoordinateConverter converter, Window window, LivingEntity livingEntity, int frameColor, float particleTick) {
         AABB aabb = livingEntity.getBoundingBox();
         // todo: lerp bounding box
         List<Vec2> vec2List = converter.convert(List.of(
@@ -141,7 +137,7 @@ public class BSFGuiTool {
      * @param font          字体
      * @param msg           装备描述
      */
-    public static void renderEquipIntroduced(GuiGraphics guiGraphics, Vec2 equipPoint, Vec2 framePoint, int lineXDistance, int color, ItemStack itemStack, Font font, Component msg) {
+    public static void renderEquipIntroduced(GuiGraphicsExtractor guiGraphics, Vec2 equipPoint, Vec2 framePoint, int lineXDistance, int color, ItemStack itemStack, Font font, Component msg) {
         Vec2 linkPoint = new Vec2(framePoint.x + EQUIPMENT_SLOT_FRAME_GUI.width, framePoint.y + (float) EQUIPMENT_SLOT_FRAME_GUI.height / 2);
         Vec2 xPoint = new Vec2(equipPoint.x - lineXDistance, linkPoint.y);
         if (xPoint.x < linkPoint.x) {
@@ -153,93 +149,73 @@ public class BSFGuiTool {
         renderFillSquareTool(guiGraphics, equipPoint.add(new Vec2(-2f, -1f)), equipPoint.add(new Vec2(2f, 3f)), 0xff000000);
         renderFillSquareTool(guiGraphics, equipPoint.add(new Vec2(-1f, 0)), equipPoint.add(new Vec2(1f, 2f)), color);
         EQUIPMENT_SLOT_FRAME_GUI.render(guiGraphics, (int) framePoint.x, (int) framePoint.y);
-        guiGraphics.renderItem(itemStack, (int) (framePoint.x + 3), (int) (framePoint.y + 3));
+        guiGraphics.item(itemStack, (int) (framePoint.x + 3), (int) (framePoint.y + 3));
         FormattedCharSequence formattedcharsequence = msg.getVisualOrderText();
-        guiGraphics.drawString(font, formattedcharsequence, framePoint.x - font.width(formattedcharsequence), framePoint.y + 7, color, true);
+        guiGraphics.text(font, formattedcharsequence, (int) (framePoint.x - font.width(formattedcharsequence)), (int) (framePoint.y + 7), color, true);
     }
 
-    public static void renderLineTool(GuiGraphics guiGraphics, Vec2 p1, Vec2 p2, float d, int color, boolean isDown, float padding, int padColor) {
+    public static void renderLineTool(GuiGraphicsExtractor guiGraphics, Vec2 p1, Vec2 p2, float d, int color, boolean isDown, float padding, int padColor) {
         Vec2 ad = p2.add(p1.negated());
-        Vec2 v1 = ad.scale(d / ad.length());
+        float length = ad.length();
+        if (length <= 0.0001F) {
+            renderFillSquareTool(guiGraphics, p1.add(new Vec2(-d * 0.5F, -d * 0.5F)), p1.add(new Vec2(d * 0.5F, d * 0.5F)), color);
+            return;
+        }
+
+        Vec2 v1 = ad.scale(d / length);
         Vec2 v2 = new Vec2(-v1.y, v1.x);
         if (isDown) {
             Vec2 v2s = v2.scale(padding);
-            renderFillTool(guiGraphics, p1, p1.add(v2), p2.add(v2), p2, padColor);
-            renderFillTool(guiGraphics, p1, p1.add(v2s), p2.add(v2s), p2, color);
+            GuiUtil.fill(guiGraphics, p1, p1.add(v2), p2.add(v2), p2, padColor);
+            GuiUtil.fill(guiGraphics, p1, p1.add(v2s), p2.add(v2s), p2, color);
         } else {
             v2 = v2.negated();
             p2 = p2.add(v2.negated());
             Vec2 v2s = v2.scale(1 - padding);
-            renderFillTool(guiGraphics, p1.add(v2), p1, p2, p2.add(v2), color);
-            renderFillTool(guiGraphics, p1.add(v2s), p1, p2, p2.add(v2s), padColor);
+            GuiUtil.fill(guiGraphics, p1.add(v2), p1, p2, p2.add(v2), color);
+            GuiUtil.fill(guiGraphics, p1.add(v2s), p1, p2, p2.add(v2s), padColor);
         }
-
     }
 
-    public static void renderFillTool(GuiGraphics guiGraphics, Vec2 a, Vec2 b, Vec2 c, Vec2 d, int pColor) {
-        Matrix4f matrix4f = guiGraphics.pose.last().pose();
-
-        VertexConsumer vertexconsumer = guiGraphics.bufferSource.getBuffer(RenderType.gui());
-        vertexconsumer.addVertex(matrix4f, a.x, a.y, 0).setColor(pColor);
-        vertexconsumer.addVertex(matrix4f, b.x, b.y, 0).setColor(pColor);
-        vertexconsumer.addVertex(matrix4f, c.x, c.y, 0).setColor(pColor);
-        vertexconsumer.addVertex(matrix4f, d.x, d.y, 0).setColor(pColor);
-        guiGraphics.flushIfUnmanaged();
+    public static void renderFillTool(GuiGraphicsExtractor guiGraphics, Vec2 a, Vec2 b, Vec2 c, Vec2 d, int pColor) {
+        GuiUtil.fill(guiGraphics, a, b, c, d, pColor);
     }
 
-    public static void renderFillSquareTool(GuiGraphics guiGraphics, Vec2 a, Vec2 b, int pColor) {
-        renderFillTool(guiGraphics, a, new Vec2(a.x, b.y), b, new Vec2(b.x, a.y), pColor);
+    public static void renderFillSquareTool(GuiGraphicsExtractor guiGraphics, Vec2 a, Vec2 b, int pColor) {
+        GuiUtil.fill(guiGraphics, a.x, a.y, b.x, b.y, pColor);
     }
 
     public static boolean isInScreen(Vec2 point, Window window) {
         return point.x > 0 && point.y > 0 && point.x < window.getGuiScaledWidth() && point.y < window.getGuiScaledHeight();
     }
 
-    public static void renderOutline(GuiGraphics guiGraphics, float x, float y, float width, float height, int color) {
+    public static void renderOutline(GuiGraphicsExtractor guiGraphics, float x, float y, float width, float height, int color) {
         fill(guiGraphics, x, y, x + width, y + 1, color);
         fill(guiGraphics, x, y + height - 1, x + width, y + height, color);
         fill(guiGraphics, x, y + 1, x + 1, y + height - 1, color);
         fill(guiGraphics, x + width - 1, y + 1, x + width, y + height - 1, color);
     }
 
-    public static void renderOutlineCoordinate(GuiGraphics guiGraphics, float x, float y, float x2, float y2, int color) {
+    public static void renderOutlineCoordinate(GuiGraphicsExtractor guiGraphics, float x, float y, float x2, float y2, int color) {
         fill(guiGraphics, x, y, x2, y + 1, color);
         fill(guiGraphics, x, y2 - 1, x2, y2, color);
         fill(guiGraphics, x, y + 1, x + 1, y2 - 1, color);
         fill(guiGraphics, x2 - 1, y + 1, x2, y2 - 1, color);
     }
 
-    public static void renderOutlineCoordinate(GuiGraphics guiGraphics, float x, float y, float x2, float y2, int color, float width) {
+    public static void renderOutlineCoordinate(GuiGraphicsExtractor guiGraphics, float x, float y, float x2, float y2, int color, float width) {
         fill(guiGraphics, x, y, x2, y + width, color);
         fill(guiGraphics, x, y2 - width, x2, y2, color);
         fill(guiGraphics, x, y + width, x + width, y2 - width, color);
         fill(guiGraphics, x2 - width, y + width, x2, y2 - width, color);
     }
 
-    public static void fill(GuiGraphics guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
-        Matrix4f matrix4f = guiGraphics.pose.last().pose();
-        float j;
-        if (minX < maxX) {
-            j = minX;
-            minX = maxX;
-            maxX = j;
-        }
-
-        if (minY < maxY) {
-            j = minY;
-            minY = maxY;
-            maxY = j;
-        }
-        VertexConsumer vertexconsumer = guiGraphics.bufferSource.getBuffer(RenderType.gui());
-        vertexconsumer.addVertex(matrix4f, minX, minY, 0).setColor(color);
-        vertexconsumer.addVertex(matrix4f, minX, maxY, 0).setColor(color);
-        vertexconsumer.addVertex(matrix4f, maxX, maxY, 0).setColor(color);
-        vertexconsumer.addVertex(matrix4f, maxX, minY, 0).setColor(color);
-        guiGraphics.flushIfUnmanaged();
+    public static void fill(GuiGraphicsExtractor guiGraphics, float minX, float minY, float maxX, float maxY, int color) {
+        GuiUtil.fill(guiGraphics, minX, minY, maxX, maxY, color);
     }
 
     public static class GuiTexture {
-        public ResourceLocation texture;
+        public Identifier texture;
         public int holeWidth;
         public int holeHeight;
 
@@ -265,26 +241,24 @@ public class BSFGuiTool {
             this.height = height;
         }
 
-        public V2I render(GuiGraphics guiGraphics, int x, int y) {
-            RenderSystem.enableBlend();
-            guiGraphics.blit(guiTexture.texture, x, y, widthOffset, heightOffset, width, height, guiTexture.holeWidth, guiTexture.holeHeight);
-            RenderSystem.disableBlend();
+        public V2I render(GuiGraphicsExtractor guiGraphics, int x, int y) {
+            GuiUtil.blit(guiGraphics, guiTexture.texture, x, y, widthOffset, heightOffset, width, height, guiTexture.holeWidth, guiTexture.holeHeight);
             return new V2I(x, y);
         }
 
-        public V2I renderCenterVertically(GuiGraphics guiGraphics, Window window, int x) {
+        public V2I renderCenterVertically(GuiGraphicsExtractor guiGraphics, Window window, int x) {
             return render(guiGraphics, x, heightFrameCenter(window, this.height));
         }
 
-        public V2I renderCenterHorizontally(GuiGraphics guiGraphics, Window window, int y) {
+        public V2I renderCenterHorizontally(GuiGraphicsExtractor guiGraphics, Window window, int y) {
             return render(guiGraphics, widthFrameCenter(window, this.width), y);
         }
 
-        public V2I renderRatio(GuiGraphics guiGraphics, Window window, double widthRatio, double heightRatio) {
+        public V2I renderRatio(GuiGraphicsExtractor guiGraphics, Window window, double widthRatio, double heightRatio) {
             return renderRatio(guiGraphics, window, widthRatio, heightRatio, 0, 0);
         }
 
-        public V2I renderRatio(GuiGraphics guiGraphics, Window window, double widthRatio, double heightRatio, int xOffset, int yOffset) {
+        public V2I renderRatio(GuiGraphicsExtractor guiGraphics, Window window, double widthRatio, double heightRatio, int xOffset, int yOffset) {
             return render(guiGraphics, widthFrameRatio(window, this.width, widthRatio) + xOffset, heightFrameRatio(window, this.height, heightRatio) + yOffset);
         }
     }

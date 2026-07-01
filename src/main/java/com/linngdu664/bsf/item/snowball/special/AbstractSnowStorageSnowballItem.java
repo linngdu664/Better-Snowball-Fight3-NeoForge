@@ -81,3 +81,4 @@ public abstract class AbstractSnowStorageSnowballItem extends AbstractBSFSnowbal
         pTooltipComponents.add(Component.translatable("snow_storage_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

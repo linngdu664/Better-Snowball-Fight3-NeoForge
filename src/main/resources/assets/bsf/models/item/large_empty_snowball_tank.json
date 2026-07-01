@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "bsf:item/large_empty_snowball_tank"
+    "layer0": "bsf:item/empty_large_snowball_tank"
   },
   "display": {
     "head": {

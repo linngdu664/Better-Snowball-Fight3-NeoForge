@@ -1,5 +1,6 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.block.entity.RegionControllerViewBlockEntity;
 import com.linngdu664.bsf.registry.BlockEntityRegister;
 import net.minecraft.core.BlockPos;
@@ -25,16 +26,16 @@ public class RegionControllerViewBlock extends Block implements EntityBlock {
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 13.0, 16.0);
 
     public RegionControllerViewBlock() {
-        super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+        super(Main.blockProperties("region_controller_view", BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK)));
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (player.isCreative() && level.getBlockEntity(pos) instanceof RegionControllerViewBlockEntity be) {
             // 空手点击时的逻辑
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 BlockPos blockPos = be.getControllerBlockPos();
-                player.displayClientMessage(Component.literal(String.format("Bind to (%d, %d, %d)", blockPos.getX(), blockPos.getY(), blockPos.getZ())), false);
+                player.sendSystemMessage(Component.literal(String.format("Bind to (%d, %d, %d)", blockPos.getX(), blockPos.getY(), blockPos.getZ())));
             }
             return InteractionResult.SUCCESS;
         }

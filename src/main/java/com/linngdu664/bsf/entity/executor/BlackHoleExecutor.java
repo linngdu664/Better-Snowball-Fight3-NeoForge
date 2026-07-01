@@ -8,22 +8,26 @@ import com.linngdu664.bsf.registry.ParticleRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
 
@@ -33,9 +37,9 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
     private static final EntityDataAccessor<Integer> RANK = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.INT);
     //The following EntityDataAccessor they are all for client rendering, only needs to be initialized.
     private static final EntityDataAccessor<Float> ANGLE1 = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Vector3f> AXIS = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> PROJECTION = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> SHAFT = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3fc> AXIS = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3fc> PROJECTION = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3fc> SHAFT = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Float> OBLIQUITY = SynchedEntityData.defineId(BlackHoleExecutor.class, EntityDataSerializers.FLOAT);
     private int tmpRank;        //client only
 
@@ -46,7 +50,7 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
 
     public BlackHoleExecutor(EntityType<?> pEntityType, double pX, double pY, double pZ, Level pLevel, Vec3 vel, int maxTime, RegionData region) {
         super(pEntityType, pX, pY, pZ, pLevel, maxTime, region);
-        setRank(pLevel.random.nextInt(30, 50));
+        setRank(pLevel.getRandom().nextInt(30, 50));
         setDeltaMovement(vel);
 
         // initialized shaft for client
@@ -56,7 +60,7 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
         entityData.set(ANGLE1, forward.y > 0 ? forward.angle(projection) : -forward.angle(projection));
         Vector3f crossV = forward.lengthSquared() == 0 ? new Vector3f(forward).cross(1, 0, 0).normalize() : new Vector3f(forward).cross(0, 1, 0).normalize();
         entityData.set(AXIS, crossV);
-        float obliquity = (float) BSFCommonUtil.randDouble(pLevel.random, -OBLIQUITY_RANGE, OBLIQUITY_RANGE) * Mth.DEG_TO_RAD;
+        float obliquity = (float) BSFCommonUtil.randDouble(pLevel.getRandom(), -OBLIQUITY_RANGE, OBLIQUITY_RANGE) * Mth.DEG_TO_RAD;
         entityData.set(SHAFT, new Vector3f(crossV).cross(forward).rotateAxis(obliquity, forward.x, forward.y, forward.z));
         entityData.set(OBLIQUITY, obliquity);
 
@@ -78,15 +82,15 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
     }
 
     public Vector3f getAxis() {
-        return entityData.get(AXIS);
+        return new Vector3f(entityData.get(AXIS));
     }
 
     public Vector3f getProjection() {
-        return entityData.get(PROJECTION);
+        return new Vector3f(entityData.get(PROJECTION));
     }
 
     public Vector3f getShaft() {
-        return entityData.get(SHAFT);
+        return new Vector3f(entityData.get(SHAFT));
     }
 
     public float getObliquity() {
@@ -113,25 +117,25 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        entityData.set(RANK, pCompound.getInt("Rank"));
-        entityData.set(ANGLE1, pCompound.getFloat("Angle1"));
-        entityData.set(AXIS, BSFCommonUtil.getVec3(pCompound, "Axis"));
-        entityData.set(PROJECTION, BSFCommonUtil.getVec3(pCompound, "Projection"));
-        entityData.set(SHAFT, BSFCommonUtil.getVec3(pCompound, "Shaft"));
-        entityData.set(OBLIQUITY, pCompound.getFloat("Obliquity"));
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        entityData.set(RANK, input.getIntOr("Rank", 30));
+        entityData.set(ANGLE1, input.getFloatOr("Angle1", 0.0F));
+        entityData.set(AXIS, input.read("Axis", ExtraCodecs.VECTOR3F).orElse(new Vector3f(1, 0, 0)));
+        entityData.set(PROJECTION, input.read("Projection", ExtraCodecs.VECTOR3F).orElse(new Vector3f(1, 0, 0)));
+        entityData.set(SHAFT, input.read("Shaft", ExtraCodecs.VECTOR3F).orElse(new Vector3f(0, 1, 0)));
+        entityData.set(OBLIQUITY, input.getFloatOr("Obliquity", 0.0F));
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putInt("Rank", getRank());
-        pCompound.putFloat("Angle1", getAngle1());
-        BSFCommonUtil.putVec3(pCompound, "Axis", getAxis());
-        BSFCommonUtil.putVec3(pCompound, "Projection", getProjection());
-        BSFCommonUtil.putVec3(pCompound, "Shaft", getShaft());
-        pCompound.putFloat("Obliquity", getObliquity());
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("Rank", getRank());
+        output.putFloat("Angle1", getAngle1());
+        output.store("Axis", ExtraCodecs.VECTOR3F, getAxis());
+        output.store("Projection", ExtraCodecs.VECTOR3F, getProjection());
+        output.store("Shaft", ExtraCodecs.VECTOR3F, getShaft());
+        output.putFloat("Obliquity", getObliquity());
     }
 
     @Override
@@ -144,11 +148,11 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
         double destroyR2 = destroyR * destroyR;
         double damageR2 = range * range * 0.01;
         float damage = (float) (range * 0.0528);
-        if (!level.isClientSide) {
+        if (level instanceof ServerLevel serverLevel) {
             if (getTimer() % 20 == 0) {
                 playSound(SoundRegister.BLACK_HOLE_AMBIENCE.get(), 12.0F, 1.0F);
             }
-            if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && ServerConfig.BLACK_HOLE_DESTROY.getConfigValue()) {
+            if (serverLevel.getGameRules().get(GameRules.MOB_GRIEFING) && ServerConfig.BLACK_HOLE_DESTROY.getConfigValue()) {
                 BlockPos.betweenClosedStream(getBoundingBox().inflate(destroyR))
                         .filter(p -> p.getCenter().distanceToSqr(pos) < destroyR2 && level.getBlockState(p).getBlock().getExplosionResistance() <= 2400)
                         .forEach(p -> {
@@ -196,8 +200,8 @@ public class BlackHoleExecutor extends AbstractForceExecutor {
     public void remove(@NotNull RemovalReason pReason) {
         super.remove(pReason);
         Level level = level();
-        if (pReason.equals(Entity.RemovalReason.DISCARDED) && !level.isClientSide) {
-            if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && ServerConfig.BLACK_HOLE_DESTROY.getConfigValue()) {
+        if (pReason.equals(Entity.RemovalReason.DISCARDED) && level instanceof ServerLevel serverLevel) {
+            if (serverLevel.getGameRules().get(GameRules.MOB_GRIEFING) && ServerConfig.BLACK_HOLE_DESTROY.getConfigValue()) {
                 level.explode(null, getX(), getY(), getZ(), Math.min(0.56F * (float) Math.sqrt(range) + 2.4F, 12F), Level.ExplosionInteraction.TNT);
             } else {
                 level.explode(null, getX(), getY(), getZ(), Math.min(0.56F * (float) Math.sqrt(range) + 2.4F, 12F), Level.ExplosionInteraction.NONE);

@@ -8,6 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,11 @@ public record TeamMembersPayload(HashSet<UUID> members) implements CustomPacketP
         if (entity instanceof RegionControllerSnowGolemEntity snowGolem && snowGolem.getFixedTeamId() == CurrentTeamPayload.currentTeam) {
             return true;
         }
-        return entity instanceof OwnableEntity ownable && TeamMembersPayload.staticMembers.contains(ownable.getOwnerUUID());
+        if (entity instanceof OwnableEntity ownable) {
+            LivingEntity owner = ownable.getOwner();
+            return owner != null && TeamMembersPayload.staticMembers.contains(owner.getUUID());
+        }
+        return false;
     }
 
     @Override

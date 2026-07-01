@@ -1,0 +1,139 @@
+{
+  "oversized_in_gui": true,
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "bsf:cooling",
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_333"
+        },
+        "threshold": 0.00
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_332"
+        },
+        "threshold": 0.02
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_331"
+        },
+        "threshold": 0.04
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_330"
+        },
+        "threshold": 0.06
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_320"
+        },
+        "threshold": 0.08
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_310"
+        },
+        "threshold": 0.10
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_300"
+        },
+        "threshold": 0.12
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_200"
+        },
+        "threshold": 0.14
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_100"
+        },
+        "threshold": 0.16
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_000"
+        },
+        "threshold": 0.20
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_001"
+        },
+        "threshold": 0.93
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_002"
+        },
+        "threshold": 0.94
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_003"
+        },
+        "threshold": 0.95
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_013"
+        },
+        "threshold": 0.96
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_023"
+        },
+        "threshold": 0.97
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_033"
+        },
+        "threshold": 0.98
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_133"
+        },
+        "threshold": 0.99
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/implosion_snowball_cannon_status/co_233"
+        },
+        "threshold": 1.00
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "bsf:item/implosion_snowball_cannon"
+    }
+  }
+}

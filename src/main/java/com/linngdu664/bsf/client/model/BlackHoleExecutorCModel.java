@@ -4,24 +4,22 @@ package com.linngdu664.bsf.client.model;
 // Paste this class into your mod and generate all required imports
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.entity.snowball.special.BlackHoleSnowballEntity;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 
-public class BlackHoleExecutorCModel<T extends BlackHoleSnowballEntity> extends EntityModel<T> {
+public class BlackHoleExecutorCModel extends EntityModel<EntityRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("textures/models/black_hole_executor_c.png"), "main");
     private final ModelPart body;
     private final ModelPart plate;
 
     public BlackHoleExecutorCModel(ModelPart root) {
+        super(root);
         this.body = root.getChild("body");
         this.plate = root.getChild("plate");
     }
@@ -2027,14 +2025,4 @@ public class BlackHoleExecutorCModel<T extends BlackHoleSnowballEntity> extends 
         return plate;
     }
 
-    @Override
-    public void setupAnim(@NotNull T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, int i2) {
-        body.render(poseStack, vertexConsumer, i, i1, i2);
-        plate.render(poseStack, vertexConsumer, i, i1, i2);
-    }
 }

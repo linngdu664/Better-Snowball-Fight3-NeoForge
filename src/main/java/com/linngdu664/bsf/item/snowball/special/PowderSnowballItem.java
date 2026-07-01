@@ -13,7 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -38,7 +38,7 @@ public class PowderSnowballItem extends AbstractBSFSnowballItem implements Proje
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         return throwOrStorage(pPlayer, pLevel, pUsedHand, 1.25F, 20);
     }
 
@@ -55,7 +55,7 @@ public class PowderSnowballItem extends AbstractBSFSnowballItem implements Proje
     }
 
     @Override
-    public void onCraftedBy(@NotNull ItemStack pStack, @NotNull Level pLevel, Player pPlayer) {
+    public void onCraftedBy(@NotNull ItemStack pStack, Player pPlayer) {
         pPlayer.getInventory().placeItemBackInInventory(new ItemStack(Items.BUCKET), true);
     }
 
@@ -64,3 +64,4 @@ public class PowderSnowballItem extends AbstractBSFSnowballItem implements Proje
         pTooltipComponents.add(Component.translatable("powder_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

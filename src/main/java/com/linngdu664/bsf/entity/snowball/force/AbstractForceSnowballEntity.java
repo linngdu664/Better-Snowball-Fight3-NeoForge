@@ -9,7 +9,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -28,7 +28,7 @@ public abstract class AbstractForceSnowballEntity extends AbstractBSFSnowballEnt
     protected void onHitBlock(@NotNull BlockHitResult p_37258_) {
         super.onHitBlock(p_37258_);
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
             level.addFreshEntity(getExecutor());
             discard();

@@ -16,22 +16,25 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class AbstractBSFSnowballItem extends Item {
     public static final int HAND_TYPE_FLAG = 1;
     private final SnowballProperties snowballProperties;
 
     public AbstractBSFSnowballItem(Rarity rarity, SnowballProperties snowballProperties) {
-        super(new Properties().stacksTo(16).rarity(rarity));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(16).rarity(rarity));
         this.snowballProperties = snowballProperties;
     }
 
@@ -112,24 +115,25 @@ public abstract class AbstractBSFSnowballItem extends Item {
         return true;
     }
 
-    public InteractionResultHolder<ItemStack> throwOrStorage(Player pPlayer, Level pLevel, InteractionHand pUsedHand, float velocity, int coolDown) {
+    public InteractionResult throwOrStorage(Player pPlayer, Level pLevel, InteractionHand pUsedHand, float velocity, int coolDown) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (!storageInTank(pPlayer)) {
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
-            if (!pLevel.isClientSide) {
+            if (!pLevel.isClientSide()) {
                 AbstractBSFSnowballEntity snowballEntity = getCorrespondingEntity(pLevel, pPlayer, getLaunchAdjustment(getSnowballDamageRate(pPlayer)), itemStack.get(DataComponentRegister.REGION.get()));
+                snowballEntity.setItem(itemStack);
                 snowballEntity.shootFromRotation(pPlayer, pPlayer.getXRot(), pPlayer.getYRot(), 0.0F, velocity * getSnowballSlowdownRate(pPlayer), 1.0F);
                 pLevel.addFreshEntity(snowballEntity);
             }
             if (!pPlayer.getAbilities().instabuild) {
                 itemStack.shrink(1);
                 if (coolDown != 0) {
-                    pPlayer.getCooldowns().addCooldown(this, coolDown);
+                    pPlayer.getCooldowns().addCooldown(itemStack, coolDown);
                 }
             }
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     // 1.005^(-ticks)
@@ -146,8 +150,8 @@ public abstract class AbstractBSFSnowballItem extends Item {
                 default -> 0.75f;
             };
         }
-        if (player.hasEffect(MobEffects.DAMAGE_BOOST)) {
-            if (player.getEffect(MobEffects.DAMAGE_BOOST).getAmplifier() == 0) {
+        if (player.hasEffect(MobEffects.STRENGTH)) {
+            if (player.getEffect(MobEffects.STRENGTH).getAmplifier() == 0) {
                 reDamageRate += 0.15F;
             } else {
                 reDamageRate += 0.3F;
@@ -187,10 +191,12 @@ public abstract class AbstractBSFSnowballItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        generateWeaponTips(tooltipComponents);
-        addMainTips(tooltipComponents);
-        addUsageTips(tooltipComponents);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        List<Component> components = new ArrayList<>();
+        generateWeaponTips(components);
+        addMainTips(components);
+        addUsageTips(components);
+        components.forEach(tooltipComponents);
     }
 
     /**
@@ -256,3 +262,4 @@ public abstract class AbstractBSFSnowballItem extends Item {
         }
     }
 }
+

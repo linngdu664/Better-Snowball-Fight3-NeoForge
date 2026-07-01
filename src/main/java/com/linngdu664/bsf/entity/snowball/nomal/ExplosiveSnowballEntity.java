@@ -7,7 +7,7 @@ import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -30,7 +30,7 @@ public class ExplosiveSnowballEntity extends AbstractNormalSnowballEntity {
     @Override
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
-        if (!level().isClientSide && !isCaught) {
+        if (!level().isClientSide() && !isCaught) {
             Vec3 location = BSFCommonUtil.getRealHitPosOnMoveVecWithHitResult(this, pResult);
             handleExplosion(1.5F, location);
         }

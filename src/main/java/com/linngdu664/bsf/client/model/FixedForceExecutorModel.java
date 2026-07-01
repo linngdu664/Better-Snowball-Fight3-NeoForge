@@ -3,18 +3,15 @@ package com.linngdu664.bsf.client.model;// Made with Blockbench 4.9.3
 // Paste this class into your mod and generate all required imports
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.entity.executor.AbstractFixedForceExecutor;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 
-public class FixedForceExecutorModel<T extends AbstractFixedForceExecutor> extends EntityModel<T> {
+public class FixedForceExecutorModel extends EntityModel<EntityRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION1 = new ModelLayerLocation(Main.makeResLoc("textures/models/monster_gravity_executor.png"), "main");
     public static final ModelLayerLocation LAYER_LOCATION2 = new ModelLayerLocation(Main.makeResLoc("textures/models/monster_repulsion_executor.png"), "main");
@@ -25,6 +22,7 @@ public class FixedForceExecutorModel<T extends AbstractFixedForceExecutor> exten
     private final ModelPart bb_main;
 
     public FixedForceExecutorModel(ModelPart root) {
+        super(root);
         this.circle1 = root.getChild("circle1");
         this.circle2 = root.getChild("circle2");
         this.bb_main = root.getChild("bb_main");
@@ -106,18 +104,6 @@ public class FixedForceExecutorModel<T extends AbstractFixedForceExecutor> exten
         PartDefinition bb_main = partdefinition.addOrReplaceChild("bb_main", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -4.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 2.0F, 0.0F));
 
         return LayerDefinition.create(meshdefinition, 32, 32);
-    }
-
-    @Override
-    public void setupAnim(@NotNull T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
-    }
-
-    @Override
-    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-        circle1.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-        circle2.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-        bb_main.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 
     public ModelPart getCircle1() {

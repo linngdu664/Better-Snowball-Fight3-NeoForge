@@ -9,10 +9,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +26,7 @@ public record AmmoTypePayload(Item ammo, int slot) implements CustomPacketPayloa
     );
 
     private AmmoTypePayload(String itemName, int slot) {
-        this(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemName)), slot);
+        this(BuiltInRegistries.ITEM.getValue(Identifier.tryParse(itemName)) == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(Identifier.tryParse(itemName)), slot);
     }
 
     public static void handleDataInServer(AmmoTypePayload payload, IPayloadContext context) {

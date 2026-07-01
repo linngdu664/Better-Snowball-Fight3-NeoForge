@@ -10,6 +10,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class RegionControllerViewBlockEntity extends BlockEntity {
     private BlockPos controllerBlockPos;
@@ -24,7 +26,7 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
     }
 
     public static <T> void tick(Level level, BlockPos pos, BlockState state, T blockEntity) {
-        if (!level.isClientSide || !(blockEntity instanceof RegionControllerViewBlockEntity be) || be.controllerBlockPos == null) {
+        if (!level.isClientSide() || !(blockEntity instanceof RegionControllerViewBlockEntity be) || be.controllerBlockPos == null) {
             return;
         }
         if (be.timer < 20) {
@@ -40,16 +42,16 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        controllerBlockPos = BlockPos.of(tag.getLong("Bind"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.getLong("Bind").ifPresent(bind -> controllerBlockPos = BlockPos.of(bind));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (controllerBlockPos != null) {
-            tag.putLong("Bind", controllerBlockPos.asLong());
+            output.putLong("Bind", controllerBlockPos.asLong());
         }
     }
 
@@ -64,10 +66,10 @@ public class RegionControllerViewBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+    public void handleUpdateTag(ValueInput tag) {
         // in client these fields are valid
-        super.handleUpdateTag(tag, lookupProvider);
-        controllerBlockPos = BlockPos.of(tag.getLong("Bind"));
+        super.handleUpdateTag(tag);
+        tag.getLong("Bind").ifPresent(bind -> controllerBlockPos = BlockPos.of(bind));
     }
 
     @Override

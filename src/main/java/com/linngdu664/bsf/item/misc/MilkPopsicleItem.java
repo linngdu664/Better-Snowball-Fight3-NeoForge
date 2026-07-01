@@ -12,23 +12,24 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.EffectCures;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class MilkPopsicleItem extends Item {
     private static final FoodProperties food = new FoodProperties.Builder().alwaysEdible().build();
 
     public MilkPopsicleItem() {
-        super(new Properties().food(food));
+        super(com.linngdu664.bsf.Main.itemProperties().food(food, Consumables.defaultDrink().consumeSeconds(3.2F).build()));
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack itemStack) {
-        return UseAnim.DRINK;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack itemStack) {
+        return ItemUseAnimation.DRINK;
     }
 
     @Override
@@ -39,11 +40,11 @@ public class MilkPopsicleItem extends Item {
     @Override
     public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, Level level, @NotNull LivingEntity user) {
         if (user instanceof Player player) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.setRemainingFireTicks(0);
-                player.removeEffectsCuredBy(EffectCures.MILK);
+                player.removeAllEffects();
                 player.setTicksFrozen(40);
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1));
+                player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1));
                 CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, stack);
             }
             if (!player.isCreative()) {
@@ -54,7 +55,8 @@ public class MilkPopsicleItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("milk_popsicle.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("milk_popsicle.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

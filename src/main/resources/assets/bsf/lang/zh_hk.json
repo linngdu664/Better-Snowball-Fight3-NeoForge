@@ -482,6 +482,7 @@
   "region_player_inspector_item_kick.tip": "[BSF反作弊] 你已被踢出區域，原因：攜帶違禁物品入內",
   "region_player_inspector_team_kick.tip": "[BSF反作弊] 你已被踢出區域，原因：當前隊伍不符合要求",
 
+  "item.bsf.smart_snow_block": "智慧雪塊",
   "block.bsf.smart_snow_block": "智慧雪塊",
   "block.bsf.loose_snow_block": "鬆散雪塊",
   "block.bsf.critical_snow": "臨界雪",

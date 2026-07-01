@@ -8,8 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.AABB;
 
 import java.util.EnumSet;
@@ -45,10 +44,13 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
     protected void findTarget() {
         TargetingConditions targetConditions = TargetingConditions.forCombat().range(SEARCH_DISTANCE);
         targetConditions.ignoreLineOfSight();
-        Level level = snowGolem.level();
-        BSFTeamSavedData savedData = snowGolem.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        if (!(snowGolem.level() instanceof ServerLevel level)) {
+            target = null;
+            return;
+        }
+        BSFTeamSavedData savedData = level.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
         int teamId = snowGolem.getFixedTeamId();
-        targetConditions.selector(p -> {
+        targetConditions.selector((p, serverLevel) -> {
             if (p instanceof BSFSnowGolemEntity snowGolem1) {
                 return teamId != savedData.getTeam(snowGolem1.getOwnerUUID());
             }
@@ -60,7 +62,22 @@ public class RegionControllerGolemNearestAttackableTargetGoal extends TargetGoal
             }
             return false;
         });
-        target = level.getNearestEntity(level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true), targetConditions, snowGolem, snowGolem.getX(), snowGolem.getEyeY(), snowGolem.getZ());
+        target = getNearestEntity(level, targetConditions);
+    }
+
+    private LivingEntity getNearestEntity(ServerLevel level, TargetingConditions targetConditions) {
+        LivingEntity nearest = null;
+        double nearestDistance = Double.MAX_VALUE;
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, getTargetSearchArea(), p -> true)) {
+            if (targetConditions.test(level, snowGolem, entity)) {
+                double distance = snowGolem.distanceToSqr(entity);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearest = entity;
+                }
+            }
+        }
+        return nearest;
     }
 
     public void start() {

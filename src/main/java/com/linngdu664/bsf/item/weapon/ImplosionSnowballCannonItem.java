@@ -25,7 +25,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -33,6 +33,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,11 +43,11 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_NEXT;
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_PREV;
+import java.util.List;
 
 public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
     public static final int TYPE_FLAG = 64;
@@ -61,15 +62,15 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.hasEffect(EffectRegister.WEAPON_JAM)) {
-            return InteractionResultHolder.fail(itemStack);
+            return InteractionResult.FAIL;
         }
         ItemStack stack = getAmmo(pPlayer, itemStack);
         if (stack != null || pPlayer.isCreative()) {
             Vec3 cameraVec = pPlayer.getViewVector(1);
-            if (!pLevel.isClientSide) {
+            if (!pLevel.isClientSide()) {
                 ServerLevel serverLevel = (ServerLevel) pLevel;
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) pLevel, new ToggleMovingSoundPayload(pPlayer.getId(), SoundRegister.IMPLOSION_SNOWBALL_CANNON.get(), ToggleMovingSoundPayload.PLAY_ONCE));
                 Vec3 eyePosition = pPlayer.getEyePosition();
@@ -106,9 +107,9 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
                         }
                     }
                 }
-                itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pUsedHand));
+                itemStack.hurtAndBreak(1, pPlayer, pUsedHand);
 
-                pPlayer.getCooldowns().addCooldown(this, 60);
+                pPlayer.getCooldowns().addCooldown(itemStack, 60);
                 if (stack != null) {
                     consumeAmmo(stack, pPlayer);
                 }
@@ -120,7 +121,7 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
             }
         }
 
-        return InteractionResultHolder.pass(itemStack);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -134,20 +135,12 @@ public class ImplosionSnowballCannonItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("implosion_snowball_cannon.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("implosion_snowball_cannon1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("implosion_snowball_cannon.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("implosion_snowball_cannon1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                return HumanoidModel.ArmPose.valueOf("BSF_WEAPON");
-            }
-        });
-    }
 }
+

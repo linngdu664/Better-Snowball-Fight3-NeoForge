@@ -2,7 +2,7 @@ package com.linngdu664.bsf.client.gui;
 
 import com.linngdu664.bsf.Main;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +15,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
-@EventBusSubscriber(modid = Main.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Main.MODID, value = Dist.CLIENT)
 public class RenderGuiEventHandler {
     @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Post event) {
@@ -31,11 +31,9 @@ public class RenderGuiEventHandler {
         HitResult.Type pickType = pick.getType();
         float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
         CoordinateConverter converter = new CoordinateConverter(partialTick);
-        GuiGraphics guiGraphics = event.getGuiGraphics();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0F, 0F, 4932F);        // 显示在原版gui的上方
-
-        //gui队列
+        GuiGraphicsExtractor guiGraphics = event.getGuiGraphics();
+        guiGraphics.nextStratum();
+        // GUI render queue
         GuiHandler.specialWallhackUi(guiGraphics, converter, partialTick);
         GuiHandler.specialScoreText(guiGraphics);
         GuiHandler.itemInHandBSFWeapon(guiGraphics, mainHandItem, offHandItem);
@@ -53,6 +51,6 @@ public class RenderGuiEventHandler {
             GuiHandler.itemInHandSnowGolemModeTweaker(guiGraphics, mainHandItem, offHandItem, varObj);
         }
         GuiHandler.specialModeText(guiGraphics, varObj);
-        guiGraphics.pose().popPose();
     }
 }
+

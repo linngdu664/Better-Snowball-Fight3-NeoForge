@@ -9,13 +9,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class SnowGolemModeTweakerItem extends Item {
     public SnowGolemModeTweakerItem() {
-        super(new Properties().rarity(Rarity.UNCOMMON).stacksTo(1)
+        super(com.linngdu664.bsf.Main.itemProperties().rarity(Rarity.UNCOMMON).stacksTo(1)
                 .component(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0)
                 .component(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0)
         );
@@ -41,12 +42,13 @@ public class SnowGolemModeTweakerItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         Options options = Minecraft.getInstance().options;
-        pTooltipComponents.add(Component.translatable("snow_golem_mode_tweaker.tooltip", options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
-        pTooltipComponents.add(Component.translatable("snow_golem_mode_tweaker1.tooltip", options.keySprint.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
-        pTooltipComponents.add(Component.translatable("snow_golem_mode_tweaker2.tooltip").withStyle(ChatFormatting.BLUE));
-        pTooltipComponents.add(Component.translatable("tweaker_target.tip", Component.translatable(locatorMap(stack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0)))).withStyle(ChatFormatting.DARK_GRAY));
-        pTooltipComponents.add(Component.translatable("tweaker_status.tip", Component.translatable(statusMap(stack.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0)))).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.accept(Component.translatable("snow_golem_mode_tweaker.tooltip", options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.accept(Component.translatable("snow_golem_mode_tweaker1.tooltip", options.keySprint.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.accept(Component.translatable("snow_golem_mode_tweaker2.tooltip").withStyle(ChatFormatting.BLUE));
+        pTooltipComponents.accept(Component.translatable("tweaker_target.tip", Component.translatable(locatorMap(stack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0)))).withStyle(ChatFormatting.DARK_GRAY));
+        pTooltipComponents.accept(Component.translatable("tweaker_status.tip", Component.translatable(statusMap(stack.getOrDefault(DataComponentRegister.TWEAKER_STATUS_MODE, (byte) 0)))).withStyle(ChatFormatting.DARK_GRAY));
     }
 }
+

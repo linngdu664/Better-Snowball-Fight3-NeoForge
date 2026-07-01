@@ -6,6 +6,7 @@ import net.minecraft.world.item.Rarity;
 
 public class RegionControllerItem extends BlockItem {
     public RegionControllerItem() {
-        super(BlockRegister.REGION_CONTROLLER.get(), new Properties().rarity(Rarity.UNCOMMON));
+        super(BlockRegister.REGION_CONTROLLER.get(), com.linngdu664.bsf.Main.itemProperties().rarity(Rarity.UNCOMMON));
     }
 }
+

@@ -3,19 +3,15 @@ package com.linngdu664.bsf.client.model;// Made with Blockbench 4.4.1
 // Paste this class into your mod and generate all required imports
 
 import com.linngdu664.bsf.Main;
-import com.linngdu664.bsf.entity.AbstractBSFSnowGolemEntity;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.linngdu664.bsf.client.renderer.entity.state.BSFSnowGolemRenderState;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
-public class BSFSnowGolemModel<T extends AbstractBSFSnowGolemEntity> extends EntityModel<T> {
+public class BSFSnowGolemModel extends EntityModel<BSFSnowGolemRenderState> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Main.makeResLoc("bsf_snow_golem"), "main");
     private final ModelPart middle;
@@ -25,6 +21,7 @@ public class BSFSnowGolemModel<T extends AbstractBSFSnowGolemEntity> extends Ent
     private final ModelPart right_arm_r1;
 
     public BSFSnowGolemModel(ModelPart root) {
+        super(root);
         this.middle = root.getChild("middle");
         this.left_arm_r1 = root.getChild("middle").getChild("left_arm_r1");
         this.right_arm_r1 = root.getChild("middle").getChild("right_arm_r1");
@@ -78,11 +75,12 @@ public class BSFSnowGolemModel<T extends AbstractBSFSnowGolemEntity> extends Ent
     }
 
     @Override
-    public void setupAnim(AbstractBSFSnowGolemEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.up.yRot = netHeadYaw * Mth.DEG_TO_RAD;
-        this.up.xRot = headPitch * Mth.DEG_TO_RAD;
-        this.middle.yRot = netHeadYaw * Mth.DEG_TO_RAD * 0.25F;
-        if (entity.getWeapon() != ItemStack.EMPTY) {
+    public void setupAnim(BSFSnowGolemRenderState state) {
+        super.setupAnim(state);
+        this.up.yRot = state.yRot * Mth.DEG_TO_RAD;
+        this.up.xRot = state.xRot * Mth.DEG_TO_RAD;
+        this.middle.yRot = state.yRot * Mth.DEG_TO_RAD * 0.25F;
+        if (!state.weapon.isEmpty()) {
             this.left_arm_r1.xRot = Mth.DEG_TO_RAD * 103;
             this.left_arm_r1.yRot = Mth.DEG_TO_RAD * 67;
             this.left_arm_r1.zRot = Mth.DEG_TO_RAD * 162;
@@ -97,12 +95,5 @@ public class BSFSnowGolemModel<T extends AbstractBSFSnowGolemEntity> extends Ent
             this.right_arm_r1.yRot = 0;
             this.right_arm_r1.zRot = Mth.DEG_TO_RAD * -60;
         }
-    }
-
-    @Override
-    public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-        middle.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-        up.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-        down.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
     }
 }

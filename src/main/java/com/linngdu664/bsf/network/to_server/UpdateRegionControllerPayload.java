@@ -8,9 +8,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record UpdateRegionControllerPayload(UpdateRegionControllerParas paras) implements CustomPacketPayload {
@@ -27,7 +29,8 @@ public record UpdateRegionControllerPayload(UpdateRegionControllerParas paras) i
             UpdateRegionControllerParas paras = payload.paras();
             BlockPos blockPos = paras.blockPos();
             if (level.hasChunkAt(blockPos) && level.getBlockEntity(blockPos) instanceof RegionControllerBlockEntity be) {
-                be.setSpawnBlock(BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(paras.spawnBlock())));
+                Block spawnBlock = BuiltInRegistries.BLOCK.getValue(Identifier.tryParse(paras.spawnBlock()));
+                be.setSpawnBlock(spawnBlock == null ? Blocks.AIR : spawnBlock);
                 be.setPlayerMultiplier(paras.playerMultiplier());
                 be.setGolemMultiplier(paras.golemMultiplier());
                 be.setDiversity(paras.diversity());

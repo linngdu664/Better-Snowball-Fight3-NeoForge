@@ -1,6 +1,7 @@
 package com.linngdu664.bsf.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.particle.HugeExplosionParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -16,7 +17,7 @@ public class GeneratorPush extends HugeExplosionParticle {
         this.setSpriteFromAge(pSprites);
     }
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         return 240;
     }
     public static class Provider implements ParticleProvider<SimpleParticleType> {
@@ -26,7 +27,7 @@ public class GeneratorPush extends HugeExplosionParticle {
             this.sprites = pSprites;
         }
 
-        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             return new GeneratorPush(pLevel, pX, pY, pZ, pXSpeed, this.sprites);
         }
     }

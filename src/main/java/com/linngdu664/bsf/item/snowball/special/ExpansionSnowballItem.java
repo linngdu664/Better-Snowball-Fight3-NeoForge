@@ -8,7 +8,7 @@ import com.linngdu664.bsf.item.snowball.AbstractBSFSnowballItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +24,7 @@ public class ExpansionSnowballItem extends AbstractBSFSnowballItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         return throwOrStorage(pPlayer, pLevel, pUsedHand, 1.25F, 40);
     }
 
@@ -38,3 +38,4 @@ public class ExpansionSnowballItem extends AbstractBSFSnowballItem {
         pTooltipComponents.add(Component.translatable("expansion_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

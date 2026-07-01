@@ -1,16 +1,17 @@
 package com.linngdu664.bsf.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
 // Good modders copy, great ones steal.
-public class ShortTimeSnowflake extends TextureSheetParticle {
+public class ShortTimeSnowflake extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected ShortTimeSnowflake(ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, SpriteSet pSprites) {
-        super(pLevel, pX, pY, pZ);
+        super(pLevel, pX, pY, pZ, pSprites.first());
         this.gravity = 0.225F;
         this.friction = 1.0F;
         this.sprites = pSprites;
@@ -23,8 +24,8 @@ public class ShortTimeSnowflake extends TextureSheetParticle {
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected @NotNull Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ShortTimeSnowflake extends TextureSheetParticle {
             this.sprites = pSprites;
         }
 
-        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             ShortTimeSnowflake shortTimeSnowflake = new ShortTimeSnowflake(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, this.sprites);
             shortTimeSnowflake.setColor(0.923F, 0.964F, 0.999F);
             return shortTimeSnowflake;

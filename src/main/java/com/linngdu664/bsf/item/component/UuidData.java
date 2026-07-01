@@ -32,3 +32,4 @@ public record UuidData(UUID uuid) {
         return uuid.getLeastSignificantBits();
     }
 }
+

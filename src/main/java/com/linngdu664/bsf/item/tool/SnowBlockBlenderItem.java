@@ -10,17 +10,18 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
     public SnowBlockBlenderItem() {
@@ -28,15 +29,15 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         BlockHitResult blockHitResult = getPlayerPOVHitResult(pLevel, pPlayer, ClipContext.Fluid.NONE);
         BlockPos blockPos = blockHitResult.getBlockPos();
         if (!pLevel.getBlockState(blockPos).getBlock().equals(Blocks.SNOW_BLOCK)) {
-            return InteractionResultHolder.pass(itemStack);
+            return InteractionResult.PASS;
         }
         pPlayer.startUsingItem(pUsedHand);
-        return InteractionResultHolder.consume(itemStack);
+        return InteractionResult.CONSUME;
     }
 
     @Override
@@ -46,9 +47,9 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
             BlockPos blockPos = blockHitResult.getBlockPos();
             if (!pLevel.getBlockState(blockPos).getBlock().equals(Blocks.SNOW_BLOCK)) {
                 player.stopUsingItem();
-            } else if (!pLevel.isClientSide) {
+            } else if (!pLevel.isClientSide()) {
                 ServerLevel serverLevel = (ServerLevel) pLevel;
-                RandomSource random = serverLevel.random;
+                RandomSource random = serverLevel.getRandom();
                 if (pRemainingUseDuration == 1) {
                     pLevel.setBlockAndUpdate(blockPos, Blocks.POWDER_SNOW.defaultBlockState());
                     for (int i = 0; i < 5; i++) {
@@ -62,7 +63,7 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
                     pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
 
                     if (!player.getAbilities().instabuild) {
-                        pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
+                        pStack.hurtAndBreak(1, player, player.getUsedItemHand());
                     }
                     player.awardStat(Stats.ITEM_USED.get(this));
                 } else {
@@ -96,17 +97,13 @@ public class SnowBlockBlenderItem extends AbstractBSFEnhanceableToolItem {
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
-        return UseAnim.BOW;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack pStack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
-    public boolean isValidRepairItem(@NotNull ItemStack pStack, ItemStack pRepairCandidate) {
-        return pRepairCandidate.is(Items.IRON_INGOT);
-    }
-
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("snow_block_blender.tooltip").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("snow_block_blender.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

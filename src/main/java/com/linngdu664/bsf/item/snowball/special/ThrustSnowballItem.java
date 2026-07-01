@@ -6,7 +6,7 @@ import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -25,10 +25,10 @@ public class ThrustSnowballItem extends AbstractBSFSnowballItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         storageInTank(pPlayer);
-        return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -43,3 +43,4 @@ public class ThrustSnowballItem extends AbstractBSFSnowballItem {
         pTooltipComponents.add(Component.translatable("thrust_snowball2.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

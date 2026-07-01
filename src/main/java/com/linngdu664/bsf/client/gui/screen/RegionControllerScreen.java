@@ -11,12 +11,12 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public class RegionControllerScreen extends Screen {
     private static final int MAIN_MAX_WIDTH = 420;
     private static final int MAIN_MARGIN = 9;
-    private static final int MAIN_HEIGHT = 3 * 10 + 15 + 5 * 25;  // 3文本+间隔+5行输入框
+    private static final int MAIN_HEIGHT = 3 * 10 + 15 + 5 * 25;  // 3閺傚洦婀?闂傛挳娈?5鐞涘矁绶崗銉︻攱
     private static final int LABEL_INPUT_GAP = 4;
     private static final int LEFT_RIGHT_GAP = 15;
     private final BlockPos blockPos;
@@ -70,13 +70,12 @@ public class RegionControllerScreen extends Screen {
         this.maxGolemNumStr = String.valueOf(paras.maxGolem());
     }
 
-    // 设置组件
+    // 鐠佸墽鐤嗙紒鍕
     @Override
     protected void init() {
         super.init();
         Font font = minecraft.font;
-
-        // 确定各组件位置
+        // Layout
         int beginY = height / 2 - MAIN_HEIGHT / 2;
 //        int maxComponentWidth = Math.max(font.width(spawnBlockComponent), Math.max(font.width(playerMultiplierComponent), Math.max(font.width(golemMultiplierComponent), Math.max(font.width(diversityComponent), Math.max(font.width(enemyTeamNumComponent), font.width(maxGolemNumComponent))))));
         int maxLeftComponentWidth = Math.max(font.width(spawnBlockComponent), Math.max(font.width(playerMultiplierComponent), Math.max(font.width(diversityComponent), Math.max(font.width(fastestStrengthComponent), font.width(enemyTeamNumComponent)))));
@@ -100,9 +99,9 @@ public class RegionControllerScreen extends Screen {
         StringWidget regionLabel = addRenderableWidget(new StringWidget(0, beginY, width, 9, regionComponent, font));
         StringWidget spawnsLabel = addRenderableWidget(new StringWidget(0, beginY + 10, width, 9, spawnsComponent, font));
         StringWidget golemsLabel = addRenderableWidget(new StringWidget(0, beginY + 20, width, 9, golemsComponent, font));
-        regionLabel.alignCenter();
-        spawnsLabel.alignCenter();
-        golemsLabel.alignCenter();
+        ScreenAlignment.alignCenter(regionLabel, 0, width);
+        ScreenAlignment.alignCenter(spawnsLabel, 0, width);
+        ScreenAlignment.alignCenter(golemsLabel, 0, width);
 
         StringWidget spawnBlockLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 51, leftLabelWidth, 9, spawnBlockComponent, font));
         StringWidget playerMultiplierLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 76, leftLabelWidth, 9, playerMultiplierComponent, font));
@@ -113,15 +112,15 @@ public class RegionControllerScreen extends Screen {
         StringWidget slowestStrengthLabel = addRenderableWidget(new StringWidget(rightLabelBeginX, beginY + 126, rightLabelWidth, 9, slowestStrengthComponent, font));
         StringWidget enemyTeamNumLabel = addRenderableWidget(new StringWidget(leftLabelBeginX, beginY + 151, leftLabelWidth, 9, enemyTeamNumComponent, font));
         StringWidget maxGolemNumLabel = addRenderableWidget(new StringWidget(rightLabelBeginX, beginY + 151, rightLabelWidth, 9, maxGolemNumComponent, font));
-        spawnBlockLabel.alignRight();
-        playerMultiplierLabel.alignRight();
-        golemMultiplierLabel.alignRight();
-        diversityLabel.alignRight();
-        rankOffsetLabel.alignRight();
-        fastestStrengthLabel.alignRight();
-        slowestStrengthLabel.alignRight();
-        enemyTeamNumLabel.alignRight();
-        maxGolemNumLabel.alignRight();
+        ScreenAlignment.alignRight(spawnBlockLabel, leftLabelBeginX, leftLabelWidth);
+        ScreenAlignment.alignRight(playerMultiplierLabel, leftLabelBeginX, leftLabelWidth);
+        ScreenAlignment.alignRight(golemMultiplierLabel, rightLabelBeginX, rightLabelWidth);
+        ScreenAlignment.alignRight(diversityLabel, leftLabelBeginX, leftLabelWidth);
+        ScreenAlignment.alignRight(rankOffsetLabel, rightLabelBeginX, rightLabelWidth);
+        ScreenAlignment.alignRight(fastestStrengthLabel, leftLabelBeginX, leftLabelWidth);
+        ScreenAlignment.alignRight(slowestStrengthLabel, rightLabelBeginX, rightLabelWidth);
+        ScreenAlignment.alignRight(enemyTeamNumLabel, leftLabelBeginX, leftLabelWidth);
+        ScreenAlignment.alignRight(maxGolemNumLabel, rightLabelBeginX, rightLabelWidth);
 
         spawnBlockEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 45, fullInputWidth, 20, spawnBlockComponent));
         playerMultiplierEdit = addRenderableWidget(new EditBox(font, leftInputBeginX, beginY + 70, leftInputWidth, 20, playerMultiplierComponent));
@@ -144,14 +143,13 @@ public class RegionControllerScreen extends Screen {
         maxGolemNumEdit.setValue(maxGolemNumStr);
     }
 
-    // 关闭GUI，向服务器发送参数
-    @Override
+    // 閸忔娊妫碐UI閿涘苯鎮滈張宥呭閸ｃ劌褰傞柅浣稿棘閺?    @Override
     public void onClose() {
         super.onClose();
         if (minecraft.level.getBlockEntity(blockPos) instanceof RegionControllerBlockEntity) {
-            // 发包
+            // Send packet
             try {
-                PacketDistributor.sendToServer(new UpdateRegionControllerPayload(new UpdateRegionControllerParas(
+                ClientPacketDistributor.sendToServer(new UpdateRegionControllerPayload(new UpdateRegionControllerParas(
                         blockPos,
                         spawnBlockEdit.getValue(),
                         Float.parseFloat(playerMultiplierEdit.getValue()),
@@ -169,7 +167,7 @@ public class RegionControllerScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft minecraft, int width, int height) {
+    public void resize(int width, int height) {
         spawnBlockStr = spawnBlockEdit.getValue();
         playerMultiplierStr = playerMultiplierEdit.getValue();
         golemMultiplierStr = golemMultiplierEdit.getValue();
@@ -179,6 +177,7 @@ public class RegionControllerScreen extends Screen {
         slowestStrengthStr = slowestStrengthEdit.getValue();
         enemyTeamNumStr = enemyTeamNumEdit.getValue();
         maxGolemNumStr = maxGolemNumEdit.getValue();
-        super.resize(minecraft, width, height);
+        super.resize(width, height);
     }
 }
+

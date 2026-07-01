@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -25,11 +25,11 @@ public class BlackHoleSnowballItem extends AbstractBSFSnowballItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (!storageInTank(pPlayer)) {
             pLevel.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (pLevel.getRandom().nextFloat() * 0.4F + 0.8F));
-            if (!pLevel.isClientSide) {
+            if (!pLevel.isClientSide()) {
                 BlackHoleSnowballEntity snowballEntity = new BlackHoleSnowballEntity(pPlayer, pLevel, getLaunchAdjustment(1), itemStack.get(DataComponentRegister.REGION.get()));
                 if (pPlayer.isShiftKeyDown()) {
                     snowballEntity.startTime = 10;
@@ -39,11 +39,11 @@ public class BlackHoleSnowballItem extends AbstractBSFSnowballItem {
             }
             if (!pPlayer.getAbilities().instabuild) {
                 itemStack.shrink(1);
-                pPlayer.getCooldowns().addCooldown(this, 100);
+                pPlayer.getCooldowns().addCooldown(itemStack, 100);
             }
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));//Feedback effect
-        return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -57,3 +57,4 @@ public class BlackHoleSnowballItem extends AbstractBSFSnowballItem {
         pTooltipComponents.add(Component.translatable("black_hole_snowball.tooltip").withStyle(ChatFormatting.GRAY));
     }
 }
+

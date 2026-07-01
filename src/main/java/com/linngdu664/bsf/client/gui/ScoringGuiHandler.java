@@ -1,10 +1,7 @@
 package com.linngdu664.bsf.client.gui;
 
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
 public class ScoringGuiHandler {
     public static int money = 0;
     public static int rank = 0;

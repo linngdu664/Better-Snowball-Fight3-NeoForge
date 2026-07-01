@@ -14,18 +14,18 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.UUID;
 
 public class TeamLinkerItem extends Item {
@@ -33,7 +33,7 @@ public class TeamLinkerItem extends Item {
     private final int teamId;
 
     public TeamLinkerItem(int teamId) {
-        super(new Properties());
+        super(com.linngdu664.bsf.Main.itemProperties());
         this.teamId = teamId;
     }
 
@@ -59,14 +59,14 @@ public class TeamLinkerItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.isShiftKeyDown()) {
-            if (pLevel.isClientSide) {
+            if (pLevel.isClientSide()) {
                 shouldShowHighlight = !shouldShowHighlight;
             }
-        } else if (!pLevel.isClientSide) {
-            BSFTeamSavedData savedData = pPlayer.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        } else if (!pLevel.isClientSide()) {
+            BSFTeamSavedData savedData = pPlayer.level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
             Component playerName = pPlayer.getName();
             UUID uuid = pPlayer.getUUID();
             int oldId = savedData.getTeam(uuid);
@@ -76,12 +76,11 @@ public class TeamLinkerItem extends Item {
             for (UUID uuid1 : oldMembers) {
                 ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
                 if (serverPlayer != null) {
-                    serverPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("leave_bsf_team.tip", null, oldNameParam)), false);
+                    serverPlayer.sendSystemMessage(MutableComponent.create(new TranslatableContents("leave_bsf_team.tip", null, oldNameParam)));
                 }
             }
             if (oldId == teamId) {
-                // 退队
-                savedData.exitTeam(uuid);       // 此时oldMembers已经不含自己了
+                savedData.exitTeam(uuid);
                 for (UUID uuid1 : oldMembers) {
                     ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
                     if (serverPlayer != null) {
@@ -91,7 +90,7 @@ public class TeamLinkerItem extends Item {
                 PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new TeamMembersPayload(new HashSet<>()));
                 PacketDistributor.sendToPlayer((ServerPlayer) pPlayer, new CurrentTeamPayload((byte) -1));
             } else {
-                // 退队后进队
+                // Leave the old team, then join the new team.
                 savedData.joinTeam(uuid, teamId);
                 for (UUID uuid1 : oldMembers) {
                     ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
@@ -103,7 +102,7 @@ public class TeamLinkerItem extends Item {
                 for (UUID uuid1 : newMembers) {
                     ServerPlayer serverPlayer = (ServerPlayer) pLevel.getPlayerByUUID(uuid1);
                     if (serverPlayer != null) {
-                        serverPlayer.displayClientMessage(MutableComponent.create(new TranslatableContents("join_bsf_team.tip", null, newNameParam)), false);
+                        serverPlayer.sendSystemMessage(MutableComponent.create(new TranslatableContents("join_bsf_team.tip", null, newNameParam)));
                         PacketDistributor.sendToPlayer(serverPlayer, new TeamMembersPayload(newMembers));
                     }
                 }
@@ -112,14 +111,14 @@ public class TeamLinkerItem extends Item {
             savedData.setDirty();
         }
         pPlayer.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.success(itemstack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Options options = Minecraft.getInstance().options;
-        tooltipComponents.add(Component.translatable("team_linker.tooltip", options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
-        tooltipComponents.add(Component.translatable("team_linker1.tooltip", options.keyShift.getTranslatedKeyMessage(), options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.accept(Component.translatable("team_linker.tooltip", options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.accept(Component.translatable("team_linker1.tooltip", options.keyShift.getTranslatedKeyMessage(), options.keyUse.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 
     public byte getTeamId() {
@@ -127,3 +126,4 @@ public class TeamLinkerItem extends Item {
     }
 
 }
+

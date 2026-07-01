@@ -6,6 +6,7 @@ import net.minecraft.world.item.Rarity;
 
 public class RegionPlayerInspectorItem extends BlockItem {
     public RegionPlayerInspectorItem() {
-        super(BlockRegister.REGION_PLAYER_INSPECTOR.get(), new Properties().rarity(Rarity.UNCOMMON));
+        super(BlockRegister.REGION_PLAYER_INSPECTOR.get(), com.linngdu664.bsf.Main.itemProperties().rarity(Rarity.UNCOMMON));
     }
 }
+

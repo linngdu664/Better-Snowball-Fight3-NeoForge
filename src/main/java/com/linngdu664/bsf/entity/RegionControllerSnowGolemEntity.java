@@ -5,19 +5,21 @@ import com.linngdu664.bsf.entity.ai.goal.RegionControllerGolemTargetNearGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.RegionControllerGolemHurtByTargetGoal;
 import com.linngdu664.bsf.entity.ai.goal.target.RegionControllerGolemNearestAttackableTargetGoal;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,15 +39,15 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putByte("FixedTeamId", getFixedTeamId());
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putByte("FixedTeamId", getFixedTeamId());
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        setFixedTeamId(pCompound.getByte("FixedTeamId"));
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        setFixedTeamId(input.getByteOr("FixedTeamId", (byte) -1));
     }
 
     public byte getFixedTeamId() {
@@ -70,8 +72,8 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
     @Override
     public void tick() {
         Level level = level();
-        if (!level.isClientSide && isAlive() && lifespan > 0 && --lifespan == 0) {
-            hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
+        if (level instanceof ServerLevel serverLevel && isAlive() && lifespan > 0 && --lifespan == 0) {
+            hurtServer(serverLevel, level.damageSources().genericKill(), Float.MAX_VALUE);
         }
         super.tick();
     }
@@ -81,9 +83,10 @@ public class RegionControllerSnowGolemEntity extends AbstractBSFSnowGolemEntity 
         if (entity == null) {
             return false;
         }
-        BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        BSFTeamSavedData savedData = level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
         if (entity instanceof OwnableEntity ownableEntity) {
-            return getFixedTeamId() != savedData.getTeam(ownableEntity.getOwnerUUID());
+            LivingEntity owner = ownableEntity.getOwner();
+            return owner != null && getFixedTeamId() != savedData.getTeam(owner.getUUID());
         }
         if (entity instanceof RegionControllerSnowGolemEntity snowGolem) {
             return getFixedTeamId() != snowGolem.getFixedTeamId();

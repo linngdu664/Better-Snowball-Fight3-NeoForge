@@ -12,7 +12,6 @@ import com.linngdu664.bsf.item.tool.SnowballClampItem;
 import com.linngdu664.bsf.item.weapon.SnowballCannonItem;
 import com.linngdu664.bsf.item.weapon.SnowballShotgunItem;
 import com.linngdu664.bsf.misc.BSFTeamSavedData;
-import com.linngdu664.bsf.misc.BSFTiers;
 import com.linngdu664.bsf.network.to_client.ForwardRaysParticlesPayload;
 import com.linngdu664.bsf.network.to_client.ShowGolemRankScreenPayload;
 import com.linngdu664.bsf.network.to_client.packed_paras.ForwardRaysParticlesParas;
@@ -29,14 +28,15 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
@@ -49,7 +49,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +66,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     private static final EntityDataAccessor<Byte> LOCATOR_FLAG = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Integer> POTION_SICKNESS = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Optional<Component>> TARGET_NAME = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
-    private static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_OWNER_ID = SynchedEntityData.defineId(BSFSnowGolemEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
     private boolean isSpecialMode;
 
     public BSFSnowGolemEntity(EntityType<? extends AbstractBSFSnowGolemEntity> entityType, Level level) {
@@ -80,36 +82,27 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         builder.define(LOCATOR_FLAG, (byte) 0);
         builder.define(POTION_SICKNESS, 0);
         builder.define(TARGET_NAME, Optional.empty());
-        builder.define(DATA_OWNERUUID_ID, Optional.empty());
+        builder.define(DATA_OWNER_ID, Optional.empty());
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putByte("Status", getStatus());
-        pCompound.putByte("Locator", getLocator());
-        pCompound.putInt("PotionSickness", getPotionSickness());
-        pCompound.putBoolean("SpecialMode", isSpecialMode);
-        if (getOwnerUUID() != null) {
-            pCompound.putUUID("Owner", getOwnerUUID());
-        }
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putByte("Status", getStatus());
+        output.putByte("Locator", getLocator());
+        output.putInt("PotionSickness", getPotionSickness());
+        output.putBoolean("SpecialMode", isSpecialMode);
+        EntityReference.store(getOwnerReference(), output, "Owner");
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        setStatus(pCompound.getByte("Status"));
-        setLocator(pCompound.getByte("Locator"));
-        setPotionSickness(pCompound.getInt("PotionSickness"));
-        isSpecialMode = pCompound.getBoolean("SpecialMode");
-        UUID uuid;
-        if (pCompound.hasUUID("Owner")) {
-            uuid = pCompound.getUUID("Owner");
-        } else {
-            String s = pCompound.getString("Owner");
-            uuid = OldUsersConverter.convertMobOwnerIfNecessary(getServer(), s);
-        }
-        setOwnerUUID(uuid);
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        setStatus(input.getByteOr("Status", (byte) 0));
+        setLocator(input.getByteOr("Locator", (byte) 0));
+        setPotionSickness(input.getIntOr("PotionSickness", 0));
+        isSpecialMode = input.getBooleanOr("SpecialMode", false);
+        setOwnerReference(EntityReference.readWithOldOwnerConversion(input, "Owner", level()));
     }
 
     public byte getStatus() {
@@ -144,13 +137,22 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         return isSpecialMode;
     }
 
-    @Override
     public @Nullable UUID getOwnerUUID() {
-        return entityData.get(DATA_OWNERUUID_ID).orElse(null);
+        EntityReference<LivingEntity> ownerReference = getOwnerReference();
+        return ownerReference == null ? null : ownerReference.getUUID();
     }
 
     public void setOwnerUUID(@Nullable UUID uuid) {
-        entityData.set(DATA_OWNERUUID_ID, Optional.ofNullable(uuid));
+        setOwnerReference(uuid == null ? null : EntityReference.of(uuid));
+    }
+
+    @Override
+    public @Nullable EntityReference<LivingEntity> getOwnerReference() {
+        return entityData.get(DATA_OWNER_ID).orElse(null);
+    }
+
+    public void setOwnerReference(@Nullable EntityReference<LivingEntity> ownerReference) {
+        entityData.set(DATA_OWNER_ID, Optional.ofNullable(ownerReference));
     }
 
     @Override
@@ -174,7 +176,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             return InteractionResult.PASS;
         }
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             ItemStack itemStack = pPlayer.getItemInHand(pHand);
             Item item = itemStack.getItem();
             if (item instanceof SnowballTankItem && getAmmo().isEmpty()) {
@@ -189,7 +191,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                 setWeapon(itemStack.copy());
                 if (!pPlayer.getAbilities().instabuild) {
                     if (EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), itemStack) > 0) {
-                        itemStack.hurtAndBreak(10, pPlayer, LivingEntity.getSlotForHand(pPlayer.getUsedItemHand()));
+                        itemStack.hurtAndBreak(10, pPlayer, pPlayer.getUsedItemHand());
                     } else {
                         itemStack.shrink(1);
                     }
@@ -241,7 +243,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                     ((ServerLevel) level).sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY() + 1, this.getZ(), 7, 0.4, 0.5, 0.4, 0.05);
                     this.playSound(SoundEvents.SNOW_PLACE, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 } else {
-                    pPlayer.displayClientMessage(Component.translatable("potionSickness.tip", String.valueOf(getPotionSickness())), false);
+                    pPlayer.sendSystemMessage(Component.translatable("potionSickness.tip", String.valueOf(getPotionSickness())));
                 }
             } else if (item.equals(ItemRegister.SNOW_GOLEM_MODE_TWEAKER.get())) {
                 int targetMode = itemStack.getOrDefault(DataComponentRegister.TWEAKER_TARGET_MODE, (byte) 0);
@@ -251,26 +253,26 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
                 }
                 setLocator((byte) targetMode);
                 setStatus((byte) statusMode);
-                pPlayer.displayClientMessage(Component.translatable("import_state.tip"), false);
+                pPlayer.sendSystemMessage(Component.translatable("import_state.tip"));
                 Vec3 color = new Vec3(0.5, 1, 0.5);
                 PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item.equals(ItemRegister.TARGET_LOCATOR.get()) && getLocator() == 1) {
                 Entity entity = ((ServerLevel) level).getEntity(itemStack.getOrDefault(DataComponentRegister.TARGET_UUID, new UuidData(new UUID(0, 0))).uuid());
                 if (entity instanceof LivingEntity livingEntity && entity != this) {
-                    pPlayer.displayClientMessage(Component.translatable("snow_golem_locator_tip"), false);
+                    pPlayer.sendSystemMessage(Component.translatable("snow_golem_locator_tip"));
                     setTarget(livingEntity);
                 }
                 Vec3 color = new Vec3(0.5, 1, 1);
                 PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 level.playSound(null, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ(), SoundEvents.DISPENSER_DISPENSE, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             } else if (item instanceof SnowballClampItem snowballClamp) {
-                if (snowballClamp.getTier().equals(BSFTiers.EMERALD)) {
+                if (snowballClamp.isForDuck()) {
                     pPlayer.getInventory().placeItemBackInInventory(ItemRegister.DUCK_SNOWBALL.get().getDefaultInstance(), true);
                 } else {
                     pPlayer.getInventory().placeItemBackInInventory(ItemRegister.SMOOTH_SNOWBALL.get().getDefaultInstance(), true);
                 }
-                itemStack.hurtAndBreak(1, pPlayer, LivingEntity.getSlotForHand(pHand));
+                itemStack.hurtAndBreak(1, pPlayer, pHand);
             } else if (item.equals(Items.SNOWBALL)) {
                 setStyle((byte) ((getStyle() + 1) % STYLE_NUM));
                 ((ServerLevel) level).sendParticles(ParticleTypes.SNOWFLAKE, this.getX(), this.getY() + 1, this.getZ(), 20, 0, 0.5, 0, 0.05);
@@ -278,10 +280,10 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
             } else if (item.equals(ItemRegister.CREATIVE_SNOW_GOLEM_TOOL.get())) {
                 if (pPlayer.isShiftKeyDown()) {
                     itemStack.set(DataComponentRegister.SNOW_GOLEM_DATA, getReconstructData());
-                    pPlayer.displayClientMessage(Component.translatable("copy.tip"), false);
+                    pPlayer.sendSystemMessage(Component.translatable("copy.tip"));
                 } else {
                     setEnhance(!getEnhance());
-                    pPlayer.displayClientMessage(Component.translatable("golem_enhance.tip", String.valueOf(getEnhance())), false);
+                    pPlayer.sendSystemMessage(Component.translatable("golem_enhance.tip", String.valueOf(getEnhance())));
                     Vec3 color = new Vec3(1, 0.8, 0.5);
                     PacketDistributor.sendToPlayersTrackingEntity(this, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(this.getPosition(1).add(-0.5, 0, -0.5), this.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 30), BSFParticleType.SNOW_GOLEM_EQUIP.ordinal()));
                 }
@@ -320,7 +322,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     @Override
     public void tick() {
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (getPotionSickness() > 0) {
                 setPotionSickness(getPotionSickness() - 1);
             }
@@ -335,8 +337,9 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
     }
 
     public CompoundTag getReconstructData() {
-        CompoundTag tag1 = new CompoundTag();
-        saveWithoutId(tag1);
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, registryAccess());
+        saveWithoutId(output);
+        CompoundTag tag1 = output.buildResult();
         tag1.remove("Pos");
         tag1.remove("Motion");
         tag1.remove("UUID");
@@ -355,7 +358,7 @@ public class BSFSnowGolemEntity extends AbstractBSFSnowGolemEntity implements Ow
         if (entity == null) {
             return false;
         }
-        BSFTeamSavedData savedData = getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+        BSFTeamSavedData savedData = level().getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
         if (entity instanceof OwnableEntity ownableEntity) {
             if (savedData.getTeam(getOwnerUUID()) < 0) {
                 return !Objects.equals(getOwner(), ownableEntity.getOwner());

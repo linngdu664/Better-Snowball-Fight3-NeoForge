@@ -1,12 +1,12 @@
 package com.linngdu664.bsf.block;
 
+import com.linngdu664.bsf.Main;
 import com.linngdu664.bsf.block.entity.VendingMachineBlockEntity;
 import com.linngdu664.bsf.client.gui.screen.VendingMachineScreenShower;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -26,7 +26,7 @@ public class VendingMachineBlock extends Block implements EntityBlock {
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 15.0, 16.0);
 
     public VendingMachineBlock() {
-        super(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+        super(Main.blockProperties("vending_machine", BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK)));
     }
 
     @Nullable
@@ -37,8 +37,7 @@ public class VendingMachineBlock extends Block implements EntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.isClientSide && player.isCreative() && player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty() && level.getBlockEntity(pos) instanceof VendingMachineBlockEntity be) {
-            // 因为客户端能拿到数据，所以直接显示gui，但是需要避免意外的类加载
+        if (level.isClientSide() && player.isCreative() && player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty() && level.getBlockEntity(pos) instanceof VendingMachineBlockEntity be) {
             VendingMachineScreenShower.show(pos, be.getMinRank(), be.getPrice(), be.isCanSell());
             return InteractionResult.SUCCESS;
         }
@@ -46,19 +45,19 @@ public class VendingMachineBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (player.getAbilities().instabuild && level.getBlockEntity(pos) instanceof VendingMachineBlockEntity be) {
             if (hand == InteractionHand.OFF_HAND && !stack.isEmpty() && player.getMainHandItem().isEmpty()) {
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     be.setGoods(stack);
                     be.setChanged();
                     level.sendBlockUpdated(pos, state, state, 2);
-                    player.displayClientMessage(Component.literal("Set goods to " + stack.getHoverName().getString()), false);
+                    player.sendSystemMessage(Component.literal("Set goods to " + stack.getHoverName().getString()));
                 }
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override

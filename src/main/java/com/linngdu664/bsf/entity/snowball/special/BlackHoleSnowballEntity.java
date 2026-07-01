@@ -10,16 +10,17 @@ import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
 import com.linngdu664.bsf.registry.SoundRegister;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -43,26 +44,26 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putInt("StartTime", startTime);
-        pCompound.putInt("EndTime", endTime);
-        pCompound.putInt("Timer", timer);
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("StartTime", startTime);
+        output.putInt("EndTime", endTime);
+        output.putInt("Timer", timer);
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        startTime = pCompound.getInt("StartTime");
-        endTime = pCompound.getInt("EndTime");
-        timer = pCompound.getInt("Timer");
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        startTime = input.getIntOr("StartTime", 20);
+        endTime = input.getIntOr("EndTime", 150);
+        timer = input.getIntOr("Timer", 0);
     }
 
 //    @Override
 //    protected void onHitBlock(@NotNull BlockHitResult p_37258_) {
 //        super.onHitBlock(p_37258_);
 //        handleExplosion(6.0F);
-//        if (!level().isClientSide) {
+//        if (!level().isClientSide()) {
 //            this.discard();
 //        }
 //    }
@@ -70,7 +71,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
     @Override
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             startBlackHole();
         }
     }
@@ -79,7 +80,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
     public void tick() {
         super.tick();
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (timer == startTime) {
                 startBlackHole();
             }
@@ -88,7 +89,7 @@ public class BlackHoleSnowballEntity extends AbstractBSFSnowballEntity {
     }
 
     private void startBlackHole() {
-        List<Player> nearbyPlayers = level().getNearbyPlayers(TargetingConditions.forNonCombat(), null, getBoundingBox().inflate(100));
+        List<Player> nearbyPlayers = level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(100), Player::isAlive);
         for (Player player : nearbyPlayers) {
             PacketDistributor.sendToPlayer((ServerPlayer) player, new ScreenshakePayload(20).setEasing(Easing.SINE_IN_OUT).setIntensity(0.6F));
         }

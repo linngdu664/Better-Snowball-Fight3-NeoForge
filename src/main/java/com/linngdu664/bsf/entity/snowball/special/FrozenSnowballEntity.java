@@ -19,9 +19,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -51,7 +51,7 @@ public class FrozenSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (!isCaught) {
                 float frozenRange;
                 if (getLaunchFrom() == LaunchFrom.FREEZING_CANNON) {
@@ -96,9 +96,9 @@ public class FrozenSnowballEntity extends AbstractBSFSnowballEntity {
                         }
                         entity.hurt(level.damageSources().thrown(this, this.getOwner()), Float.MIN_NORMAL);
                         if (getLaunchFrom() == LaunchFrom.FREEZING_CANNON) {
-                            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4));
+                            entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 4));
                         }
-                        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
+                        entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 2));
                     }
                 }
                 if (getLaunchFrom() == LaunchFrom.FREEZING_CANNON) {

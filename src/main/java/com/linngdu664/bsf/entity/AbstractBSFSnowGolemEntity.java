@@ -16,17 +16,17 @@ import com.linngdu664.bsf.registry.*;
 import com.linngdu664.bsf.util.BSFCommonUtil;
 import com.linngdu664.bsf.util.BSFEnchantmentHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -46,6 +46,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
@@ -71,9 +73,9 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     protected double shootX;
     protected double shootY;
     protected double shootZ;
-    protected int rank;   // 等级，配合积分器使用
-    protected int money;  // 金钱，配合积分器使用
-    protected int lifespan;   // boss寿命
+    protected int rank;   // 绛夌骇锛岄厤鍚堢Н鍒嗗櫒浣跨敤
+    protected int money;  // 閲戦挶锛岄厤鍚堢Н鍒嗗櫒浣跨敤
+    protected int lifespan;   // boss瀵垮懡
     protected boolean dropEquipment;
     protected boolean dropSnowball;
     @Nullable
@@ -97,46 +99,49 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.put("Weapon", getWeapon().saveOptional(registryAccess()));
-        pCompound.put("Ammo", getAmmo().saveOptional(registryAccess()));
-        pCompound.put("Core", getCore().saveOptional(registryAccess()));
-        pCompound.putByte("Style", getStyle());
-        pCompound.putInt("CoreCoolDown", getCoreCoolDown());
-        pCompound.putBoolean("Enhance", getEnhance());
-        pCompound.putBoolean("DropEquipment", dropEquipment);
-        pCompound.putBoolean("DropSnowball", dropSnowball);
-        pCompound.putInt("Rank", rank);
-        pCompound.putInt("Money", money);
-        pCompound.putInt("Lifespan", lifespan);
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.store("Weapon", ItemStack.OPTIONAL_CODEC, getWeapon());
+        output.store("Ammo", ItemStack.OPTIONAL_CODEC, getAmmo());
+        output.store("Core", ItemStack.OPTIONAL_CODEC, getCore());
+        output.putInt("WeaponAng", getWeaponAng());
+        output.putByte("Style", getStyle());
+        output.putInt("CoreCoolDown", getCoreCoolDown());
+        output.putBoolean("Enhance", getEnhance());
+        output.putBoolean("DropEquipment", dropEquipment);
+        output.putBoolean("DropSnowball", dropSnowball);
+        output.putInt("Rank", rank);
+        output.putInt("Money", money);
+        output.putInt("Lifespan", lifespan);
         if (aliveRange != null) {
-            aliveRange.saveToCompoundTag("AliveRange", pCompound);
+            aliveRange.saveToValueOutput("AliveRange", output);
         }
         if (getTarget() != null) {
-            pCompound.putUUID("TargetUUID", getTarget().getUUID());
+            output.store("TargetUUID", UUIDUtil.CODEC, getTarget().getUUID());
         }
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        setWeapon(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Weapon")));
-        setAmmo(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Ammo")));
-        setCore(ItemStack.parseOptional(registryAccess(), pCompound.getCompound("Core")));
-        setWeaponAng(pCompound.getInt("WeaponAng"));
-        setStyle(pCompound.getByte("Style"));
-        setCoreCoolDown(pCompound.getInt("CoreCoolDown"));
-        setEnhance(pCompound.getBoolean("Enhance"));
-        dropEquipment = pCompound.getBoolean("DropEquipment");
-        dropSnowball = pCompound.getBoolean("DropSnowball");
-        rank = pCompound.getInt("Rank");
-        money = pCompound.getInt("Money");
-        lifespan = pCompound.getInt("Lifespan");
-        aliveRange = RegionData.loadFromCompoundTag("AliveRange", pCompound);
-        if (pCompound.contains("TargetUUID") && level() instanceof ServerLevel serverLevel) {
-            setTarget((LivingEntity) serverLevel.getEntity(pCompound.getUUID("TargetUUID")));   // check level type to avoid exception in top
-        }
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        input.read("Weapon", ItemStack.OPTIONAL_CODEC).ifPresent(this::setWeapon);
+        input.read("Ammo", ItemStack.OPTIONAL_CODEC).ifPresent(this::setAmmo);
+        input.read("Core", ItemStack.OPTIONAL_CODEC).ifPresent(this::setCore);
+        setWeaponAng(input.getIntOr("WeaponAng", 0));
+        setStyle(input.getByteOr("Style", (byte) 0));
+        setCoreCoolDown(input.getIntOr("CoreCoolDown", 0));
+        setEnhance(input.getBooleanOr("Enhance", false));
+        dropEquipment = input.getBooleanOr("DropEquipment", false);
+        dropSnowball = input.getBooleanOr("DropSnowball", false);
+        rank = input.getIntOr("Rank", 0);
+        money = input.getIntOr("Money", 0);
+        lifespan = input.getIntOr("Lifespan", 0);
+        aliveRange = RegionData.loadFromValueInput("AliveRange", input);
+        input.read("TargetUUID", UUIDUtil.CODEC).ifPresent(uuid -> {
+            if (level() instanceof ServerLevel serverLevel && serverLevel.getEntity(uuid) instanceof LivingEntity target) {
+                setTarget(target);
+            }
+        });
     }
 
     public ItemStack getWeapon() {
@@ -293,7 +298,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
                     weapon.setDamageValue(weapon.getDamageValue() + 1);
                     if (weapon.getDamageValue() == 256) {
                         setWeapon(ItemStack.EMPTY);
-                        playSound(SoundEvents.ITEM_BREAK, 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 0.8F));
+                        playSound(SoundEvents.ITEM_BREAK.value(), 1.0F, 1.0F / (getRandom().nextFloat() * 0.4F + 0.8F));
                     }
                 }
                 setWeaponAng(360);
@@ -302,32 +307,29 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     }
 
     @Override
-    public boolean hurt(@NotNull DamageSource pSource, float pAmount) {
-        Level level = level();
-        if (!level.isClientSide) {
-            Item item = getCore().getItem();
-            if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
-                resetCoreCoolDown();
-            } else if (pSource.getDirectEntity() instanceof Projectile && item.equals(ItemRegister.ENDER_TELEPORTATION_GOLEM_CORE.get()) && getCoreCoolDown() == 0 && canMoveAndAttack()) {
-                Vec3 vec3 = getRandomTeleportPos();
-                if (vec3 != null) {
-                    tpWithParticlesAndResetCD(vec3);
-                    return false;
-                }
+    public boolean hurtServer(@NotNull ServerLevel level, @NotNull DamageSource pSource, float pAmount) {
+        Item item = getCore().getItem();
+        if (item.equals(ItemRegister.REGENERATION_GOLEM_CORE.get())) {
+            resetCoreCoolDown();
+        } else if (pSource.getDirectEntity() instanceof Projectile && item.equals(ItemRegister.ENDER_TELEPORTATION_GOLEM_CORE.get()) && getCoreCoolDown() == 0 && canMoveAndAttack()) {
+            Vec3 vec3 = getRandomTeleportPos();
+            if (vec3 != null) {
+                tpWithParticlesAndResetCD(vec3);
+                return false;
             }
         }
-        return super.hurt(pSource, pAmount);
+        return super.hurtServer(level, pSource, pAmount);
     }
 
     @Override
     public void aiStep() {
         super.aiStep();
         Level level = level();
-        if (!level.isClientSide) {
-            if (level.getBiome(blockPosition()).is(BiomeTags.SNOW_GOLEM_MELTS)) {
-                this.hurt(this.damageSources().onFire(), 1.0F);
+        if (level instanceof ServerLevel serverLevel) {
+            if (serverLevel.environmentAttributes().getValue(EnvironmentAttributes.SNOW_GOLEM_MELTS, this.position())) {
+                this.hurtServer(serverLevel, this.damageSources().onFire(), 1.0F);
             }
-            if (!EventHooks.canEntityGrief(level, this)) {
+            if (!EventHooks.canEntityGrief(serverLevel, this)) {
                 return;
             }
             BlockState blockState = Blocks.SNOW.defaultBlockState();
@@ -355,7 +357,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
     @Override
     public void tick() {
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             setTicksFrozen(0);
             int coreCooldown = getCoreCoolDown();
             if (getWeaponAng() > 0) {
@@ -363,14 +365,14 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
             }
             if (getEnhance()) {
                 heal(1);
-                addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 2, 3));
+                addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 2, 3));
                 if (coreCooldown > 0) {
                     setCoreCoolDown(Math.max(getCoreCoolDown() - 5, 0));
                 }
             }
             Item core = getCore().getItem();
             if (core.equals(ItemRegister.SWIFTNESS_GOLEM_CORE.get())) {
-                addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 2, 0));
+                addEffect(new MobEffectInstance(MobEffects.SPEED, 2, 0));
             }
             if (coreCooldown > 0) {
                 setCoreCoolDown(coreCooldown - 1);
@@ -405,7 +407,7 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
                     setTarget(null);
                 }
                 if (!aliveRange.inRegion(position()) && isAlive()) {
-                    hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
+                    hurtServer((ServerLevel) level, level.damageSources().genericKill(), Float.MAX_VALUE);
                 }
             }
         }
@@ -419,21 +421,21 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
 
     @Override
     protected void dropCustomDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource damageSource, boolean recentlyHit) {
-        // 永远不会掉隐藏的护甲了，同时已经判断掉落gamerule了
+        // Drops are already gated by the vanilla game rule.
         if (dropEquipment) {
             int weaponVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getWeapon());
             int ammoVanish = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, Enchantments.VANISHING_CURSE), getAmmo());
             int snowGolemExclusive = EnchantmentHelper.getTagEnchantmentLevel(BSFEnchantmentHelper.getEnchantmentHolder(this, BSFEnchantmentHelper.SNOW_GOLEM_EXCLUSIVE), getWeapon());
             if (weaponVanish <= 0 && snowGolemExclusive <= 0) {
-                spawnAtLocation(getWeapon());
+                spawnAtLocation(level, getWeapon());
             }
             if (ammoVanish <= 0) {
-                spawnAtLocation(getAmmo());
+                spawnAtLocation(level, getAmmo());
             }
-            spawnAtLocation(getCore());
+            spawnAtLocation(level, getCore());
         }
         if (dropSnowball) {
-            spawnAtLocation(new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
+            spawnAtLocation(level, new ItemStack(Items.SNOWBALL, getRandom().nextInt(0, 16)));
         }
     }
 
@@ -442,7 +444,6 @@ public abstract class AbstractBSFSnowGolemEntity extends PathfinderMob implement
         return true;
     }
 
-    @Override
     protected int calculateFallDamage(float pDistance, float pDamageMultiplier) {
         return 0;
     }

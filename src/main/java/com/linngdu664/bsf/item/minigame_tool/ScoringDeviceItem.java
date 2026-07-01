@@ -17,23 +17,24 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.util.List;
 
 public class ScoringDeviceItem extends Item {
     public ScoringDeviceItem() {
-        super(new Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.RANK.get(), 0).component(DataComponentRegister.MONEY.get(), 0));
+        super(com.linngdu664.bsf.Main.itemProperties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.RANK.get(), 0).component(DataComponentRegister.MONEY.get(), 0));
     }
 
     @Override
@@ -42,7 +43,7 @@ public class ScoringDeviceItem extends Item {
         Player player = context.getPlayer();
         ItemStack stack = context.getItemInHand();
         if (level.getBlockEntity(context.getClickedPos()) instanceof VendingMachineBlockEntity be) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 int money = stack.getOrDefault(DataComponentRegister.MONEY.get(), 0);
                 ItemStack goods = be.getGoods();
                 if (player.isShiftKeyDown()) {
@@ -62,9 +63,9 @@ public class ScoringDeviceItem extends Item {
                             return true;
                         });
                         if (stacks.isEmpty()) {
-                            player.displayClientMessage(Component.translatable("scoring_device_no_item_to_sell.tip"), false);
+                            player.sendSystemMessage(Component.translatable("scoring_device_no_item_to_sell.tip"));
                         } else {
-                            // 退款成功
+                            // Refund succeeded.
                             int addMoney = 0;
                             for (ItemStack stack1 : stacks) {
                                 addMoney += stack1.getCount() * be.getPrice();
@@ -73,22 +74,22 @@ public class ScoringDeviceItem extends Item {
                             for (ItemStack stack1 : stacks) {
                                 stack1.setCount(0);
                             }
-                            player.displayClientMessage(Component.translatable("scoring_device_sell_success.tip", String.valueOf(addMoney)), false);
+                            player.sendSystemMessage(Component.translatable("scoring_device_sell_success.tip", String.valueOf(addMoney)));
                         }
                     } else {
-                        player.displayClientMessage(Component.translatable("scoring_device_cannot_sell.tip"), false);
+                        player.sendSystemMessage(Component.translatable("scoring_device_cannot_sell.tip"));
                     }
                 } else {
                     if (be.getMinRank() > stack.getOrDefault(DataComponentRegister.RANK.get(), 0)) {
-                        // 等级过低，无法购买
-                        player.displayClientMessage(Component.translatable("scoring_device_rank_low.tip"), false);
+                        // Rank is too low to buy.
+                        player.sendSystemMessage(Component.translatable("scoring_device_rank_low.tip"));
                     } else if (be.getPrice() > money) {
-                        // 钱不够，无法购买
-                        player.displayClientMessage(Component.translatable("scoring_device_no_money.tip"), false);
+                        // Not enough money to buy.
+                        player.sendSystemMessage(Component.translatable("scoring_device_no_money.tip"));
                     } else {
                         player.getInventory().placeItemBackInInventory(goods);
                         stack.set(DataComponentRegister.MONEY.get(), money - be.getPrice());
-//                        player.displayClientMessage(Component.translatable("scoring_device_buy_success.tip"), false);
+//                        player.sendSystemMessage(Component.translatable("scoring_device_buy_success.tip"));
                     }
                 }
                 Vec3 soundPos = be.getBlockPos().getCenter();
@@ -100,11 +101,11 @@ public class ScoringDeviceItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (itemStack.getOrDefault(DataComponentRegister.RANK.get(), 0) < 0) {
             pPlayer.startUsingItem(pUsedHand);
-            return InteractionResultHolder.consume(itemStack);
+            return InteractionResult.CONSUME;
         }
         RegionData region = itemStack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
         byte team = itemStack.getOrDefault(DataComponentRegister.TEAM.get(), (byte) 0);
@@ -117,28 +118,28 @@ public class ScoringDeviceItem extends Item {
             }
             return !p.get(DataComponentRegister.REGION.get()).equals(region);
         };
-        if (pLevel.isClientSide) {
+        if (pLevel.isClientSide()) {
             if (CurrentTeamPayload.currentTeam != team || BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
-                return InteractionResultHolder.fail(itemStack);
+                return InteractionResult.FAIL;
             }
         } else {
-            BSFTeamSavedData savedData = pLevel.getServer().overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(BSFTeamSavedData::new, BSFTeamSavedData::new), "bsf_team");
+            BSFTeamSavedData savedData = pLevel.getServer().overworld().getDataStorage().computeIfAbsent(BSFTeamSavedData.TYPE);
             if (savedData.getTeam(pPlayer.getUUID()) != team) {
-                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_0.tip", BSFColorUtil.getColorTransNameById(team)), false);
-                return InteractionResultHolder.fail(itemStack);
+                pPlayer.sendSystemMessage(Component.translatable("scoring_device_tp_failed1_0.tip", BSFColorUtil.getColorTransNameById(team)));
+                return InteractionResult.FAIL;
             }
             if (BSFCommonUtil.findInventoryItemStack(pPlayer, predicate) != null) {
-                pPlayer.displayClientMessage(Component.translatable("scoring_device_tp_failed1_1.tip"), false);
-                return InteractionResultHolder.fail(itemStack);
+                pPlayer.sendSystemMessage(Component.translatable("scoring_device_tp_failed1_1.tip"));
+                return InteractionResult.FAIL;
             }
         }
         pPlayer.startUsingItem(pUsedHand);
-        return InteractionResultHolder.consume(itemStack);
+        return InteractionResult.CONSUME;
     }
 
     @Override
     public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             Vec3 color = new Vec3(0.9, 0.9, 0.9);
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity, new ForwardRaysParticlesPayload(new ForwardRaysParticlesParas(livingEntity.getPosition(1).add(-0.5, 0, -0.5), livingEntity.getPosition(1).add(0.5, 1, 0.5), color, color.length(), color.length(), 5), BSFParticleType.SPAWN_SNOW.ordinal()));
         }
@@ -149,7 +150,7 @@ public class ScoringDeviceItem extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         Vec3 tpPoint = stack.getOrDefault(DataComponentRegister.TP_POINT.get(), livingEntity.getPosition(1));
-        livingEntity.moveTo(tpPoint);
+        livingEntity.absSnapTo(tpPoint.x, tpPoint.y, tpPoint.z, livingEntity.getYRot(), livingEntity.getXRot());
         livingEntity.playSound(SoundRegister.FORCE_EXECUTOR_START.get(), 3.0F, 1.0F);
         livingEntity.removeAllEffects();
         if (stack.getOrDefault(DataComponentRegister.RANK.get(), 0) < 0) {
@@ -162,22 +163,22 @@ public class ScoringDeviceItem extends Item {
         return 40;
     }
 
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack stack) {
-        return UseAnim.BOW;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack stack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         int rank = stack.getOrDefault(DataComponentRegister.RANK.get(), 0);
         int money = stack.getOrDefault(DataComponentRegister.MONEY.get(), 0);
         int team = stack.getOrDefault(DataComponentRegister.TEAM.get(), (byte) 0);
         RegionData region = stack.getOrDefault(DataComponentRegister.REGION.get(), RegionData.EMPTY);
-        tooltipComponents.add(Component.translatable("scoring_device.tooltip"));
-        tooltipComponents.add(Component.translatable("scoring_device1.tooltip"));
-        tooltipComponents.add(Component.translatable("scoring_device_team.tooltip", BSFColorUtil.getColorTransNameById(team)));
-        tooltipComponents.add(Component.translatable("scoring_device_rank.tooltip", String.valueOf(rank)));
-        tooltipComponents.add(Component.translatable("scoring_device_money.tooltip", String.valueOf(money)));
-        tooltipComponents.add(Component.translatable(
+        tooltipComponents.accept(Component.translatable("scoring_device.tooltip"));
+        tooltipComponents.accept(Component.translatable("scoring_device1.tooltip"));
+        tooltipComponents.accept(Component.translatable("scoring_device_team.tooltip", BSFColorUtil.getColorTransNameById(team)));
+        tooltipComponents.accept(Component.translatable("scoring_device_rank.tooltip", String.valueOf(rank)));
+        tooltipComponents.accept(Component.translatable("scoring_device_money.tooltip", String.valueOf(money)));
+        tooltipComponents.accept(Component.translatable(
                 "scoring_device_region.tooltip",
                 region.start().getX(),
                 region.start().getY(),
@@ -188,3 +189,4 @@ public class ScoringDeviceItem extends Item {
         ));
     }
 }
+

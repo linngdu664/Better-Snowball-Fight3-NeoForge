@@ -12,18 +12,21 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class SnowballTankItem extends Item {
     public SnowballTankItem() {
-        super(new Properties().stacksTo(1).durability(96).rarity(Rarity.UNCOMMON));
+        super(com.linngdu664.bsf.Main.itemProperties().stacksTo(1).durability(96).rarity(Rarity.UNCOMMON));
     }
 
     public SnowballTankItem(Properties properties) {
@@ -31,16 +34,16 @@ public class SnowballTankItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (!pPlayer.getOffhandItem().isEmpty()) {
-            return InteractionResultHolder.pass(itemStack);
+            return InteractionResult.PASS;
         }
         Item item = itemStack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (Items.AIR.equals(item)) {
-            return InteractionResultHolder.pass(itemStack);
+            return InteractionResult.PASS;
         }
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             int damageValue = itemStack.getDamageValue();
             int maxDamage = itemStack.getMaxDamage();
             Inventory inventory = pPlayer.getInventory();
@@ -74,7 +77,7 @@ public class SnowballTankItem extends Item {
             }
             pPlayer.awardStat(Stats.ITEM_USED.get(this));
         }
-        return InteractionResultHolder.success(itemStack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -88,26 +91,20 @@ public class SnowballTankItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Item item = stack.getOrDefault(DataComponentRegister.AMMO_ITEM, ItemData.EMPTY).item();
         if (item instanceof AbstractBSFSnowballItem snowballItem) {
-            snowballItem.generateWeaponTips(tooltipComponents);
-            snowballItem.addMainTips(tooltipComponents);
+            List<Component> components = new ArrayList<>();
+            snowballItem.generateWeaponTips(components);
+            snowballItem.addMainTips(components);
+            components.forEach(tooltipComponents);
         } else {
-            tooltipComponents.add(Component.translatable("snowball_storage_tank.tooltip").withStyle(ChatFormatting.GRAY));
-            tooltipComponents.add(Component.translatable("snowball_storage_tank1.tooltip").withStyle(ChatFormatting.GRAY));
-            tooltipComponents.add(Component.translatable("snowball_storage_tank2.tooltip").withStyle(ChatFormatting.GRAY));
-            tooltipComponents.add(Component.translatable("snowball_storage_tank3.tooltip", Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+            tooltipComponents.accept(Component.translatable("snowball_storage_tank.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltipComponents.accept(Component.translatable("snowball_storage_tank1.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltipComponents.accept(Component.translatable("snowball_storage_tank2.tooltip").withStyle(ChatFormatting.GRAY));
+            tooltipComponents.accept(Component.translatable("snowball_storage_tank3.tooltip", Minecraft.getInstance().options.keyShift.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
-    @Override
-    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
-        return false;
-    }
-
-    @Override
-    public boolean isRepairable(@NotNull ItemStack stack) {
-        return false;
-    }
 }
+

@@ -1,11 +1,13 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "cold_compression_jet_engine_body",
-		"3": "cold_compression_jet_engine_sc_0",
-		"4": "cold_compression_jet_engine_sc_3",
-		"5": "cold_compression_jet_engine_sc_2",
-		"particle": "cold_compression_jet_engine_body"
+		"0": "bsf:item/cold_compression_jet_engine_body",
+		"3": "bsf:item/cold_compression_jet_engine_sc_0",
+		"4": "bsf:item/cold_compression_jet_engine_sc_3",
+		"5": "bsf:item/cold_compression_jet_engine_sc_2",
+		"12": "bsf:item/cold_compression_jet_engine_body",
+		"missing": "bsf:item/cold_compression_jet_engine_body",
+		"particle": "bsf:item/cold_compression_jet_engine_body"
 	},
 	"elements": [
 		{

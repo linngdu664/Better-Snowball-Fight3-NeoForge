@@ -1,15 +1,16 @@
 package com.linngdu664.bsf.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
-public class ProjectileRepulsionExecutorAsh extends TextureSheetParticle {
+public class ProjectileRepulsionExecutorAsh extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected ProjectileRepulsionExecutorAsh(ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, SpriteSet pSprites) {
-        super(pLevel, pX, pY, pZ);
+        super(pLevel, pX, pY, pZ, pSprites.first());
         this.hasPhysics = false;
         this.gravity = 0F;
         this.friction = 0.9345794F;
@@ -26,8 +27,8 @@ public class ProjectileRepulsionExecutorAsh extends TextureSheetParticle {
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected @NotNull Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
     @Override
@@ -37,8 +38,8 @@ public class ProjectileRepulsionExecutorAsh extends TextureSheetParticle {
         scale(1.0204f);
     }
     @Override
-    public int getLightColor(float partialTick) {
-        return super.getLightColor(partialTick)|112;
+    public int getLightCoords(float partialTick) {
+        return super.getLightCoords(partialTick)|112;
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
@@ -48,7 +49,7 @@ public class ProjectileRepulsionExecutorAsh extends TextureSheetParticle {
             this.sprites = pSprites;
         }
 
-        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        public Particle createParticle(@NotNull SimpleParticleType pType, @NotNull ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed, RandomSource random) {
             return new ProjectileRepulsionExecutorAsh(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed, this.sprites);
         }
     }

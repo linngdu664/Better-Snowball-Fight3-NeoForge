@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 
 public class RegionControllerViewItem extends BlockItem {
     public RegionControllerViewItem() {
-        super(BlockRegister.REGION_CONTROLLER_VIEW.get(), new Properties().rarity(Rarity.UNCOMMON));
+        super(BlockRegister.REGION_CONTROLLER_VIEW.get(), com.linngdu664.bsf.Main.itemProperties().rarity(Rarity.UNCOMMON));
     }
 
     @Override
@@ -23,17 +23,18 @@ public class RegionControllerViewItem extends BlockItem {
         Player player = context.getPlayer();
         Level level = context.getLevel();
         if (!itemStack.has(DataComponentRegister.BIND_POS)) {
-            if (!level.isClientSide) {
-                player.displayClientMessage(Component.literal("No binding"), false);
+            if (!level.isClientSide()) {
+                player.sendSystemMessage(Component.literal("No binding"));
             }
             return InteractionResult.FAIL;
         }
         InteractionResult result = super.place(context);
-        if (result != InteractionResult.FAIL && !level.isClientSide && level.getBlockEntity(context.getClickedPos()) instanceof RegionControllerViewBlockEntity be) {
-            // 设置方块实体绑定
+        if (result != InteractionResult.FAIL && !level.isClientSide() && level.getBlockEntity(context.getClickedPos()) instanceof RegionControllerViewBlockEntity be) {
+            // 璁剧疆鏂瑰潡瀹炰綋缁戝畾
             be.setControllerBlockPos(itemStack.get(DataComponentRegister.BIND_POS));
             be.setChanged();
         }
         return result;
     }
 }
+

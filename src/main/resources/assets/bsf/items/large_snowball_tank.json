@@ -1,0 +1,236 @@
+{
+    "model":  {
+                  "type":  "minecraft:range_dispatch",
+                  "property":  "bsf:snowball",
+                  "entries":  [
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_compacted_snowball_tank"
+                                                },
+                                      "threshold":  0
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_cherry_blossom_snowball_tank"
+                                                },
+                                      "threshold":  1
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_stone_snowball_tank"
+                                                },
+                                      "threshold":  2
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_glass_snowball_tank"
+                                                },
+                                      "threshold":  3
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_ice_snowball_tank"
+                                                },
+                                      "threshold":  4
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_iron_snowball_tank"
+                                                },
+                                      "threshold":  5
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_gold_snowball_tank"
+                                                },
+                                      "threshold":  6
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_obsidian_snowball_tank"
+                                                },
+                                      "threshold":  7
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_explosive_snowball_tank"
+                                                },
+                                      "threshold":  8
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_spectral_snowball_tank"
+                                                },
+                                      "threshold":  9
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_powder_snowball_tank"
+                                                },
+                                      "threshold":  10
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_frozen_snowball_tank"
+                                                },
+                                      "threshold":  11
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_critical_frozen_snowball_tank"
+                                                },
+                                      "threshold":  12
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_ender_snowball_tank"
+                                                },
+                                      "threshold":  13
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_thrust_snowball_tank"
+                                                },
+                                      "threshold":  14
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_subspace_snowball_tank"
+                                                },
+                                      "threshold":  15
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_ghost_snowball_tank"
+                                                },
+                                      "threshold":  16
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_expansion_snowball_tank"
+                                                },
+                                      "threshold":  17
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_reconstruct_snowball_tank"
+                                                },
+                                      "threshold":  18
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_impulse_snowball_tank"
+                                                },
+                                      "threshold":  19
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_black_hole_snowball_tank"
+                                                },
+                                      "threshold":  20
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_monster_gravity_snowball_tank"
+                                                },
+                                      "threshold":  21
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_monster_repulsion_snowball_tank"
+                                                },
+                                      "threshold":  22
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_projectile_gravity_snowball_tank"
+                                                },
+                                      "threshold":  23
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_projectile_repulsion_snowball_tank"
+                                                },
+                                      "threshold":  24
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_light_monster_tracking_snowball_tank"
+                                                },
+                                      "threshold":  25
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_heavy_monster_tracking_snowball_tank"
+                                                },
+                                      "threshold":  26
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_explosive_monster_tracking_snowball_tank"
+                                                },
+                                      "threshold":  27
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_light_player_tracking_snowball_tank"
+                                                },
+                                      "threshold":  28
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_heavy_player_tracking_snowball_tank"
+                                                },
+                                      "threshold":  29
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_explosive_player_tracking_snowball_tank"
+                                                },
+                                      "threshold":  30
+                                  },
+                                  {
+                                      "model":  {
+                                                    "type":  "minecraft:model",
+                                                    "model":  "bsf:item/large_icicle_snowball_tank"
+                                                },
+                                      "threshold":  31
+                                  }
+                              ],
+                  "fallback":  {
+                                   "type":  "minecraft:model",
+                                   "model":  "bsf:item/large_snowball_tank"
+                               }
+              }
+}

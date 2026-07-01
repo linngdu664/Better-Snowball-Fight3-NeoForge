@@ -19,7 +19,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -43,7 +43,7 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (!isCaught) {
                 Vec3 location = BSFCommonUtil.getRealHitPosOnMoveVecWithHitResult(this, pResult);
                 List<Entity> list = level.getEntitiesOfClass(Entity.class, new AABB(location, location).inflate(4), EntitySelector.NO_SPECTATORS);
@@ -59,7 +59,7 @@ public class ImpulseSnowballEntity extends AbstractBSFSnowballEntity {
     public void tick() {
         super.tick();
         Level level = level();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             List<Projectile> list = level.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(2), p -> !this.equals(p));
             if (!list.isEmpty()) {
                 List<Entity> list1 = level.getEntitiesOfClass(Entity.class, getBoundingBox().inflate(4), EntitySelector.NO_SPECTATORS);

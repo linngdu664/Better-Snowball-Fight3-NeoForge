@@ -4,6 +4,7 @@ import com.linngdu664.bsf.registry.BlockEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -11,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class VendingMachineBlockEntity extends BlockEntity {
     // all these fields are sync to client
@@ -24,27 +27,27 @@ public class VendingMachineBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        goods = ItemStack.parseOptional(registries, tag.getCompound("Goods"));
-        minRank = tag.getInt("MinRank");
-        price = tag.getInt("Price");
-        canSell = tag.getBoolean("CanSell");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        goods = input.read("Goods", ItemStack.OPTIONAL_CODEC).orElse(Items.AIR.getDefaultInstance());
+        minRank = input.getIntOr("MinRank", 0);
+        price = input.getIntOr("Price", 0);
+        canSell = input.getBooleanOr("CanSell", false);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("Goods", goods.saveOptional(registries));
-        tag.putInt("MinRank", minRank);
-        tag.putInt("Price", price);
-        tag.putBoolean("CanSell", canSell);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store("Goods", ItemStack.OPTIONAL_CODEC, goods);
+        output.putInt("MinRank", minRank);
+        output.putInt("Price", price);
+        output.putBoolean("CanSell", canSell);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        tag.put("Goods", goods.saveOptional(registries));
+        tag.store("Goods", ItemStack.OPTIONAL_CODEC, registries.createSerializationContext(NbtOps.INSTANCE), goods);
         tag.putInt("MinRank", minRank);
         tag.putInt("Price", price);
         tag.putBoolean("CanSell", canSell);
@@ -52,12 +55,12 @@ public class VendingMachineBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
-        super.handleUpdateTag(tag, lookupProvider);
-        goods = ItemStack.parseOptional(lookupProvider, tag.getCompound("Goods"));
-        minRank = tag.getInt("MinRank");
-        price = tag.getInt("Price");
-        canSell = tag.getBoolean("CanSell");
+    public void handleUpdateTag(ValueInput tag) {
+        super.handleUpdateTag(tag);
+        goods = tag.read("Goods", ItemStack.OPTIONAL_CODEC).orElse(Items.AIR.getDefaultInstance());
+        minRank = tag.getIntOr("MinRank", 0);
+        price = tag.getIntOr("Price", 0);
+        canSell = tag.getBooleanOr("CanSell", false);
     }
 
     @Override

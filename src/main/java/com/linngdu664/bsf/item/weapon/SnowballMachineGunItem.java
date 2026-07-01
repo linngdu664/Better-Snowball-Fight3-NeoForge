@@ -16,16 +16,19 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_NEXT;
 import static com.linngdu664.bsf.event.ClientModEvents.CYCLE_MOVE_AMMO_PREV;
@@ -76,7 +79,7 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
+    public @NotNull InteractionResult use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
         ammo = getAmmo(pPlayer, stack);
         if (ammo != null && !pPlayer.hasEffect(EffectRegister.WEAPON_JAM) && !stack.getOrDefault(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, false)) {
@@ -90,9 +93,9 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
                 stack.set(DataComponentRegister.MACHINE_GUN_TIMER, (timer / 3 + 1) * 3);     // ceil to multiple of 3
             }
             pPlayer.startUsingItem(pUsedHand);
-            return InteractionResultHolder.consume(stack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail(stack);
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -102,17 +105,17 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
             if (timer >= 360) {
                 player.playSound(SoundRegister.MACHINE_GUN_COOLING.get(), 3.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
                 pStack.set(DataComponentRegister.MACHINE_GUN_IS_COOL_DOWN, true);
-                this.releaseUsing(pStack, pLevel, player, pRemainingUseDuration);
+                pStack.releaseUsing(pLevel, player, pRemainingUseDuration);
                 return;
             } else if (ammo == null || ammo.isEmpty() || !ammo.has(DataComponentRegister.AMMO_ITEM) || player.hasEffect(EffectRegister.WEAPON_JAM)) {
-                this.releaseUsing(pStack, pLevel, player, pRemainingUseDuration);
+                pStack.releaseUsing(pLevel, player, pRemainingUseDuration);
                 return;
             }
             float pitch = player.getXRot();
             float yaw = player.getYRot();
             if (timer % 9 == 0 && (!isExplosive || timer % 36 == 0)) {
                 Vec3 cameraVec = Vec3.directionFromRotation(pitch, yaw);
-                if (pLevel.isClientSide) {
+                if (pLevel.isClientSide()) {
                     // add push
                     player.push(-cameraVec.x * recoil * 0.25, -cameraVec.y * recoil * 0.25, -cameraVec.z * recoil * 0.25);
                 } else {
@@ -124,7 +127,7 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
                     ((ServerLevel) pLevel).sendParticles(ParticleTypes.SNOWFLAKE, player.getX() + cameraVec.x, player.getEyeY() + cameraVec.y, player.getZ() + cameraVec.z, 4, 0, 0, 0, 0.32);
                     // handle ammo consume and damage weapon.
                     consumeAmmo(ammo, player);
-                    pStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
+                    pStack.hurtAndBreak(1, player, player.getUsedItemHand());
                 }
             }
             // set pitch according to recoil.
@@ -136,16 +139,18 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, int pTimeCharged) {
+    public boolean releaseUsing(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull LivingEntity pLivingEntity, int pTimeCharged) {
         if (pLivingEntity instanceof Player player) {
             player.stopUsingItem();
             player.awardStat(Stats.ITEM_USED.get(this));
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
-        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
+    public void inventoryTick(@NotNull ItemStack pStack, @NotNull ServerLevel pLevel, @NotNull Entity pEntity, @Nullable EquipmentSlot pSlot) {
+        super.inventoryTick(pStack, pLevel, pEntity, pSlot);
         if (pEntity instanceof Player player && !pStack.equals(player.getUseItem())) {
             int timer = pStack.getOrDefault(DataComponentRegister.MACHINE_GUN_TIMER, 0);
             if (timer > 0) {
@@ -160,8 +165,8 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
-        return UseAnim.BOW;
+    public @NotNull ItemUseAnimation getUseAnimation(@NotNull ItemStack pStack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
@@ -180,9 +185,10 @@ public class SnowballMachineGunItem extends AbstractBSFWeaponItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("snowball_machine_gun1.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("snowball_machine_gun2.tooltip").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.accept(Component.translatable("snowball_machine_gun1.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("snowball_machine_gun2.tooltip").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.accept(Component.translatable("guns2.tooltip", CYCLE_MOVE_AMMO_PREV.getTranslatedKeyMessage(), CYCLE_MOVE_AMMO_NEXT.getTranslatedKeyMessage()).withStyle(ChatFormatting.DARK_GRAY));
     }
 }
+

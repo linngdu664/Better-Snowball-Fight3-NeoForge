@@ -5,18 +5,22 @@ import com.linngdu664.bsf.entity.snowball.util.ILaunchAdjustment;
 import com.linngdu664.bsf.item.component.RegionData;
 import com.linngdu664.bsf.registry.EntityRegister;
 import com.linngdu664.bsf.registry.ItemRegister;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity {
     private static final int GENERATING_DISTANCE = 1;
@@ -37,30 +41,28 @@ public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.addAdditionalSaveData(pCompound);
-        pCompound.putInt("Timer", timer);
+    protected void addAdditionalSaveData(@NotNull ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("Timer", timer);
         long[] tmpArr = new long[POS_NUM];
         for (int i = 0; i < POS_NUM && passingPosArr[i] != null; i++) {
             tmpArr[i] = passingPosArr[i].asLong();
         }
-        pCompound.putLongArray("PassingPosArr", tmpArr);
+        output.store("PassingPosArr", Codec.LONG_STREAM, Arrays.stream(tmpArr));
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
-        super.readAdditionalSaveData(pCompound);
-        timer = pCompound.getInt("Timer");
-        long[] tmpArr = pCompound.getLongArray("PassingPosArr");
-        for (long l : tmpArr) {
-            allBlock.push(BlockPos.of(l));
-        }
+    protected void readAdditionalSaveData(@NotNull ValueInput input) {
+        super.readAdditionalSaveData(input);
+        timer = input.getIntOr("Timer", 0);
+        input.read("PassingPosArr", Codec.LONG_STREAM)
+                .ifPresent(tmpStream -> tmpStream.forEach(longBlockPos -> allBlock.push(BlockPos.of(longBlockPos))));
     }
 
     @Override
     protected void onHitBlock(@NotNull BlockHitResult result) {
         Level level = level();
-        if (!level.isClientSide && !(posIsLooseSnow(level, result.getBlockPos()))) {
+        if (!level.isClientSide() && !(posIsLooseSnow(level, result.getBlockPos()))) {
             if (!inBlockDuration) {
                 startTimingOfDiscard();
             }
@@ -79,7 +81,7 @@ public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity
         if (timer % GROWTH_CONSTRAINT == 0) {
             handleSetBlock(level);
         }
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             posArrMove(new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getY()), Mth.floor(this.getZ())));
         }
         timer++;
@@ -172,7 +174,7 @@ public class ReconstructSnowballEntity extends AbstractSnowStorageSnowballEntity
 
     protected void tryPlaceLooseSnowBlock(Level level, BlockPos blockPos) {
         if (snowStock > 0) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 if (posIsLooseSnow(level, blockPos) || level.getBlockState(blockPos).canBeReplaced()) {
                     placeAndRecordBlock(level, blockPos);
                     level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundEvents.SNOW_PLACE, SoundSource.NEUTRAL, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);

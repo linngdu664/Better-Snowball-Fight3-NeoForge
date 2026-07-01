@@ -482,6 +482,7 @@
   "region_player_inspector_item_kick.tip": "[BSF Anti Cheat] You have been kicked out of the region. Reason: Carrying prohibited items.",
   "region_player_inspector_team_kick.tip": "[BSF Anti Cheat] You have been kicked out of the region. Reason: Current team does not meet the requirements.",
 
+  "item.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.smart_snow_block": "Smart Snow Block",
   "block.bsf.loose_snow_block": "Loose Snow Block",
   "block.bsf.critical_snow": "Critical Snow",

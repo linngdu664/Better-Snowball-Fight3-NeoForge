@@ -25,7 +25,7 @@ public class MonsterRepulsionExecutor extends AbstractFixedForceExecutor {
     public void tick() {
         super.tick();
         Level level = level();
-        if (level.isClientSide && getTimer() < getMaxTime() - 59) {
+        if (level.isClientSide() && getTimer() < getMaxTime() - 59) {
             ParticleUtil.spawnSphereDiffusionParticles(level, ParticleRegister.MONSTER_REPULSION_EXECUTOR_ASH.get(), this.getPosition(0), 40, 1.066864);
         }
     }

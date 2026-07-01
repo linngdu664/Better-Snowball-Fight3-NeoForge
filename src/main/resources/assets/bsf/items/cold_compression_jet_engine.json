@@ -1,0 +1,1593 @@
+{
+  "oversized_in_gui": true,
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "bsf:sc_starting",
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:range_dispatch",
+          "property": "bsf:sc_xxx",
+          "entries": [
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_1"
+              },
+              "threshold": 0.01
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_2"
+              },
+              "threshold": 0.02
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_3"
+              },
+              "threshold": 0.03
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_4"
+              },
+              "threshold": 0.04
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_5"
+              },
+              "threshold": 0.05
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_6"
+              },
+              "threshold": 0.06
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_7"
+              },
+              "threshold": 0.07
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_8"
+              },
+              "threshold": 0.08
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_9"
+              },
+              "threshold": 0.09
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_10"
+              },
+              "threshold": 0.1
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_11"
+              },
+              "threshold": 0.11
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_12"
+              },
+              "threshold": 0.12
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_13"
+              },
+              "threshold": 0.13
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_14"
+              },
+              "threshold": 0.14
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_15"
+              },
+              "threshold": 0.15
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_16"
+              },
+              "threshold": 0.16
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_17"
+              },
+              "threshold": 0.17
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_18"
+              },
+              "threshold": 0.18
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_19"
+              },
+              "threshold": 0.19
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_20"
+              },
+              "threshold": 0.2
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_21"
+              },
+              "threshold": 0.21
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_22"
+              },
+              "threshold": 0.22
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_23"
+              },
+              "threshold": 0.23
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_24"
+              },
+              "threshold": 0.24
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_25"
+              },
+              "threshold": 0.25
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_26"
+              },
+              "threshold": 0.26
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_27"
+              },
+              "threshold": 0.27
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_28"
+              },
+              "threshold": 0.28
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_29"
+              },
+              "threshold": 0.29
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_30"
+              },
+              "threshold": 0.3
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_31"
+              },
+              "threshold": 0.31
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_32"
+              },
+              "threshold": 0.32
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_33"
+              },
+              "threshold": 0.33
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_34"
+              },
+              "threshold": 0.34
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_35"
+              },
+              "threshold": 0.35
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_36"
+              },
+              "threshold": 0.36
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_37"
+              },
+              "threshold": 0.37
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_38"
+              },
+              "threshold": 0.38
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_39"
+              },
+              "threshold": 0.39
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_40"
+              },
+              "threshold": 0.4
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_41"
+              },
+              "threshold": 0.41
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_42"
+              },
+              "threshold": 0.42
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_43"
+              },
+              "threshold": 0.43
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_44"
+              },
+              "threshold": 0.44
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_45"
+              },
+              "threshold": 0.45
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_46"
+              },
+              "threshold": 0.46
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_47"
+              },
+              "threshold": 0.47
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_48"
+              },
+              "threshold": 0.48
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_49"
+              },
+              "threshold": 0.49
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_50"
+              },
+              "threshold": 0.5
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_51"
+              },
+              "threshold": 0.51
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_52"
+              },
+              "threshold": 0.52
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_53"
+              },
+              "threshold": 0.53
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_54"
+              },
+              "threshold": 0.54
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_55"
+              },
+              "threshold": 0.55
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_56"
+              },
+              "threshold": 0.56
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_57"
+              },
+              "threshold": 0.57
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_58"
+              },
+              "threshold": 0.58
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_59"
+              },
+              "threshold": 0.59
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_60"
+              },
+              "threshold": 0.6
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_61"
+              },
+              "threshold": 0.61
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_62"
+              },
+              "threshold": 0.62
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_63"
+              },
+              "threshold": 0.63
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_64"
+              },
+              "threshold": 0.64
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_65"
+              },
+              "threshold": 0.65
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_66"
+              },
+              "threshold": 0.66
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_67"
+              },
+              "threshold": 0.67
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_68"
+              },
+              "threshold": 0.68
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_69"
+              },
+              "threshold": 0.69
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_70"
+              },
+              "threshold": 0.7
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_71"
+              },
+              "threshold": 0.71
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_72"
+              },
+              "threshold": 0.72
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_73"
+              },
+              "threshold": 0.73
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_74"
+              },
+              "threshold": 0.74
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_75"
+              },
+              "threshold": 0.75
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_76"
+              },
+              "threshold": 0.76
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_77"
+              },
+              "threshold": 0.77
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_78"
+              },
+              "threshold": 0.78
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_79"
+              },
+              "threshold": 0.79
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_80"
+              },
+              "threshold": 0.8
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_81"
+              },
+              "threshold": 0.81
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_82"
+              },
+              "threshold": 0.82
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_83"
+              },
+              "threshold": 0.83
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_84"
+              },
+              "threshold": 0.84
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_85"
+              },
+              "threshold": 0.85
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_86"
+              },
+              "threshold": 0.86
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_87"
+              },
+              "threshold": 0.87
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_88"
+              },
+              "threshold": 0.88
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_89"
+              },
+              "threshold": 0.89
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_90"
+              },
+              "threshold": 0.9
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_91"
+              },
+              "threshold": 0.91
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_92"
+              },
+              "threshold": 0.92
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_93"
+              },
+              "threshold": 0.93
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_94"
+              },
+              "threshold": 0.94
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_95"
+              },
+              "threshold": 0.95
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_96"
+              },
+              "threshold": 0.96
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_97"
+              },
+              "threshold": 0.97
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_98"
+              },
+              "threshold": 0.98
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_99"
+              },
+              "threshold": 0.99
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/scs_100"
+              },
+              "threshold": 1.0
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "bsf:item/cold_compression_jet_engine_sc/scs_0"
+          }
+        },
+        "threshold": 0
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_1"
+        },
+        "threshold": 0.05
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_2"
+        },
+        "threshold": 0.1
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_3"
+        },
+        "threshold": 0.14
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_4"
+        },
+        "threshold": 0.19
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_5"
+        },
+        "threshold": 0.24
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_6"
+        },
+        "threshold": 0.29
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_7"
+        },
+        "threshold": 0.33
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_8"
+        },
+        "threshold": 0.38
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_9"
+        },
+        "threshold": 0.43
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_10"
+        },
+        "threshold": 0.48
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_11"
+        },
+        "threshold": 0.52
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_12"
+        },
+        "threshold": 0.57
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_13"
+        },
+        "threshold": 0.62
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_14"
+        },
+        "threshold": 0.67
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_15"
+        },
+        "threshold": 0.71
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_16"
+        },
+        "threshold": 0.76
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_17"
+        },
+        "threshold": 0.81
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_18"
+        },
+        "threshold": 0.86
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_19"
+        },
+        "threshold": 0.9
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_20"
+        },
+        "threshold": 0.95
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scx_21"
+        },
+        "threshold": 1
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bsf:item/cold_compression_jet_engine_sc/scw"
+        },
+        "threshold": 1.05
+      },
+      {
+        "model": {
+          "type": "minecraft:range_dispatch",
+          "property": "bsf:sc_xxx",
+          "entries": [
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_1"
+              },
+              "threshold": 0.01
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_2"
+              },
+              "threshold": 0.02
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_3"
+              },
+              "threshold": 0.03
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_4"
+              },
+              "threshold": 0.04
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_5"
+              },
+              "threshold": 0.05
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_6"
+              },
+              "threshold": 0.06
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_7"
+              },
+              "threshold": 0.07
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_8"
+              },
+              "threshold": 0.08
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_9"
+              },
+              "threshold": 0.09
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_10"
+              },
+              "threshold": 0.1
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_11"
+              },
+              "threshold": 0.11
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_12"
+              },
+              "threshold": 0.12
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_13"
+              },
+              "threshold": 0.13
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_14"
+              },
+              "threshold": 0.14
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_15"
+              },
+              "threshold": 0.15
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_16"
+              },
+              "threshold": 0.16
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_17"
+              },
+              "threshold": 0.17
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_18"
+              },
+              "threshold": 0.18
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_19"
+              },
+              "threshold": 0.19
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_20"
+              },
+              "threshold": 0.2
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_21"
+              },
+              "threshold": 0.21
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_22"
+              },
+              "threshold": 0.22
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_23"
+              },
+              "threshold": 0.23
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_24"
+              },
+              "threshold": 0.24
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_25"
+              },
+              "threshold": 0.25
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_26"
+              },
+              "threshold": 0.26
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_27"
+              },
+              "threshold": 0.27
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_28"
+              },
+              "threshold": 0.28
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_29"
+              },
+              "threshold": 0.29
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_30"
+              },
+              "threshold": 0.3
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_31"
+              },
+              "threshold": 0.31
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_32"
+              },
+              "threshold": 0.32
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_33"
+              },
+              "threshold": 0.33
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_34"
+              },
+              "threshold": 0.34
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_35"
+              },
+              "threshold": 0.35
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_36"
+              },
+              "threshold": 0.36
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_37"
+              },
+              "threshold": 0.37
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_38"
+              },
+              "threshold": 0.38
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_39"
+              },
+              "threshold": 0.39
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_40"
+              },
+              "threshold": 0.4
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_41"
+              },
+              "threshold": 0.41
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_42"
+              },
+              "threshold": 0.42
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_43"
+              },
+              "threshold": 0.43
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_44"
+              },
+              "threshold": 0.44
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_45"
+              },
+              "threshold": 0.45
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_46"
+              },
+              "threshold": 0.46
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_47"
+              },
+              "threshold": 0.47
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_48"
+              },
+              "threshold": 0.48
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_49"
+              },
+              "threshold": 0.49
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_50"
+              },
+              "threshold": 0.5
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_51"
+              },
+              "threshold": 0.51
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_52"
+              },
+              "threshold": 0.52
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_53"
+              },
+              "threshold": 0.53
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_54"
+              },
+              "threshold": 0.54
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_55"
+              },
+              "threshold": 0.55
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_56"
+              },
+              "threshold": 0.56
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_57"
+              },
+              "threshold": 0.57
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_58"
+              },
+              "threshold": 0.58
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_59"
+              },
+              "threshold": 0.59
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_60"
+              },
+              "threshold": 0.6
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_61"
+              },
+              "threshold": 0.61
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_62"
+              },
+              "threshold": 0.62
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_63"
+              },
+              "threshold": 0.63
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_64"
+              },
+              "threshold": 0.64
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_65"
+              },
+              "threshold": 0.65
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_66"
+              },
+              "threshold": 0.66
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_67"
+              },
+              "threshold": 0.67
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_68"
+              },
+              "threshold": 0.68
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_69"
+              },
+              "threshold": 0.69
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_70"
+              },
+              "threshold": 0.7
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_71"
+              },
+              "threshold": 0.71
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_72"
+              },
+              "threshold": 0.72
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_73"
+              },
+              "threshold": 0.73
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_74"
+              },
+              "threshold": 0.74
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_75"
+              },
+              "threshold": 0.75
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_76"
+              },
+              "threshold": 0.76
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_77"
+              },
+              "threshold": 0.77
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_78"
+              },
+              "threshold": 0.78
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_79"
+              },
+              "threshold": 0.79
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_80"
+              },
+              "threshold": 0.8
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_81"
+              },
+              "threshold": 0.81
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_82"
+              },
+              "threshold": 0.82
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_83"
+              },
+              "threshold": 0.83
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_84"
+              },
+              "threshold": 0.84
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_85"
+              },
+              "threshold": 0.85
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_86"
+              },
+              "threshold": 0.86
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_87"
+              },
+              "threshold": 0.87
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_88"
+              },
+              "threshold": 0.88
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_89"
+              },
+              "threshold": 0.89
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_90"
+              },
+              "threshold": 0.9
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_91"
+              },
+              "threshold": 0.91
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_92"
+              },
+              "threshold": 0.92
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_93"
+              },
+              "threshold": 0.93
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_94"
+              },
+              "threshold": 0.94
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_95"
+              },
+              "threshold": 0.95
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_96"
+              },
+              "threshold": 0.96
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_97"
+              },
+              "threshold": 0.97
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_98"
+              },
+              "threshold": 0.98
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_99"
+              },
+              "threshold": 0.99
+            },
+            {
+              "model": {
+                "type": "minecraft:model",
+                "model": "bsf:item/cold_compression_jet_engine_sc/sc_100"
+              },
+              "threshold": 1.0
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "bsf:item/cold_compression_jet_engine_sc/sc_0"
+          }
+        },
+        "threshold": 2
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "bsf:item/cold_compression_jet_engine"
+    }
+  }
+}

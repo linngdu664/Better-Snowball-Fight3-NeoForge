@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -39,7 +39,7 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
     @Override
     protected void onHit(@NotNull HitResult pResult) {
         super.onHit(pResult);
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             this.discard();
         }
     }
@@ -50,9 +50,9 @@ public class GPSSnowballEntity extends AbstractBSFSnowballEntity {
         if (!isCaught && pResult.getEntity() instanceof LivingEntity livingEntity && targetLocator != null) {
             targetLocator.set(DataComponentRegister.TARGET_UUID, new UuidData(livingEntity.getUUID()));
             if (getOwner() instanceof Player player) {
-//                player.displayClientMessage(MutableComponent.create(new TranslatableContents("target.tip", null, new Object[0])).append(livingEntity.getName().getString() + " UUID:" + livingEntity.getUUID()), false);
+//                player.sendSystemMessage(MutableComponent.create(new TranslatableContents("target.tip", null, new Object[0])).append(livingEntity.getName().getString() + " UUID:" + livingEntity.getUUID()));
                 if (pResult.getEntity() instanceof Player player1) {
-                    player1.displayClientMessage(MutableComponent.create(new TranslatableContents("targeted.tip", null, new Object[]{})), false);
+                    player1.sendSystemMessage(MutableComponent.create(new TranslatableContents("targeted.tip", null, new Object[]{})));
                 }
                 level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.7F, 1.0F / (level().getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
             }
